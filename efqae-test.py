@@ -5,11 +5,10 @@ from qibo.models import Circuit
 from qibo import hamiltonians, gates, models, matrices
 from qibo.hamiltonians import Hamiltonian
 from scipy.optimize import minimize
-from sklearn.datasets import load_digits
 import argparse
 
 
-def main(layers, autoencoder, example):
+def main(layers, autoencoder):
     
     def encoder_hamiltonian_simple(nqubits, ncompress):
         """Creates the encoding Hamiltonian.
@@ -83,6 +82,7 @@ def main(layers, autoencoder, example):
                 Value of the cost function.
             """                    
             cost = 0
+            # The following two lines are what makes this a QAE: Quantum circuit needs to update angles
             circuit.set_parameters(params) # this will change all thetas to the appropriate values
             for i in range(len(ising_groundstates)):
                 final_state = circuit.execute(np.copy(ising_groundstates[i]))
@@ -100,7 +100,7 @@ def main(layers, autoencoder, example):
         initial_params = np.random.uniform(0, 2*np.pi, nparams)
     
         result = minimize(cost_function_QAE_Ising, initial_params,
-                          args=(count), method='BFGS', options={'maxiter': 5.0e4})
+                          args=(count), method='BFGS', options={'maxiter': 1.0e4}) # 5.0e4 is set in the example
                           
     # There's a choice of two autoencoders, 1 = the QAE (supposed to be not as good), 0= EF-QAE       
     elif autoencoder == 0:
@@ -133,6 +133,7 @@ def main(layers, autoencoder, example):
                 Value of the cost function.
             """                                                               
             cost = 0
+            # The following two lines are what makes this an EF-QAE: New angles are suggested via "rotate" and the circuit set externally
             for i in range(len(ising_groundstates)):
                 newparams = rotate(params, lambdas[i])
                 circuit.set_parameters(newparams)
@@ -152,7 +153,7 @@ def main(layers, autoencoder, example):
         initial_params = np.random.uniform(0, 2*np.pi, nparams)
     
         result = minimize(cost_function_EF_QAE_Ising, initial_params,
-                          args=(count), method='BFGS', options={'maxiter': 5.0e4})
+                          args=(count), method='BFGS', options={'maxiter': 1.0e4}) # 5.0e4 is set in the example
         
     else:
         raise ValueError("You have to introduce a value of 0 or 1 in the autoencoder argument.")
@@ -167,6 +168,5 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--layers", default=3, type=int, help='(int): number of ansatz layers')
     parser.add_argument("--autoencoder", default=0, type=int, help='(int): 0 to run the EF-QAE or 1 to run the QAE')
-    parser.add_argument("--example", default=0, type=int, help='(int): 0 to run Ising model example or 1 to run the Handwritten digits example')
     args = parser.parse_args()
     main(**vars(args))
