@@ -8,7 +8,7 @@ from scipy.optimize import minimize
 import argparse
 
 
-def main(layers, autoencoder, nlambda):
+def main(layers, autoencoder, nlambda, ncompress):
     
     def encoder_hamiltonian_simple(nqubits, ncompress):
         """Creates the encoding Hamiltonian.
@@ -42,21 +42,21 @@ def main(layers, autoencoder, nlambda):
 
     # open some files
     if autoencoder == 1:
-        outf_ising_in   = open("ising.QAE.ly{}.nlb{}.in".format(layers,nlambda), "w")
-        outf_ising_mid  = open("ising.QAE.ly{}.nlb{}.mid".format(layers,nlambda), "w")
-        outf_ising_out  = open("ising.QAE.ly{}.nlb{}.out".format(layers,nlambda), "w")
-        outf_loss_out   = open("loss.QAE.ly{}.nlb{}.dat".format(layers,nlambda), "w")
+        outf_ising_in   = open("ising.QAE.ly{}.nlb{}.ncp{}.in".format(layers,nlambda,ncompress), "w")
+        outf_ising_mid  = open("ising.QAE.ly{}.nlb{}.ncp{}.mid".format(layers,nlambda,ncompress), "w")
+        outf_ising_out  = open("ising.QAE.ly{}.nlb{}.ncp{}.out".format(layers,nlambda,ncompress), "w")
+        outf_loss_out   = open("loss.QAE.ly{}.nlb{}.ncp{}.dat".format(layers,nlambda,ncompress), "w")
     if autoencoder == 0:
-        outf_ising_in   = open("ising.EF-QAE.ly{}.nlb{}.in".format(layers,nlambda), "w")
-        outf_ising_mid  = open("ising.EF-QAE.ly{}.nlb{}.mid".format(layers,nlambda), "w")
-        outf_ising_out  = open("ising.EF-QAE.ly{}.nlb{}.out".format(layers,nlambda), "w")
-        outf_loss_out   = open("loss.EF-QAE.ly{}.nlb{}.dat".format(layers,nlambda), "w")
+        outf_ising_in   = open("ising.EF-QAE.ly{}.nlb{}.ncp{}.in".format(layers,nlambda,ncompress), "w")
+        outf_ising_mid  = open("ising.EF-QAE.ly{}.nlb{}.ncp{}.mid".format(layers,nlambda,ncompress), "w")
+        outf_ising_out  = open("ising.EF-QAE.ly{}.nlb{}.ncp{}.out".format(layers,nlambda,ncompress), "w")
+        outf_loss_out   = open("loss.EF-QAE.ly{}.nlb{}.ncp{}.dat".format(layers,nlambda,ncompress), "w")
         
 
     # some variables, goal: compress 2 qubits from 6 qubit input    
     cost_function_steps = []
     nqubits = 6
-    compress = 2
+    compress = ncompress
     nstop = 8000 # stop the calculation after a given set of iterations
     encoder = encoder_hamiltonian_simple(nqubits, compress) 
     count = [0]
@@ -208,5 +208,6 @@ if __name__ == "__main__":
     parser.add_argument("--layers", default=3, type=int, help='(int): number of ansatz layers')
     parser.add_argument("--autoencoder", default=0, type=int, help='(int): 0 to run the EF-QAE or 1 to run the QAE')
     parser.add_argument("--nlambda", default=20, type=int, help='(int): number if Ising lambda (couplings) between 0.5 and 1.0')
+    parser.add_argument("--ncompress", default=2, type=int, help='(int): number if qubits to compress to, max=6')
     args = parser.parse_args()
     main(**vars(args))
