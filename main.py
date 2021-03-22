@@ -86,15 +86,20 @@ def GetRapidity(init, event):
         raise AssertionError("Input file is not an Event")
 
 
-def main():
-    init = readInit('data/ppttbar_10k_events.lhe')
-    evs = list(readEvent('data/ppttbar_10k_events.lhe'))
+def load_events(filename):
+    init = readInit(filename)
+    evs = list(readEvent(filename))
 
     invar = np.zeros((len(evs),3))
     for ev in range(len(evs)):
          invar[ev, 0] = GetEnergySquared(evs[ev])
          invar[ev, 1] = GetMandelT(evs[ev])
          invar[ev, 2] = GetRapidity(init, evs[ev])
+    return invar
+
+
+def main():
+    invar = load_events('data/ppttbar_10k_events.lhe')
 
     # debug plot
     bins = [np.arange(0, 1e6, 1e4), np.arange(-1e6, 0, 1e4), np.arange(-3.5, 3.5, 0.1)]
