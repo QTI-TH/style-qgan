@@ -12,3 +12,5 @@ Quantum Generative MC
 - [Classical GAN](https://github.com/luigifvr/tesi/tree/master/dcgan)
 
 - [PernnyLane GAN](https://pennylane.ai/qml/demos/tutorial_QGAN.html)
+
+- [qiskit GAN](https://github.com/keamanansiber/qiskit/blob/master/3QuantumMachineLearning/qGAN_LoadingRandomDistributions.ipynb)
