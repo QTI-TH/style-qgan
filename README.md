@@ -10,3 +10,5 @@ Quantum Generative MC
 - [Ray tune](https://pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html)
 
 - [Classical GAN](https://github.com/luigifvr/tesi/tree/master/dcgan)
+
+- [PernnyLane GAN](https://pennylane.ai/qml/demos/tutorial_QGAN.html)
