@@ -8,3 +8,5 @@ Quantum Generative MC
 - [QVA](https://arxiv.org/pdf/2010.06599.pdf)
 
 - [Ray tune](https://pytorch.org/tutorials/beginner/hyperparameter_tuning_tutorial.html)
+
+- [Classical GAN](https://github.com/luigifvr/tesi/tree/master/dcgan)
