@@ -23,7 +23,7 @@ We have rough ideas for the GAN structure
 
 - **quantum GAN:**
   - Do we need a 4th wire to connect the Generator and Discriminator? 
-  - In D, could we use quantum interference to project (like e.g. in Grover's algorithm) instead of a classical minimizer? Could the whole problem not be recast in such a way? In that case we could use quantum parallelism more efficiently?
+  - In D, could we use quantum interference to project (like e.g. in Grover's algorithm) instead of a classical minimizer? Could the whole problem not be recast in such a way? In that case we could use quantum parallelism more efficiently? -> Info in the Re-uploading paper
 
 # Ressources
 
@@ -42,13 +42,13 @@ We have rough ideas for the GAN structure
 
 - [Classical GAN](https://github.com/luigifvr/tesi/tree/master/dcgan)
 
-- [PernnyLane GAN](https://pennylane.ai/qml/demos/tutorial_QGAN.html)
+- [PennyLane GAN](https://pennylane.ai/qml/demos/tutorial_QGAN.html)
 
 - [qiskit GAN](https://github.com/keamanansiber/qiskit/blob/master/3QuantumMachineLearning/qGAN_LoadingRandomDistributions.ipynb)
 
 ## Re-uploading
 
-- [Re-uploading](https://arxiv.org/abs/1907.02085)
+- [Re-uploading paper](https://arxiv.org/abs/1907.02085)
 
 - [Implementation in PennyLane](https://pennylane.ai/qml/demos/tutorial_data_reuploading_classifier.html)
 
