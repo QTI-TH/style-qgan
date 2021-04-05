@@ -49,7 +49,7 @@ We have rough ideas for the GAN structure
 ## Re-uploading
 
 - [Re-uploading paper](https://arxiv.org/abs/1907.02085)
-- 
+
 - [Re-uploading example in qibo](https://qibo.readthedocs.io/en/stable/tutorials/reuploading_classifier/README.html)
 
 - [Implementation in PennyLane](https://pennylane.ai/qml/demos/tutorial_data_reuploading_classifier.html)
