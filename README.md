@@ -58,3 +58,9 @@ We have rough ideas for the GAN structure
 
 - [PDF implementation in qibo](https://qibo.readthedocs.io/en/stable/tutorials/qPDF/qPDF.html)
 
+
+## Quantum error correction
+
+_ [Description of an algorithm by Shor](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.52.R2493)
+
+_ [Tutorial on quantum error correction](https://www2.physics.ox.ac.uk/sites/default/files/ErrorCorrectionSteane06.pdf)
