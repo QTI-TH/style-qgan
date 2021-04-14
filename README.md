@@ -1,3 +1,4 @@
+<img width="649" alt="our-gan" src="https://user-images.githubusercontent.com/11166117/114699378-845af580-9d20-11eb-8315-c8ad894ac89c.png">
 # qgmc
 Quantum Generative MC
 
@@ -20,6 +21,8 @@ We have rough ideas for the GAN structure
 - **Generator (G):**
   - one qubit per observable (aim: s,t,y) -> three wires
   - introduction of uniformly distributed random variables, either via classical RNG (not preferred) or quantum RNG (preferred) (Insert graphical representation here)
+
+![our gan idea](./our-gan.png)
 
 - **quantum GAN:**
   - Do we need a 4th wire to connect the Generator and Discriminator? 
