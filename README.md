@@ -20,13 +20,13 @@ We have rough ideas for the GAN structure
 - **Generator (G):**
   - one qubit per observable (aim: s,t,y) -> three wires
   - introduction of uniformly distributed random variables, either via classical RNG (not preferred) or quantum RNG (preferred) (Insert graphical representation here)
-
-![our gan idea](<img width="649" alt="our-gan" src="https://user-images.githubusercontent.com/11166117/114699378-845af580-9d20-11eb-8315-c8ad894ac89c.png">
-)
-
+  - 
 - **quantum GAN:**
   - Do we need a 4th wire to connect the Generator and Discriminator? 
   - In D, could we use quantum interference to project (like e.g. in Grover's algorithm) instead of a classical minimizer? Could the whole problem not be recast in such a way? In that case we could use quantum parallelism more efficiently? -> Info in the Re-uploading paper
+
+<img width="649" alt="our-gan" src="https://user-images.githubusercontent.com/11166117/114699378-845af580-9d20-11eb-8315-c8ad894ac89c.png">
+
 
 # Ressources
 
