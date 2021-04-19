@@ -12,6 +12,14 @@ To-do list:
 - Implement new dataset, ideally a simplified/idealised version of our even data
 - Train and run qlassifier
 
+# Code info
+
+- **_a.py: First implementation aiming to classify a Gaussian.**
+  - simplified the tutorial code
+  - **create_dataset** with grid=None creates a set of points with x=[-1,1] and y=[0,1]
+  - **create_target(gauss)** will read the random points and if one of them is within cutoff of a Gaussian distrition with parameters (m,sig) will set the label to 1 and 0 otherwise.
+  - executing the code as usual runs and I get a cost function of 0.016 on a single layer and (m=0,sig=1,cutoff=0.02), but nothing is has been visually inspected for correctness.  
+
 # Ressources
 
 ## Re-uploading
