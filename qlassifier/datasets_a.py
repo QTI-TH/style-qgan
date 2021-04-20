@@ -2,7 +2,7 @@ import numpy as np
 from itertools import product
 
 
-def create_dataset(name, grid=None, samples=400, seed=0):
+def create_dataset(name, grid=None, samples=200, seed=0):
     """Function to create training and test sets for classifying.
     Args:
         name (str): Name of the problem to create the dataset, to choose between
@@ -112,7 +112,7 @@ def _gauss2(points):
     # some parameters       
     m=0
     sig=0.5
-    cutoff=0.1 # defines width of Gaussian tube
+    cutoff=0.05 # defines width of Gaussian tube
     nratio=0.5 # controls the reatio between 0 and 1 labels, 1=random, 0=all on Gauss tube
     
     #print(points)   
