@@ -30,6 +30,9 @@ The initial upload is the tutorial implementation of the re-uploading classifier
 - Gaussian parameters: m=0, sig=0.5, cutoff=0.1, n_samples=400, n_predict=100, nlayers=4
 <img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6342776/qlassifier.nl4.ns400.nr05.pdf">
 
+- Gaussian parameters: m=0, sig=0.5, cutoff=0.1, n_samples=400, n_predict=100, nlayers=5
+<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6343458/qlassifier.nl5.ns400.nr05.cut005.pdf">
+
 
 # Ressources
 
