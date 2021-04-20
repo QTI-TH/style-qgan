@@ -2,7 +2,7 @@ import numpy as np
 from itertools import product
 
 
-def create_dataset(name, grid=None, samples=1000, seed=0):
+def create_dataset(name, grid=None, samples=2000, seed=0):
     """Function to create training and test sets for classifying.
     Args:
         name (str): Name of the problem to create the dataset, to choose between
@@ -17,7 +17,8 @@ def create_dataset(name, grid=None, samples=1000, seed=0):
     """
     if grid == None:
         np.random.seed(seed)
-        x = 1 - 2 * np.random.rand(samples, 1) # between -1 and 1
+        xwindow=2
+        x = xwindow * ( 1 - 2 * np.random.rand(samples, 1)) # between -xwindow and xwindow
         y = np.random.rand(samples, 1) # between 0 and 1
         points = np.concatenate((x, y), axis=1)
     
@@ -75,11 +76,11 @@ def _gauss(points):
     # some parameters       
     m=0
     sig=1
-    cutoff=0.02
+    cutoff=0.1
     
     #print(points)   
     labels = np.zeros(len(points), dtype=np.int32)
-    
+        
     for n in range(0,len(points)):
         x=points[n,0]
         y=points[n,1]
@@ -87,7 +88,6 @@ def _gauss(points):
         #print(x,y,gaussian(x,m,sig),target_marker(x,m,sig,y,cutoff))
         labels[n]=target_marker(x,m,sig,y,cutoff)
         
-
     return points, labels    
 
 

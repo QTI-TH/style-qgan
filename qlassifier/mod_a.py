@@ -16,11 +16,15 @@ layers=1
 """
 ql = single_qubit_classifier("gauss",layers)  # Define classifier
 
+ql.output()
 
-print('Problem never solved, finding optimal parameters...')
+print('Finding optimal parameters...')
 result, parameters = ql.minimize(method='l-bfgs-b', options={'disp': True})
  
 ql.set_parameters(parameters)
+
+ql.predict() 
+
 value_loss = ql.cost_function_fidelity()
 print('The value of the cost function achieved is %.6f' % value_loss.numpy())
 

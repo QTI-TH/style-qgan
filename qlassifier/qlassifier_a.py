@@ -7,7 +7,7 @@ import os
 
 
 class single_qubit_classifier:
-    def __init__(self, name, layers, grid=None, test_samples=1000, seed=0):
+    def __init__(self, name, layers, grid=None, test_samples=2000, seed=0):
         """Class with all computations needed for classification.
         Args:
             name (str): Name of the problem to create the dataset, to choose between
@@ -173,6 +173,60 @@ class single_qubit_classifier:
             labels[j] = np.argmax(fids)
 
         return labels
+
+
+    def output(self):
+        """Method for outputting data
+        Returns:
+            files with data etc
+        """
+        
+        outf0  = open("out.qlassi.data.label0", "w")
+        outf1  = open("out.qlassi.data.label1", "w")
+        
+        xy    = self.training_set[0]
+        x, y  = xy[:, 0], xy[:, 1]
+        labels = self.training_set[1]
+        
+        
+        for n in range(0,len(labels)):
+            if labels[n]==0:
+                outf0.write("%.7e %.7e\n" %(x[n],y[n]))
+            else:
+                outf1.write("%.7e %.7e\n" %(x[n],y[n]))
+        
+        
+        outf0.close
+        outf1.close
+        
+        return 0
+        
+        
+    def predict(self):
+        """Method for predicting data
+        Returns:
+            files with data etc
+        """
+        
+        outf3  = open("out.qlassi.predict.label0", "w")
+        outf4  = open("out.qlassi.predict.label1", "w")
+        
+        xy    = self.test_set[0]
+        x, y  = xy[:, 0], xy[:, 1]
+        labels = self.eval_test_set_fidelity()
+    
+        print(labels)
+        
+        for n in range(0,len(labels)):
+            if labels[n]==0:
+                outf3.write("%.7e %.7e\n" %(x[n],y[n]))
+            else:
+                outf4.write("%.7e %.7e\n" %(x[n],y[n]))
+        
+        outf3.close
+        outf4.close
+        
+        return 0    
 
     
 
