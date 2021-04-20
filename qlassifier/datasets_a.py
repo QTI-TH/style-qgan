@@ -25,8 +25,9 @@ def create_dataset(name, grid=None, samples=200, seed=0):
     else:
         x = np.linspace(-1, 1, grid)
         points = np.array(list(product(x, x)))
+        
+        
     creator = globals()[f"_{name}"]
-
     x, y = creator(points)
     return x, y
 
@@ -45,7 +46,12 @@ def create_target(name):
     elif name in ['gauss', 'gauss2']:
         targets = [np.array([1, 0], dtype='complex'),
                    np.array([0, 1], dtype='complex')]
-
+    elif name in ['uniform']:
+        targets = [np.array([1, 0], dtype='complex'),
+                   np.array([0, 1], dtype='complex')]
+ 
+    #print(targets)
+ 
     return targets
 
 
@@ -55,6 +61,14 @@ def _circle(points):
     ids = np.where(np.linalg.norm(points, axis=1) > np.sqrt(2 / np.pi))
     labels[ids] = 1
 
+    return points, labels
+    
+
+# output is uniformly distributed numbers    
+def _uniform(points):
+    labels = np.zeros(len(points), dtype=np.int32)
+    labels = points[:,1]
+        
     return points, labels
     
 
@@ -112,8 +126,8 @@ def _gauss2(points):
     # some parameters       
     m=0
     sig=0.5
-    cutoff=0.05 # defines width of Gaussian tube
-    nratio=0.5 # controls the reatio between 0 and 1 labels, 1=random, 0=all on Gauss tube
+    cutoff=0.1 # defines width of Gaussian tube
+    nratio=0.33 # controls the reatio between 0 and 1 labels, 1=random, 0=all on Gauss tube
     
     #print(points)   
     labels = np.zeros(len(points), dtype=np.int32)

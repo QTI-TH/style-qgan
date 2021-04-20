@@ -25,6 +25,9 @@ class single_qubit_classifier:
         self.name = name
         self.layers = layers
         self.training_set = create_dataset(name, grid=grid)
+        
+        
+        
         self.test_set = create_dataset(name, samples=test_samples)
         self.target = create_target(name)
         self.params = np.random.randn(layers * 4)
@@ -215,7 +218,7 @@ class single_qubit_classifier:
         x, y  = xy[:, 0], xy[:, 1]
         labels = self.eval_test_set_fidelity()
     
-        print(labels)
+        #print(labels)
         
         for n in range(0,len(labels)):
             if labels[n]==0:
