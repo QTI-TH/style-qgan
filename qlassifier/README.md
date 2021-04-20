@@ -1,4 +1,4 @@
-# qgmc 
+# qgmc - qlassifier
 
 - **Discriminator (D) development:** 
   - single qubit "wire" to output 0 or 1. 
