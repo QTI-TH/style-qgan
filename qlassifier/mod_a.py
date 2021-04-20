@@ -6,7 +6,7 @@ from qlassifier_a import single_qubit_classifier
 
 # Some parameters
 
-layers=1
+layers=4
 
 # output
 
@@ -14,7 +14,7 @@ layers=1
 
 """Perform classification for a given problem and number of layers.
 """
-ql = single_qubit_classifier("gauss",layers)  # Define classifier
+ql = single_qubit_classifier("gauss2",layers)  # Define classifier
 
 ql.output()
 

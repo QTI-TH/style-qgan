@@ -7,7 +7,7 @@ import os
 
 
 class single_qubit_classifier:
-    def __init__(self, name, layers, grid=None, test_samples=2000, seed=0):
+    def __init__(self, name, layers, grid=None, test_samples=100, seed=0):
         """Class with all computations needed for classification.
         Args:
             name (str): Name of the problem to create the dataset, to choose between
@@ -181,8 +181,8 @@ class single_qubit_classifier:
             files with data etc
         """
         
-        outf0  = open("out.qlassi.data.label0", "w")
-        outf1  = open("out.qlassi.data.label1", "w")
+        outf0  = open("./out.qlassi.data.label0", "w")
+        outf1  = open("./out.qlassi.data.label1", "w")
         
         xy    = self.training_set[0]
         x, y  = xy[:, 0], xy[:, 1]
@@ -208,8 +208,8 @@ class single_qubit_classifier:
             files with data etc
         """
         
-        outf3  = open("out.qlassi.predict.label0", "w")
-        outf4  = open("out.qlassi.predict.label1", "w")
+        outf3  = open("./out.qlassi.predict.label0", "w")
+        outf4  = open("./out.qlassi.predict.label1", "w")
         
         xy    = self.test_set[0]
         x, y  = xy[:, 0], xy[:, 1]
