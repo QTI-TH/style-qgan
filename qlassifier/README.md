@@ -16,7 +16,7 @@ To-do list:
 
 - **_a.py: First implementation aiming to classify a Gaussian.**
   - simplified the tutorial code
-  - **create_dataset** with grid=None creates a set of points with x=[-1,1] and y=[0,1]
+  - **create_dataset** with grid=None creates a set of points with x=[-xwindow,xwindow] and y=[0,1]
   - **create_target(gauss)** will read the random points and if one of them is within cutoff of a Gaussian distribution with parameters (m,sig) will set the label to 1 and 0 otherwise.
   - **create_target(gauss2)** creates a more balanced training set: nratio sets the ratio of 0 vs. 1 labels in the training, setting it e.g. to 0.5 means the data is arranged in such a way that half the samples have label 0 will the remainder is within a Gaussian tube defined by (m,sig,cutoff).
   - running on a laptop is fairly slow, tests with 4 layers already take a long time. It'd be good to run this on a gpu or so. I couldn't port it to google colab easily though. Does anybody have good experience porting simple .py to ipynb?
