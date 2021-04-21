@@ -7,7 +7,7 @@ import os
 
 
 class single_qubit_generator:
-    def __init__(self, name, layers, grid=None, test_samples=100, seed=1):
+    def __init__(self, name, layers, dlayers, grid=None, test_samples=100, seed=1):
        
        
         print('# Reading qlassifier parameters into generator...')
@@ -17,12 +17,14 @@ class single_qubit_generator:
         np.random.seed(seed)
         self.name = name
         self.layers = layers
+        self.dlayers = dlayers
         
         self.data_set = create_dataset(name, grid=grid, samples=test_samples)
         self.target = create_target(name)
         
         self.params = np.random.randn(layers * 4)
         self._circuit = self._initialize_circuit() # initialise with random parameters
+        self._dcircuit = self._initialize_dcircuit() # initialise the discriminator circuit
         
         # some tests of the initial labels and cost function labels 
         print("# Testing labels, no minimisation:")
@@ -34,14 +36,7 @@ class single_qubit_generator:
         self.params = np.random.randn(layers * 4)
         test_in=np.sum(self.eval_test_set_fidelity())/test_samples
         test_out=self.cost_function_fidelity()
-        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))
-
-        np.random.seed(seed*20)
-        self.params = np.random.randn(layers * 4)
-        test_in=np.sum(self.eval_test_set_fidelity())/test_samples
-        test_out=self.cost_function_fidelity()
-        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))
-        
+        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))      
         
         try:
             os.makedirs('results/generate'+self.name+'/%s_layers' % self.layers)
@@ -56,7 +51,16 @@ class single_qubit_generator:
         """
         self.params = new_params
 
-       
+    # discriminator circuit, must be same as before!
+    def _initialize_dcircuit(self):
+        """Creates variational circuit."""
+        C = Circuit(1)
+        for l in range(self.dlayers):
+            C.add(gates.RY(0, theta=0))
+            C.add(gates.RZ(0, theta=0))
+        return C
+        
+    # generator circuit  
     def _initialize_circuit(self):
         """Creates variational circuit."""
         C = Circuit(1)
@@ -87,11 +91,11 @@ class single_qubit_generator:
            Qibo circuit for predicting the discriminator result.
         """
         qlassi = []
-        for i in range(0, 4 * self.layers, 4):
+        for i in range(0, 4 * self.dlayers, 4):
            qlassi.append(self.qlassi[i] * x[0] + self.qlassi[i + 1])
            qlassi.append(self.qlassi[i + 2] * x[1] + self.qlassi[i + 3])
-        self._circuit.set_parameters(qlassi)
-        return self._circuit
+        self._dcircuit.set_parameters(qlassi)
+        return self._dcircuit
 
 
     def cost_function_one_point_fidelity(self, x):
@@ -128,8 +132,7 @@ class single_qubit_generator:
         cf=(1.-tflabel)
         
         return cf
-        
-            
+                    
 
     def cost_function_fidelity(self, params=None):
         """Method for computing the cost function for the training set, using fidelity.
@@ -138,10 +141,10 @@ class single_qubit_generator:
         Returns:
             float with the cost function.
         """
-        if params is None:
-            params = self.params
+        #print(params)
 
-        print(params)
+        if params is None:
+            params = self.params       
 
         self.set_parameters(params)        
                   
@@ -150,6 +153,8 @@ class single_qubit_generator:
             cf += self.cost_function_one_point_fidelity(x) 
             #print(cf)    
         cf /= len(self.data_set[0])
+        
+        #print(params,float(cf))
         return cf    
         
         
@@ -178,13 +183,90 @@ class single_qubit_generator:
         loss = self.cost_function_fidelity
         print("# Run minimisation:")
 
-        import numpy as np
-        from scipy.optimize import minimize
-        m = minimize(lambda p: loss(p).numpy(), self.params, method=method, options=options)
-        result = m.fun
-        parameters = m.x
+
+        if method == 'cma':
+            # Genetic optimizer
+            import cma
+            r = cma.fmin2(lambda p: loss(p).numpy(), self.params, 2)
+            #r = cma.fmin2(lambda p: loss(p).numpy(), self.params, 2, {'seed':113895})
+            result = r[1].result.fbest
+            parameters = r[1].result.xbest
+
+        elif method == 'sgd':
+            from qibo.tensorflow.gates import TensorflowGate
+            circuit = self.circuit(self.training_set[0])
+            for gate in circuit.queue:
+                if not isinstance(gate, TensorflowGate):
+                    raise RuntimeError('SGD VQE requires native Tensorflow '
+                                       'gates because gradients are not '
+                                       'supported in the custom kernels.')
+
+            sgd_options = {"nepochs": 5001,
+                           "nmessage": 1000,
+                           "optimizer": "Adamax",
+                           "learning_rate": 0.5}
+            if options is not None:
+                sgd_options.update(options)
+
+            # proceed with the training
+            from qibo.config import K
+            vparams = K.Variable(self.params)
+            optimizer = getattr(K.optimizers, sgd_options["optimizer"])(
+                learning_rate=sgd_options["learning_rate"])
+
+            def opt_step():
+                with K.GradientTape() as tape:
+                    l = loss(vparams)
+                grads = tape.gradient(l, [vparams])
+                optimizer.apply_gradients(zip(grads, [vparams]))
+                return l, vparams
+
+            if compile:
+                opt_step = K.function(opt_step)
+
+            l_optimal, params_optimal = 10, self.params
+            for e in range(sgd_options["nepochs"]):
+                l, vparams = opt_step()
+                if l < l_optimal:
+                    l_optimal, params_optimal = l, vparams
+                if e % sgd_options["nmessage"] == 0:
+                    print('ite %d : loss %f' % (e, l.numpy()))
+
+            result = self.cost_function(params_optimal).numpy()
+            parameters = params_optimal.numpy()
+
+        else:
+            import numpy as np
+            from scipy.optimize import minimize
+            m = minimize(lambda p: loss(p).numpy(), self.params, method=method, options=options)
+            result = m.fun
+            parameters = m.x
 
         return result, parameters
+
+
+    def generate(self):
+        """Method for predicting data
+        Returns:
+            files with data etc
+        """
+        
+        outf = open("./out.qgen.samples", "w")
+        
+        nsamples=1000
+        self.generate_set = create_dataset("uniform", grid=None, samples=nsamples)
+                
+        for x in self.generate_set[0]:
+            C = self.circuit(x)
+            state = C.execute()
+            y = qgen_real_out(state)
+                    
+            outf.write("%.7e %.7e\n" % ( x[0],y ))
+        
+        outf.close
+        
+        
+        return 0    
 
 
 def qgen_real_out(state):

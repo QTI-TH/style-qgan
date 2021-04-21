@@ -96,6 +96,8 @@ class single_qubit_classifier:
         for x, y in zip(self.training_set[0], self.training_set[1]):
             cf += self.cost_function_one_point_fidelity(x, y)
         cf /= len(self.training_set[0])
+        
+        #print(params,float(cf))
         return cf
 
     def minimize(self, method='BFGS', options=None, compile=True):
