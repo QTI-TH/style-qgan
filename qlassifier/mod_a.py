@@ -16,6 +16,8 @@ from qgenerator_a import single_qubit_generator
 
 layers=2
 new_qlassifier=0 # train a new qlassifier? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
+print("# ### Discriminator with {} layers".format(layers))
+
 
 """Perform classification for a given problem and number of layers.
 """
@@ -54,18 +56,19 @@ print('# The value of the qlassifier cost function achieved is %.6f' % value_los
 # Some parameters and setup
 
 dlayers=2 # need to tell the generator how many layers there were in the discriminator
-glayers=2 # can choose a different number of generator vs. discriminator layers
+glayers=4 # can choose a different number of generator vs. discriminator layers
 new_qgenerator=1 # train a new qgenerator? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
+print("# ### Generator with {} layers".format(glayers))
 
 qg = single_qubit_generator("uniform",glayers,dlayers)  # Define generator
 
 if new_qgenerator==1:
     print('# Running new qgenerator parameters')
     
-    # do not use the minimize as before, the search space is too small
+    # do not use the scipy minimize as before, the search space is too small
     #gresult, gparameters = qg.minimize(method='l-bfgs-b', options={'disp': True}) 
     
-    # genetic algorithm
+    # genetic algorithm seems to work
     gresult, gparameters = qg.minimize(method='cma', options={'disp': True})
 
     outf=open("./out.qgen.parameters", "w")

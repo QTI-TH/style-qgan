@@ -7,7 +7,7 @@ import os
 
 
 class single_qubit_generator:
-    def __init__(self, name, layers, dlayers, grid=None, test_samples=100, seed=1):
+    def __init__(self, name, layers, dlayers, grid=None, test_samples=200, seed=0):
        
        
         print('# Reading qlassifier parameters into generator...')
@@ -32,11 +32,20 @@ class single_qubit_generator:
         test_out=self.cost_function_fidelity()
         print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))
         
-        np.random.seed(seed*2)
-        self.params = np.random.randn(layers * 4)
-        test_in=np.sum(self.eval_test_set_fidelity())/test_samples
-        test_out=self.cost_function_fidelity()
-        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))      
+#        np.random.seed(seed*2)
+#        self.params = np.random.randn(layers * 4)
+#        test_in=np.sum(self.eval_test_set_fidelity())/test_samples
+#        test_out=self.cost_function_fidelity()
+#        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))      
+
+#        np.random.seed(seed*20)
+#        self.params = np.random.randn(layers * 4)
+#        test_in=np.sum(self.eval_test_set_fidelity())/test_samples
+#        test_out=self.cost_function_fidelity()
+#        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))      
+        
+#        print("# --- Note: The initial set also provides the first guess for the minimiser,") 
+#        print("# --- if it's already randomly good say cf~=0.1, this makes the job easier.")
         
         try:
             os.makedirs('results/generate'+self.name+'/%s_layers' % self.layers)
@@ -187,8 +196,8 @@ class single_qubit_generator:
         if method == 'cma':
             # Genetic optimizer
             import cma
-            r = cma.fmin2(lambda p: loss(p).numpy(), self.params, 2)
-            #r = cma.fmin2(lambda p: loss(p).numpy(), self.params, 2, {'seed':113895})
+            #r = cma.fmin2(lambda p: loss(p).numpy(), self.params, 2)
+            r = cma.fmin2(lambda p: loss(p).numpy(), self.params, 2, {'seed':113895})
             result = r[1].result.fbest
             parameters = r[1].result.xbest
 
