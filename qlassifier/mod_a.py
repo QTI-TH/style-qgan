@@ -57,7 +57,7 @@ new_qgenerator=1 # train a new qlassifier? 1=yes, 0=no - requires parameters to 
 
 qg = single_qubit_generator("uniform",layers)  # Define classifier
 
-#gresult, gparameters = qg.minimize(method='l-bfgs-b', options={'disp': True})
+gresult, gparameters = qg.minimize(method='l-bfgs-b', options={'disp': True})
 
 
 

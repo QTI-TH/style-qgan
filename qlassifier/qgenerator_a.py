@@ -24,13 +24,23 @@ class single_qubit_generator:
         self.params = np.random.randn(layers * 4)
         self._circuit = self._initialize_circuit() # initialise with random parameters
         
-        print(self.eval_test_set_fidelity())
-        print(self.cost_function_fidelity())
+        # some tests of the initial labels and cost function labels 
+        print("# Testing labels, no minimisation:")
+        test_in=np.sum(self.eval_test_set_fidelity())/test_samples
+        test_out=self.cost_function_fidelity()
+        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))
         
         np.random.seed(seed*2)
         self.params = np.random.randn(layers * 4)
-        print(self.eval_test_set_fidelity())
-        print(self.cost_function_fidelity())
+        test_in=np.sum(self.eval_test_set_fidelity())/test_samples
+        test_out=self.cost_function_fidelity()
+        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))
+
+        np.random.seed(seed*20)
+        self.params = np.random.randn(layers * 4)
+        test_in=np.sum(self.eval_test_set_fidelity())/test_samples
+        test_out=self.cost_function_fidelity()
+        print("# --- Cost from initial set: {} and randomly transformed set {}".format(test_in,test_out))
         
         
         try:
@@ -84,7 +94,7 @@ class single_qubit_generator:
         return self._circuit
 
 
-    def cost_function_one_point_fidelity(self, x, y):
+    def cost_function_one_point_fidelity(self, x):
         """Method for computing the cost function for
         a given sample (in the datasets), using fidelity.
         Args:
@@ -97,27 +107,27 @@ class single_qubit_generator:
         # generate the real output from our circuit
         C = self.circuit(x)
         state1 = C.execute()
-        
-        # check the outstate projection
-        #num = qgen_real_out(state)
-        #print(num)
-                
         y = qgen_real_out(state1)
+           
         
         # generate the labels based on the discriminator circuit
-        D = self.dcircuit(x) 
+        x2 = ([x[0],y]) # join x and y_new values
+        #print(x[0],x[1],y,x2,x)
+        
+        D = self.dcircuit(x2) 
         state2 = D.execute()
         fids = np.empty(len(self.target))
         for i, t in enumerate(self.target):
             fids[i] = fidelity(state2, t)
         label = np.argmax(fids)
         
-        print(x,y,label)
+        # next define cost from this point. 0 if the label is 1 (right) or 1 if the label is 0 (wrong)
         
-        cf = 0
+        #print(x,y,label,cf)
+        cf=(1.-label)
         return cf
+        
             
-
 
     def cost_function_fidelity(self, params=None):
         """Method for computing the cost function for the training set, using fidelity.
@@ -129,21 +139,17 @@ class single_qubit_generator:
         if params is None:
             params = self.params
 
-        self.set_parameters(params)
-        
-        tag   = self.eval_test_set_fidelity()
-        val   = self.data_set[1]
-        xy    = self.data_set[0]
-        x, y  = xy[:, 0], xy[:, 1]
-        #print(x,y,tag,val)
-        
+        print(params)
+
+        self.set_parameters(params)        
                   
         cf = 0
-        for x, y in zip(self.data_set[0], self.data_set[1]):
-            cf += self.cost_function_one_point_fidelity(x, y)
-            
-            
-        return cf
+        for x in self.data_set[0]:
+            cf += self.cost_function_one_point_fidelity(x) 
+            #print(cf)    
+        cf /= len(self.data_set[0])
+        return cf    
+        
         
     def eval_test_set_fidelity(self): # prediction circuit here, just for testing
         """Method for evaluating points in the training set, using fidelity.
@@ -168,11 +174,11 @@ class single_qubit_generator:
 
     def minimize(self, method='BFGS', options=None, compile=True):
         loss = self.cost_function_fidelity
+        print("# Run minimisation:")
 
         import numpy as np
         from scipy.optimize import minimize
-        m = minimize(lambda p: loss(p).numpy(), self.params,
-                     method=method, options=options)
+        m = minimize(lambda p: loss(p).numpy(), self.params, method=method, options=options)
         result = m.fun
         parameters = m.x
 
