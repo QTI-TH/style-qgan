@@ -124,7 +124,9 @@ class single_qubit_generator:
         # next define cost from this point. 0 if the label is 1 (right) or 1 if the label is 0 (wrong)
         
         #print(x,y,label,cf)
-        cf=(1.-label)
+        tflabel = tf.convert_to_tensor(label, dtype=tf.float64)
+        cf=(1.-tflabel)
+        
         return cf
         
             
