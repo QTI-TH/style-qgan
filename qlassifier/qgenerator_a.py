@@ -1,5 +1,5 @@
 from qibo.models import Circuit
-from qibo import gates
+from qibo import hamiltonians, gates, models
 import numpy as np
 from datasets_a import create_dataset, create_target
 import tensorflow as tf
@@ -93,10 +93,30 @@ class single_qubit_generator:
         Returns:
             float with the cost function.
         """
+        
+        # generate the real output from our circuit
         C = self.circuit(x)
-        state = C.execute()
+        state1 = C.execute()
+        
+        # check the outstate projection
+        #num = qgen_real_out(state)
+        #print(num)
+                
+        y = qgen_real_out(state1)
+        
+        # generate the labels based on the discriminator circuit
+        D = self.dcircuit(x) 
+        state2 = D.execute()
+        fids = np.empty(len(self.target))
+        for i, t in enumerate(self.target):
+            fids[i] = fidelity(state2, t)
+        label = np.argmax(fids)
+        
+        print(x,y,label)
+        
         cf = 0
         return cf
+            
 
 
     def cost_function_fidelity(self, params=None):
@@ -117,24 +137,31 @@ class single_qubit_generator:
         x, y  = xy[:, 0], xy[:, 1]
         #print(x,y,tag,val)
         
-       
-            
+                  
         cf = 0
+        for x, y in zip(self.data_set[0], self.data_set[1]):
+            cf += self.cost_function_one_point_fidelity(x, y)
+            
+            
         return cf
         
-    def eval_test_set_fidelity(self):
+    def eval_test_set_fidelity(self): # prediction circuit here, just for testing
         """Method for evaluating points in the training set, using fidelity.
         Returns:
             list of guesses for the discriminator parameters.
         """
         labels = [[0]] * len(self.data_set[0])
         for j, x in enumerate(self.data_set[0]):
-            C = self.dcircuit(x) # set the discriminator circuit here
+            C = self.circuit(x) 
             state = C.execute()
             fids = np.empty(len(self.target))
             for i, t in enumerate(self.target):
                 fids[i] = fidelity(state, t)
             labels[j] = np.argmax(fids)
+            
+            # test the state projection here
+            # num = qgen_real_out(state)
+            # print(x,num)
 
         return labels        
 
@@ -152,7 +179,12 @@ class single_qubit_generator:
         return result, parameters
 
 
-
-        
+def qgen_real_out(state):
+    hx  = hamiltonians.X(1, numpy=True) # create a 1-qubit Pauli-X Hamiltonian
+    num = hx.expectation(state).numpy().real # project the state (output from generator) with Hamiltonian 
+    #res = (1 - num) / (1+num) # relate this way
+    res = np.abs(num) # make it easier for the network by mapping the result between 0 and 1 
+    return res
+         
 def fidelity(state1, state2):
     return tf.constant(tf.abs(tf.reduce_sum(tf.math.conj(state2) * state1))**2)
