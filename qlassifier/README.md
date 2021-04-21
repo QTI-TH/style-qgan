@@ -29,6 +29,11 @@ Full network: Generator data (orange), Discriminator quality (blue), n_layers=2,
 
 <img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6351036/qgenerator.nl2.ns100.pdf">
 
+n_layers=2, n_samples=400, cma algorithm
+
+<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6351177/qgenerator.nl2.ns400.pdf">
+
+
 Discriminator alone: n_layers=2, n_samples=200, scipy minimise algorithm
 
 <img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6351035/qlassifier.nl2.ns200.nr05.cut01.pdf">
