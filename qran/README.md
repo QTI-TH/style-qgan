@@ -14,6 +14,7 @@
 # Code info
 
 Main: qran.py
+
 Requires: dataset.py, qlassifier.py, qgenerator.py
 
 Routines to generate training data sets. Currently implemented (dataset.py):
@@ -54,6 +55,7 @@ Routines to run the QML quantum generator (qgenerator.py):
 # Example 
 
 **Full network**
+
 Discriminator quality (orange): n_layers=2, n_input=20000, cma algorithm
 
 <img width="649" alt="qd" src="https://github.com/scarrazza/qgmc/files/6398030/qlassifier.pdf">
