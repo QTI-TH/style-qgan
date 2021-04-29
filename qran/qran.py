@@ -3,7 +3,7 @@ import datasets as ds
 import numpy as np
 from qlassifier import single_qubit_classifier
 from qgenerator import single_qubit_generator
-
+import qibo as qibo
 
 # ###############################################################################
 #
@@ -24,6 +24,11 @@ from qgenerator import single_qubit_generator
 #
 # ###############################################################################
 
+# set the number of threads to 1, if you want to
+qibo.set_threads(1)
+# retrieve the current number of threads
+current_threads = qibo.get_threads()
+print("Qibo runs with "+str(current_threads)+" thread(s)")
 
 
 # #########################
@@ -34,7 +39,7 @@ from qgenerator import single_qubit_generator
 layers=2
 
 # train a new qlassifier? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
-new_qlassifier=0
+new_qlassifier=1
 
 # Define classifier
 print("# ### Discriminator with {} layers".format(layers))
@@ -80,7 +85,7 @@ print('# The value of the qlassifier cost function achieved is %.6f' % value_los
 dlayers=layers # hacked to be equal to qlassifier layers 
 
 # can choose a different number of generator vs. discriminator layers
-glayers=1
+glayers=2
 
 # train a new qgenerator? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
 new_qgenerator=1 
