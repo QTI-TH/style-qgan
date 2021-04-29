@@ -51,9 +51,20 @@ Routines to run the QML quantum generator (qgenerator.py):
     
 
 
-# Ressources
+# Example 
 
-## Re-uploading
+**Full network**
+Discriminator quality (orange): n_layers=2, n_input=20000, cma algorithm
+
+<img width="649" alt="qd" src="https://github.com/scarrazza/qgmc/files/6398030/qlassifier.pdf">
+
+Generator data (orange): n_layers=2, n_generate=2000, cma algorithm 
+
+<img width="649" alt="qg" src="https://github.com/scarrazza/qgmc/files/6398035/qgenerator.pdf">
+
+
+
+# Re-uploading
 
 - [Re-uploading paper](https://arxiv.org/abs/1907.02085)
 
