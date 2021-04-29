@@ -1,72 +1,54 @@
-[qgenerator.nl2.ns400.qlassi.nl2.ns2000.pdf](https://github.com/scarrazza/qgmc/files/6351971/qgenerator.nl2.ns400.qlassi.nl2.ns2000.pdf)
-# qgmc - qlassifier
+# qgmc - qran (quantum regressive adversarial network)
 
-- **Discriminator (D) development:** 
-  - single qubit "wire" to output 0 or 1. 
-  - use re-uploading for this task
 
-- **Generator (G) development:** 
-  - single qubit "wire", 
-  - task is to transform input=(x,y) to output=(x,y_new), where y_new is in the target distribution. 
+- **Discriminator (D):** 
+  - Single qubit 
+  - re-uploading is used to train a classifier on data to distinguish elements of a wanted result function
+
+- **Generator (G):** 
+  - single qubit 
+  - task is to transform input=(x,y) to output=(x,y_new), where y_new is part of the target function. 
   - the discriminator evaluates the result by asigning labels to the y_new. The cost function is minimised when all labels are 1=in the distribution
-
-
-The initial upload is the tutorial implementation of the re-uploading classifier in qibo. Based on this we should be able to learn how to classify also other scenarios and to write our own code to perform the task.
 
 
 # Code info
 
-- **_a.py: First implementation aiming to classify and sample in a Gaussian.**
-  - simplified the tutorial code
-  - **create_dataset** with grid=None creates a set of points with x=[-xwindow,xwindow] and y=[0,1]
-  - **create_target(gauss)** will read the random points and if one of them is within cutoff of a Gaussian distribution with parameters (m,sig) will set the label to 1 and 0 otherwise.
-  - **create_target(gauss2)** creates a more balanced training set: nratio sets the ratio of 0 vs. 1 labels in the training, setting it e.g. to 0.5 means the data is arranged in such a way that half the samples have label 0 will the remainder is within a Gaussian tube defined by (m,sig,cutoff).
-  - running on a laptop is fairly slow, tests with 4 layers already take a long time. It'd be good to run this on a gpu or so. I couldn't port it to google colab easily though. Does anybody have good experience porting simple .py to ipynb?
-   
-   
-# Some results for the discriminator/generator combination
+Main: qran.py
+Requires: dataset.py, qlassifier.py, qgenerator.py
 
-**Full network**  
-Generator data (orange): n_layers=2, n_input=400, cma algorithm
-Discriminator quality (blue): n_layers=2, n_input=2000, cma algorithm
+Routines to generate training data sets. Currently implemented (dataset.py):
+-   create_dataset: Create uniformly distributed random points in x=(x_1,x_2) and call subroutine to add label (y), output is tuple (x,y)
+-   create_target: Creates target array of complex 1+i0 and 0+i1
+-   uniform: Subroutine that creates uniformly distributed random real labels, needed for qgenerator
+-   gauss: Subroutine to imprint labels on training set according to a given Gaussian distribution.
+-   gauss2: Subroutine to imprint labels on training set according to a given Gaussian distribution, where a fixed percentage is inside  the Gaussian tube
 
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6351971/qgenerator.nl2.ns400.qlassi.nl2.ns2000.pdf">
+Routines to run the QML quantum discriminator (qlassifier.py)
+- single_qubit_qlassifier: Defines and initiates qlassifier
+-   set_parameters: set parameters in quantum circuit
+-   _initialise_circuit: initalised generator circuit
+-   circuit: define the circuit
+-   cost_function_one_point_fidelity: Return the cost of input point, executes circuit for label and evaluates cost based on label.
+-   cost_function_fidelity: gather cost for all points
+-   minimize: run the minimizer, currently cma and scipy.minimize
+-   eval_test_set_fidelity: run discriminator circuit and generate label after training
+-   output: print training data set, separated by label 0 and 1
+-   predict: predict labels on test_set and output
+-   fidelity: multiply circuit state and target state (from create_target) into result 0 or 1
 
-
-Full network: Generator data (orange), Discriminator quality (blue), n_layers=2, n_samples=100, cma algorithm
-
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6351036/qgenerator.nl2.ns100.pdf">
-
-n_layers=2, n_samples=400, cma algorithm
-
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6351177/qgenerator.nl2.ns400.pdf">
-
-Discriminator alone: n_layers=2, n_samples=200, scipy minimise algorithm
-
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6351035/qlassifier.nl2.ns200.nr05.cut01.pdf">
-   
-   
-# Some results for the discriminator
-
-- Gaussian parameters: m=0, sig=0.5, cutoff=0.1, n_samples=200, n_predict=100, nlayers=4
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6342777/qlassifier.nl4.ns200.nr05.pdf">
-
-<!--
-- Gaussian parameters: m=0, sig=0.5, cutoff=0.05, n_samples=200, n_predict=100, nlayers=4
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6342876/qlassifier.nl4.ns200.nr05.cut005.pdf">
--->
-<!--
-- Gaussian parameters: m=0, sig=0.5, cutoff=0.05, n_samples=200, n_predict=100, nlayers=5
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6343303/qlassifier.nl5.ns200.nr05.cut005.pdf">
--->
-<!--
-- Gaussian parameters: m=0, sig=0.5, cutoff=0.1, n_samples=400, n_predict=100, nlayers=4
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6342776/qlassifier.nl4.ns400.nr05.pdf">
--->
-<!--
-- Gaussian parameters: m=0, sig=0.5, cutoff=0.1, n_samples=400, n_predict=100, nlayers=5
-<img width="649" alt="our-gan" src="https://github.com/scarrazza/qgmc/files/6343458/qlassifier.nl5.ns400.nr05.cut005.pdf">
--->
+Routines to run the QML quantum generator (qgenerator.py): 
+-   single_qubit_generator: Defines and initiates qgenerator
+-   set_parameters: set parameters in quantum circuit
+-   _initialise_circuit: initalised generator circuit
+-   _initialise_dcircuit: initalised discriminator circuit
+-   circuit: define the circuit
+-   cost_function_one_point_fidelity: Return the cost of input point, executes generator circuit to create data, then the discriminator circuit for label and evaluates cost based on label.
+-   cost_function_fidelity: gather cost for all points
+-   minimize: run the minimizer, currently cma and scipy.minimize
+-   generate: generate data set by executing generator circuit given some input points
+-   qgen_real_out: project curcuit result agains Pauli_X Hamiltonian to output real numbers
+-   fidelity: multiply circuit state and target state (from create_target) into result 0 or 1
+    
 
 
 # Ressources
