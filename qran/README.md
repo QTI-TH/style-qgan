@@ -60,7 +60,7 @@ Discriminator quality (orange): n_layers=2, n_input=20000, cma algorithm
 
 Generator data (orange): n_layers=2, n_generate=2000, cma algorithm 
 
-<img width="649" alt="qg" src="https:https://github.com/scarrazza/qgmc/files/6398035/qgenerator.pdf">
+<img width="649" alt="qg" src="https://github.com/scarrazza/qgmc/files/6398035/qgenerator.pdf">
 
 
 
