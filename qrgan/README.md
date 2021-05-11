@@ -53,9 +53,14 @@ Routines to run the QML quantum generator (qgenerator.py):
 
 **Generator**
 
-Generator data (orange): n_layers=2, n_target=2000, n_samples=200, n_meas=10, n_generate=10000, cma algorithm 
+- Generator data (orange): n_layers=4, n_target=2000, n_samples=200, n_meas=10, n_generate=10000, cma algorithm (maxiter=100)
 
-<img width="649" alt="qg" src="https://github.com/scarrazza/qgmc/files/6398035/qgenerator.pdf">
+<img width="649" alt="qg" src="https://user-images.githubusercontent.com/11166117/117848299-777be400-b283-11eb-8423-0bd54ff46007.png">
+
+
+- Generator data (orange): n_layers=2, n_target=2000, n_samples=200, n_meas=10, n_generate=10000, cma algorithm (maxiter=100)
+
+<img width="649" alt="qg" src="https://user-images.githubusercontent.com/11166117/117848504-aa25dc80-b283-11eb-95c0-bf50fa41c9e9.png">
 
 
 
