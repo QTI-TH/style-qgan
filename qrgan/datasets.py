@@ -30,16 +30,26 @@ def create_dataset(nmeas=10, nsamp=200, seed=0):
 
 
 # create one sample of the target distribution
-def create_target(nmeas=2000, seed=0):
+def create_target(name, nmeas=2000, seed=0):
     
     
     # draw from a Gaussian distribution
-    m=0
-    sig=0.25
-    target = np.random.default_rng(seed).normal(m, sig, nmeas)
+    if name in ['gauss']:
+        m=0
+        sig=0.25
+        target = np.random.default_rng(seed).normal(m, sig, nmeas)
     
-    print("# Testing mean of target:")
-    print(abs(m - np.mean(target)))
+        print("# Testing mean of target (Gaussian):")
+        print(abs(m - np.mean(target)))
+        
+    if name in ['lognormal']:    
+        m=-0.5
+        sig=0.5
+        target = np.random.default_rng(seed).lognormal(m, sig, nmeas)-1
+        
+        print("# Testing mean of target (Lognormal):")
+        print(abs(m - np.mean(target)))
+        
     
     return target
 

@@ -38,7 +38,7 @@ from qgenerator import single_qubit_generator
 dlayers=1 # hacked to be equal to qlassifier layers 
 
 # can choose a different number of generator vs. discriminator layers
-glayers=4
+glayers=2
 
 # train a new qgenerator? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
 new_qgenerator=1

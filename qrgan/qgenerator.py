@@ -49,7 +49,7 @@ class single_qubit_generator:
         self.dlayers = dlayers
         
         self.data_set = create_dataset()
-        self.target = create_target()
+        self.target = create_target('lognormal')
                
         outf = open("./out.qgen.target", "w")
         for x in self.target:
