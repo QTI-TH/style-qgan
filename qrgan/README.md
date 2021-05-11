@@ -53,7 +53,7 @@ Routines to run the QML quantum generator (qgenerator.py):
 
 ## Some observations
 
-The minimisation does not go very well. In these examples the worst case for the two distributions D_target != D_generated implies a cf=200 (i.e. cost=1 for each of the test samples). Typically the cf reached at the iteration cutoff=100 is around cf=100-120. This implies that of 200 samples generated only 80-100 will actually lie in the target distribution on average. In that light it makes sense that all figures exhibit a strong uniformly distributed background. It is likely that replacing the simple yes/no-based cost function with one in which the KS distance is minimised instead. However, once a discriminator comes into play that won't work anymore since it will reply the yes/no answers as is done here. The idea was indeed to mimic the discriminator response in this way.
+The minimisation does not go very well. In these examples the worst case for the two distributions D_target != D_generated implies a cf=200 (i.e. cost=1 for each of the test samples). Typically the cf reached at the iteration cutoff=100 is around cf=100-120. This implies that of 200 samples generated only 80-100 will actually lie in the target distribution on average. In that light it makes sense that all figures exhibit a strong uniformly distributed background. It is likely that replacing the simple yes/no-based cost function with one in which the KS distance is minimised instead will work better. However, once a discriminator comes into play that won't work anymore since it will reply the yes/no answers as is done here. The idea was indeed to mimic the discriminator response in this way.
 
 ## Generator, Gaussian
 
