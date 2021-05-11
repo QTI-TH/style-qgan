@@ -12,7 +12,7 @@
   - task is to transform input=(x) to output=(x_new), where x_new is distributed as the target distribution. 
   - the discriminator evaluates the result by asigning labels to the y_new. The cost function is minimised when all labels are 1=in the distribution
 
-** Implementation **
+## Implementation 
 
 Generator recipe:
 - generate target sample by pulling n numbers from a Gaussian distribution (python implementation)
