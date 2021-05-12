@@ -72,6 +72,14 @@ The minimisation does not go very well. In these examples the worst case for the
 
 <img width="649" alt="qg" src="https://user-images.githubusercontent.com/11166117/117863900-8919b780-b294-11eb-9b49-edb3645aa884.png">
 
+
+## Generator, Gauss, score criterion
+
+- Generator setup: n_layers=2, n_target=2000, n_samples=200, n_meas=10, n_generate=10000, cma algorithm (maxiter=100)
+
+<img width="649" alt="qg" src="https://user-images.githubusercontent.com/11166117/117998943-a7d78700-b344-11eb-8da6-8954784ae2c6.png">
+
+
 ## Generator, Lognormal, score criterion
 
 - Generator setup: n_layers=2, n_target=2000, n_samples=200, n_meas=10, n_generate=10000, cma algorithm (maxiter=100)
