@@ -138,11 +138,16 @@ class single_qubit_generator:
             # "fake" discriminator, do the Kolmogorov-Smirnoff test
             kstst=ks_2samp(y,self.target)
             
-            # if the p-value of the KS test is larger than 0.7 accept the result
-            if kstst[1] > 0.4:
-                cf+=0
-            else:
-                cf+=1    
+            # yes/no approach: if the p-value of the KS test is larger than 0.4 accept the result 
+            #if kstst[1] > 0.4:
+            #    cf+=0
+            #else:
+            #    cf+=1    
+            
+            # score approach: return KS p-value as score to be minimised, i.e. p=1 -> cf+=0, p=0 -> cf+=1
+            cf+=(1 - kstst[1])
+                
+                
             
             # Kullbeck-Leibler needs conversion from distributed points to pdf
             #kldv=entropy(self.target)
