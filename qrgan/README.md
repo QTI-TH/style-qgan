@@ -75,7 +75,7 @@ The minimisation does not go very well. In these examples the worst case for the
 ## Generator, Lognormal, score criterion
 
 - Generator setup: n_layers=2, n_target=2000, n_samples=200, n_meas=10, n_generate=10000, cma algorithm (maxiter=100)
-- 
+
 <img width="649" alt="qg" src="https://user-images.githubusercontent.com/11166117/117973536-d3e70e00-b32c-11eb-916b-408af05ec2b2.png">
 
 
