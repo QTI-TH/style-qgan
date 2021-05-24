@@ -19,14 +19,11 @@
 from qibo.models import Circuit
 from qibo import hamiltonians, gates, models
 import numpy as np
-from datasets import create_dataset, create_target
+from datasets import create_training
 import tensorflow as tf
 import os
 import qibo as qibo
 from itertools import product
-from scipy.stats import entropy
-from scipy.stats import gaussian_kde
-from scipy.stats import ks_2samp
 
 
 # set the number of threads to 1, if you want to
@@ -36,8 +33,8 @@ current_threads = qibo.get_threads()
 print("Qibo runs with "+str(current_threads)+" thread(s)")
 
 
-class single_qubit_generator:
-    def __init__(self, layers, dlayers, grid=None, seed=0):
+class single_qubit_classifier:
+    def __init__(self, layers, grid=None, seed=0):
        
        
         print('# Reading qlassifier parameters into generator...')
@@ -46,15 +43,13 @@ class single_qubit_generator:
         
         np.random.seed(seed)
         self.layers = layers
-        self.dlayers = dlayers
         
-        self.data_set = create_dataset()
-        self.target = create_target('gauss')
+        self.training = create_training('gauss')
                
-        outf = open("./out.qgen.target", "w")
-        for x in self.target:
-             outf.write("%.7e\n" % ( x ))
-        outf.close
+        #outf = open("./out.qdsc.training", "w")
+        #for x in self.training:
+        #     outf.write("%.7e\n" % ( x ))
+        #outf.close
         
         
         self.params = np.random.randn(layers * 4)
@@ -109,51 +104,54 @@ class single_qubit_generator:
         Returns:
             float with the cost function.
         """
-        #print(params)
-
+        
+        # need a blank state to contract fidelity against
+        blank_state = [np.array([1, 0], dtype='complex'), np.array([0, 1], dtype='complex')]
+        
+        # setup parameters
         if params is None:
             params = self.params       
 
         self.set_parameters(params)        
         
-        cf=0 
+        #print(self.training[0], self.training[1])
         
-        #print(self.data_set.shape)         
-        #print(len(self.data_set))
-        #print(len(self.data_set[0]))
-         
-        #for i in range(0,len(self.data_set)):
-        for i in range(0,len(self.data_set)):
-            
-            y=np.zeros(len(self.data_set[0])) 
-            for j in range(0,len(self.data_set[0])):
-                
-                # generate the real output from our circuit
-                x = self.data_set[i,j]       
-                C = self.circuit(x)
-                state1 = C.execute()
-                y[j] = qgen_real_out(state1)
-             
+        # initiate cost function and calculate it
+        cf=0
+        tots=len(self.training[0])
+        quali=0
+        
+        for i in range(0,len(self.training[0])):
                     
-            # "fake" discriminator, do the Kolmogorov-Smirnoff test
-            kstst=ks_2samp(y,self.target)
+            slabl=0    
+            for x in self.training[0][i]:
+                #y=self.training[1][i]
+                #print(x,y)   
             
-            # yes/no approach: if the p-value of the KS test is larger than 0.4 accept the result 
-            #if kstst[1] > 0.4:
-            #    cf+=0
-            #else:
-            #    cf+=1    
-            
-            # score approach: return KS p-value as score to be minimised, i.e. p=1 -> cf+=0, p=0 -> cf+=1
-            cf+=(1 - kstst[1])
+                # generate the output from our circuit     
+                C = self.circuit(x)
+                state1 = C.execute()   
+                 
+                # label is projected out via fidelity: y=yes -> blank_state[1], y=no -> blank_state[0]
+                #slabl += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
+                # not a good cost function, would prefer something that is based on how many it got right. Like in the predict case
+           
+           #slabl/=(len(self.training[0][0]))        
+           #cf+=slabl
+           
+                # from predict, in this cost function cf=0 when all labels are right
+                fids = np.empty(len(blank_state))
+                for j, t in enumerate(blank_state):
+                    fids[j] = fidelity(state1, t)
+                slabl += np.argmax(fids)
                 
+            slabl/=(len(self.training[0][0]))     
+
+            qtest = self.training[1][i] - slabl
+            if qtest == 0.0:
+                quali+=1
                 
-            
-            # Kullbeck-Leibler needs conversion from distributed points to pdf
-            #kldv=entropy(self.target)
-            #print(kldv)    
-            
-        #cf /= len(self.data_set)
+        cf=tots-quali    
         
         tflabel = tf.convert_to_tensor(cf, dtype=tf.float64)
         cf=(tflabel)
@@ -230,30 +228,38 @@ class single_qubit_generator:
         return result, parameters
 
 
-    def generate(self):
-        """Method for predicting data
-        Returns:
-            files with data etc
-        """
-        
-        outf = open("./out.qgen.samples", "w")
-        
-        nsamples=1000        
-        for i in range(0,nsamples):
-            
-            xwindow=1 # between -xwindow and xwindow
-            x=float(xwindow * ( 1 - 2 * np.random.rand(1, 1)))
 
-            C = self.circuit(x)
-            state = C.execute()
-            y = qgen_real_out(state)
-                    
-            outf.write("%.7e %.7e\n" % ( y, x ))
+    def predict(self):
+    
+  
+        # need a blank state to contract fidelity against
+        blank_state = [np.array([1, 0], dtype='complex'), np.array([0, 1], dtype='complex')]
         
-        outf.close
-        
-        
-        return 0    
+        tots=len(self.training[0])
+        quali=0
+        for i in range(0,len(self.training[0])):
+            
+            slabl=0
+            for x in self.training[0][i]:
+                
+                # generate the output from our circuit     
+                C = self.circuit(x)
+                state1 = C.execute()
+
+                fids = np.empty(len(blank_state))
+                for j, t in enumerate(blank_state):
+                    fids[j] = fidelity(state1, t)
+                slabl += np.argmax(fids)
+                
+            slabl/=(len(self.training[0][0]))     
+
+            qtest = self.training[1][i] - slabl
+            if qtest == 0.0:
+                quali+=1
+            
+        print("# The discriminator got {} of {} right in training".format(quali, tots))    
+            
+        return quali, tots
 
 
 def qgen_real_out(state):

@@ -2,6 +2,7 @@
 #import datasets as ds
 import numpy as np
 from qgenerator import single_qubit_generator
+from qclassifier import single_qubit_classifier
 
 # ###############################################################################
 #
@@ -27,21 +28,61 @@ from qgenerator import single_qubit_generator
 # The discriminator
 # #########################
 
-# For now the discriminator is handled analytically
+# set discriminator layers
+dlayers=4 
+
+# train a new qgenerator? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
+new_qdiscriminator=1
+
+# Define discriminator
+print("# ### Discriminator with {} layers".format(dlayers))
+qd = single_qubit_classifier(dlayers)  
+
+qd.predict()
+
+# Run discriminator training
+if new_qdiscriminator==1:
+    print('# Running new discriminator parameters')
+    
+    # do not use the scipy minimize as before, the search space is too small
+    #dresult, dparameters = qd.minimize(method='l-bfgs-b', options={'disp': True, 'maxiter': 3}) 
+    
+    # genetic algorithm seems to work better
+    dresult, dparameters = qd.minimize(method='cma', options={'seed':113895, 'maxiter': 10})
+
+    outf=open("./out.qdsc.parameters", "w")
+    
+    for n in range(0,len(dparameters)):
+        outf.write("%13e " %(dparameters[n]) )
+    outf.flush()
+    outf.close    
+else:
+    print('# Reading qgenerator parameters...')
+    gparameters = np.loadtxt("./out.qdsc.parameters"); 
+
+# Output parameters and generate data      
+print("# Parameters are:")
+print(dparameters) 
+
+qd.set_parameters(dparameters)
+qd.predict()
+
+value_loss = qd.cost_function()
+print('# The value of the qdiscriminator cost function achieved is %.6f' % value_loss.numpy())
+
 
 
 # #########################
 # The generator
 # #########################
 
-# need to tell the generator how many layers there were in the discriminator
-dlayers=1 # hacked to be equal to qlassifier layers 
+# No discriminator, Kolmogorov-Smirnov instead
 
-# can choose a different number of generator vs. discriminator layers
-glayers=3
+# generator layers, discriminator layer needs to be set irrespectively
+glayers=1
 
 # train a new qgenerator? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
-new_qgenerator=1
+new_qgenerator=0
 
 # Define generator
 print("# ### Generator with {} layers".format(glayers))
@@ -52,10 +93,10 @@ if new_qgenerator==1:
     print('# Running new qgenerator parameters')
     
     # do not use the scipy minimize as before, the search space is too small
-    #gresult, gparameters = qg.minimize(method='l-bfgs-b', options={'disp': True}) 
+    #gresult, gparameters = qg.minimize(method='l-bfgs-b', options={'disp': True, 'maxiter': 3}) 
     
     # genetic algorithm seems to work better
-    gresult, gparameters = qg.minimize(method='cma', options={'seed':113895, 'maxiter': 100})
+    gresult, gparameters = qg.minimize(method='cma', options={'seed':113895, 'maxiter': 3})
 
     outf=open("./out.qgen.parameters", "w")
     
