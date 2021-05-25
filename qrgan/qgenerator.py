@@ -156,7 +156,7 @@ class single_qubit_generator:
         
         
         cf = tf.keras.losses.binary_crossentropy(yfake, yguess)
-        cf = tf.reduce_mean(cf)
+        #cf = tf.reduce_mean(cf)
         
         cf /= self.nmeas
     

@@ -31,17 +31,17 @@ import tensorflow as tf
 # #########################
 
 # set discriminator layers
-dlayers=3
+dlayers=5
 
 # set generator layers
-glayers=3
+glayers=5
 
 # set size of mini batch
 nmeas=50
 
 # number of iterations in minimizer
-dmaxiter=2
-gmaxiter=2
+dmaxiter=10
+gmaxiter=10
 
 # set number of epochs
 nepoch=100
@@ -55,6 +55,9 @@ dseed=1
 gseed=2
 fseed=3
 
+# open losses file freshly
+outf1 = open("./out.qgen.losses", "w")
+outf1.close
 
 # output target distribution
 xtarget, ytarget = ds.create_target_training('gauss',1000,dseed)
@@ -91,8 +94,8 @@ for n in range(0,nepoch+1):
     # set the real and fake data, then update in joined cost function
     qd.set_data(xreal,yreal)
     qd.set_fake([xfake],[yfake])
-    dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
-    #dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
+    #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
+    dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
     qd.set_parameters(dpar)
 
     # figure out how many times it managed to make the label be the passed one
@@ -118,8 +121,8 @@ for n in range(0,nepoch+1):
     qg.set_dparameters(dpar)
     qg.set_seed(fseed)
     qg.cost_function()
-    gloss, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': gmaxiter}) 
-    #gloss, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': gmaxiter}) 
+    #gloss, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': gmaxiter}) 
+    gloss, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': gmaxiter}) 
     
     # these are the new generator values, repeat the calculation
     qg.set_parameters(gpar)
