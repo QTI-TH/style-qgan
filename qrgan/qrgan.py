@@ -30,16 +30,19 @@ import datasets as ds
 # #########################
 
 # set discriminator layers
-dlayers=2
+dlayers=1
 
 # set generator layers
-glayers=2
+glayers=1
 
 # set size of mini batch
-nmeas=100
+nmeas=50
 
 # number of iterations in minimizer
 maxiter=10
+
+# set number of epochs
+nepoch=100
 
 # set up the generator and discriminator
 qd = single_qubit_classifier(dlayers)
@@ -48,8 +51,8 @@ qg = single_qubit_generator(glayers,dlayers)
 
 dseed=1
 gseed=1
-# loop over epochs
-for n in range(0,10):
+# loop over iterations
+for n in range(0,nepoch):
 
     dseed+=1
     gseed+=1
@@ -120,8 +123,25 @@ for n in range(0,10):
     qg.set_parameters(gpar)
     #print("# Real gen:", qg.params,gres)
 
-    print("# Epoch {}: G_loss= {}, Davg_loss= {}".format(n,gres,dloss))
+    print("# Iteration {}: G_loss= {}, Davg_loss= {}".format(n,gres,dloss))
     
 
+# #########################
+# Finally, generate data
+# #########################
 
+print ("# Generate a few test samples")
 
+nsamp=1000
+nseed=nsamp
+
+qg.set_parameters(gpar)
+xinput = ds.create_dataset(nsamp,1,nseed)
+xgen = qg.generate(xinput,gpar)
+
+outf = open("./out.qgen.samples", "w")
+
+for i in range(0,nsamp):
+    outf.write("%.7e\n" % ( xgen[i] ))
+        
+outf.close
