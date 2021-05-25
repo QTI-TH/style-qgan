@@ -202,7 +202,7 @@ class single_qubit_classifier:
             fids = np.empty(len(blank_state))
             for i, t in enumerate(blank_state):
                 fids[i] = fidelity(state, t)
-            labels[j] = np.argmax(fids)
+            labels[j] = float(np.argmax(fids))
 
         #print(labels)
         return labels

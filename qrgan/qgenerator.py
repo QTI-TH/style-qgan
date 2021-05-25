@@ -131,7 +131,9 @@ class single_qubit_generator:
 
         return labels   
   
-  
+    
+    def set_seed(self, sseed):
+        self.seed=sseed
                       
     def cost_function(self, params=None):
         
@@ -142,7 +144,7 @@ class single_qubit_generator:
         self.set_parameters(params)
                
         # First create another set of fake data, using the gparams, this time the labels are set to 1
-        gseed=10
+        gseed=self.seed
         xinput = create_dataset(self.nmeas,1,gseed)
         xfake = self.generate(xinput,params)
         yfake = np.ones(self.nmeas)

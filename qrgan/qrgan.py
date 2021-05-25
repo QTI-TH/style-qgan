@@ -30,10 +30,10 @@ import datasets as ds
 # #########################
 
 # set discriminator layers
-dlayers=1
+dlayers=2
 
 # set generator layers
-glayers=1
+glayers=2
 
 # set size of mini batch
 nmeas=50
@@ -42,7 +42,7 @@ nmeas=50
 maxiter=10
 
 # set number of epochs
-nepoch=100
+nepoch=200
 
 # set up the generator and discriminator
 qd = single_qubit_classifier(dlayers)
@@ -50,12 +50,14 @@ qg = single_qubit_generator(glayers,dlayers)
 
 
 dseed=1
-gseed=1
+gseed=2
+fseed=3
 # loop over iterations
 for n in range(0,nepoch):
 
     dseed+=1
     gseed+=1
+    fseed+=1
     
     # create a sample of real data with labels=1
     xreal, yreal = ds.create_target_training('gauss',nmeas,dseed)
@@ -73,16 +75,15 @@ for n in range(0,nepoch):
     xfake = qg.generate(xinput,gpar)
     yfake = np.zeros(nmeas)
 
-    # train the discriminator on these two samples, just one iteration of the minimizer
+    # train the discriminator on these two samples
 
     # first the real
     qd.set_data(xreal,yreal)
-    #dres_real, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': 2}) 
+    #dres_real, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': maxiter}) 
     dres_real, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
     qd.set_parameters(dpar)
-    #print("# Real train:", qd.params,dres_real)
-    #qd.predict(xreal,dpar)
-    #print("#        Real train got it right {}%".format( (1-np.sum(yreal-qd.predict(xreal,dpar)))*100 )  )
+
+    # figure out how many times it managed to make the label be the passed one
     rreal=0
     for i in range(0,len(yfake)):
         yguess=qd.predict(xreal,dpar)
@@ -92,42 +93,75 @@ for n in range(0,nepoch):
 
     # then the fake, the first guess parameters have been set by the previous training
     qd.set_data([xfake],[yfake])
-    #dres_fake, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': 2}) 
+    #dres_fake, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': maxiter}) 
     dres_fake, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
     qd.set_parameters(dpar)
-    #qd.predict([xfake],dpar)
-    #print("#        Fake train got it right {}%".format( (1-np.sum(yfake-qd.predict([xfake],dpar)))*100 )  )
+
+    # figure out how many times it managed to make the label be the passed one
     rfake=0
     for i in range(0,len(yfake)):
         yguess=qd.predict([xfake],dpar)
         qtst=(yfake[i]-yguess[i])
         if qtst==0:
             rfake+=1
-                        
-    #print(rreal,rfake)
-    print("# -------- Discriminator update, correct guess: Real {}/{}, Fake {}/{}".format(rreal,nmeas,rfake,nmeas))
+                          
+    #print("# ------------ Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
+    print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
         
-
     dloss= 0.5*(dres_real + dres_fake)
     #print("# Averaged discriminator loss:", dloss)
 
-
-    # pass this info to the generator and minimize, just one iteration of the minimizer
+    # pass this info to the generator and minimize
     qg.set_dparameters(dpar)
-    #print(qg.dparams, qg.params)
+    qg.set_seed(fseed)
     qg.cost_function()
     #gres, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': 2}) 
-    gres, gpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
+    gres, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
     
     # these are the new generator values, repeat the calculation
     qg.set_parameters(gpar)
     #print("# Real gen:", qg.params,gres)
+    
+    # figure out how many times the generator passed
+    xinput = ds.create_dataset(nmeas,1,fseed)
+    xtest = qg.generate(xinput,gpar)
+    ytest = np.sum(qd.predict([xtest]))
+    #ytest2 = np.sum(qg.dpredict([xtest]))
+    #print("# ------------ Generator update, times passed: {} / {}".format(int(ytest),len(xtest)))
+    print("#              Generator update, times passed: {} / {}".format(int(ytest),len(xtest)))
+    
+    
 
     print("# Iteration {}: G_loss= {}, Davg_loss= {}".format(n,gres,dloss))
     
 
+    # #########################
+    # generate data on the fly
+    # #########################
+
+    if n%10==0:
+        #print ("# ============ Generate a few test samples")
+        print ("#              Generate a few test samples")
+
+        nsamp=1000
+        nseed=nsamp
+
+        qg.set_parameters(gpar)
+        xinput = ds.create_dataset(nsamp,1,nseed)
+        xgen = qg.generate(xinput,gpar)
+
+        outf = open("./out.qgen.samples.n{}".format(n), "w")
+
+        for i in range(0,nsamp):
+            outf.write("%.7e\n" % ( xgen[i] ))
+        
+        outf.close
+
+
+
+
 # #########################
-# Finally, generate data
+# Final data generation
 # #########################
 
 print ("# Generate a few test samples")
