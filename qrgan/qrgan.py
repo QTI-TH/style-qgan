@@ -36,10 +36,11 @@ dlayers=2
 glayers=2
 
 # set size of mini batch
-nmeas=50
+nmeas=20
 
 # number of iterations in minimizer
-maxiter=10
+gmaxiter=1
+dmaxiter=10
 
 # set number of epochs
 nepoch=200
@@ -79,8 +80,8 @@ for n in range(0,nepoch):
 
     # first the real
     qd.set_data(xreal,yreal)
-    #dres_real, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': maxiter}) 
-    dres_real, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
+    dres_real, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
+    #dres_real, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
     qd.set_parameters(dpar)
 
     # figure out how many times it managed to make the label be the passed one
@@ -93,8 +94,8 @@ for n in range(0,nepoch):
 
     # then the fake, the first guess parameters have been set by the previous training
     qd.set_data([xfake],[yfake])
-    #dres_fake, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': maxiter}) 
-    dres_fake, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
+    dres_fake, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
+    #dres_fake, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
     qd.set_parameters(dpar)
 
     # figure out how many times it managed to make the label be the passed one
@@ -115,8 +116,8 @@ for n in range(0,nepoch):
     qg.set_dparameters(dpar)
     qg.set_seed(fseed)
     qg.cost_function()
-    #gres, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': 2}) 
-    gres, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
+    gres, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': gmaxiter}) 
+    #gres, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': gmaxiter}) 
     
     # these are the new generator values, repeat the calculation
     qg.set_parameters(gpar)

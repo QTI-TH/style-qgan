@@ -148,6 +148,7 @@ class single_qubit_generator:
         xinput = create_dataset(self.nmeas,1,gseed)
         xfake = self.generate(xinput,params)
         yfake = np.ones(self.nmeas)
+        #print(xfake)
         
         # Now guess the labels using the discriminator
         yguess = self.dpredict([xfake])
@@ -155,7 +156,9 @@ class single_qubit_generator:
         
         
         cf = tf.keras.losses.binary_crossentropy(yfake, yguess)
-        cf = tf.reduce_mean(cf)
+        #cf = tf.reduce_mean(cf)
+        
+        cf /= self.nmeas
     
         #tflabel = tf.convert_to_tensor(cf, dtype=tf.float64)
         #cf=(tflabel)
@@ -257,9 +260,9 @@ class single_qubit_generator:
 def qgen_real_out(state):
     hx  = hamiltonians.X(1, numpy=True) # create a 1-qubit Pauli-X Hamiltonian
     num = hx.expectation(state).numpy().real # project the state (output from generator) with Hamiltonian 
-    #res = (1 - num) / (1+num) # relate this way, it's positive
+    res = (1 - num) / (1+num) # relate this way, it's positive
     #res = np.abs(num) # make it easier for the network by mapping the result between 0 and 1 
-    res = num # between -1 and 1
+    #res = num # between -1 and 1
     return res
          
 def fidelity(state1, state2):

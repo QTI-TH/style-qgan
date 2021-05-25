@@ -23,8 +23,10 @@ def create_dataset(nmeas=10, nsamp=100, seed=0):
     
     data=np.zeros((nsamp,nmeas)) 
     # draw from a uniform distribution
-    xwindow=1
-    data=xwindow * ( 1 - 2 * np.random.rand(nsamp, nmeas)) # between -xwindow and xwindow
+    #xwindow=1
+    #data=xwindow * ( 1 - 2 * np.random.rand(nsamp, nmeas)) # between -xwindow and xwindow
+    data=np.random.rand(nsamp, nmeas) # between 0 and 1
+    
     
     return data
 
@@ -64,8 +66,8 @@ def create_target_training(name, nmeas=10, nsamp=1, seed=0):
     # draw from a Gaussian distribution
     if name in ['gauss']:
         # target distribution parameters
-        m=0
-        sig=0.25
+        m=0.5
+        sig=0.125
         
         # draw nsamples of nmeas length    
         for n in range(0,nsamp): 
@@ -82,7 +84,7 @@ def create_target_training(name, nmeas=10, nsamp=1, seed=0):
         # draw nsamples of nmeas length    
         for n in range(0,nsamp): 
             seed+=1
-            data[n,:] = np.random.default_rng(seed).lognormal(m, sig, nmeas)-1
+            data[n,:] = np.random.default_rng(seed).lognormal(m, sig, nmeas) # between 0 and 1, otherwise do -1 to expression
             labl[n,:]=1
          
     
