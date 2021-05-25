@@ -95,18 +95,17 @@ for n in range(0,nepoch+1):
     #dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
     qd.set_parameters(dpar)
 
- 
     # figure out how many times it managed to make the label be the passed one
     rfake=0
-    for i in range(0,len(yfake)):
-        yguess=qd.predict([xfake],dpar)
+    yguess=qd.predict([xfake],dpar)
+    for i in range(0,nmeas): 
         qtst=(yfake[i]-yguess[i])
         if qtst==0:
             rfake+=1
             
     rreal=0
-    for i in range(0,len(yreal)):
-        yguess=qd.predict(xreal,dpar)
+    yguess=qd.predict(xreal,dpar)
+    for i in range(0,nmeas): 
         qtst=(yreal[0][i]-yguess[i])
         if qtst==0:
             rreal+=1        
