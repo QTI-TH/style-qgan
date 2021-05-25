@@ -36,11 +36,11 @@ dlayers=2
 glayers=2
 
 # set size of mini batch
-nmeas=20
+nmeas=100
 
 # number of iterations in minimizer
+dmaxiter=1
 gmaxiter=1
-dmaxiter=10
 
 # set number of epochs
 nepoch=200
@@ -49,18 +49,27 @@ nepoch=200
 qd = single_qubit_classifier(dlayers)
 qg = single_qubit_generator(glayers,dlayers)
 
-
+# initiate seeds
 dseed=1
 gseed=2
 fseed=3
+
+
+# output target distribution
+xtarget, ytarget = ds.create_target_training('gauss',1000,dseed)
+outf = open("./out.qgen.target", "w")
+for i in range(0,1000):
+    outf.write("%.7e\n" % ( xtarget[0][i] ))        
+outf.close
+
 # loop over iterations
-for n in range(0,nepoch):
+for n in range(0,nepoch+1):
 
     dseed+=1
     gseed+=1
     fseed+=1
     
-    # create a sample of real data with labels=1
+    # create a mini-batch of real data with labels=1
     xreal, yreal = ds.create_target_training('gauss',nmeas,dseed)
 
     # set the generator parameters from last iteration, except if it's the first iteration
@@ -105,9 +114,16 @@ for n in range(0,nepoch):
         qtst=(yfake[i]-yguess[i])
         if qtst==0:
             rfake+=1
+            
+    rreal2=0
+    for i in range(0,len(yreal)):
+        yguess=qd.predict(xreal,dpar)
+        qtst=(yreal[0][i]-yguess[i])
+        if qtst==0:
+            rreal2+=1        
                           
     #print("# ------------ Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
-    print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
+    print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {} (Real: {})".format(rreal,nmeas,rfake,nmeas,rreal2))
         
     dloss= 0.5*(dres_real + dres_fake)
     #print("# Averaged discriminator loss:", dloss)
@@ -126,13 +142,12 @@ for n in range(0,nepoch):
     # figure out how many times the generator passed
     xinput = ds.create_dataset(nmeas,1,fseed)
     xtest = qg.generate(xinput,gpar)
-    ytest = np.sum(qd.predict([xtest]))
-    #ytest2 = np.sum(qg.dpredict([xtest]))
+    #ytest = np.sum(qd.predict([xtest]))
+    ytest = np.sum(qg.dpredict([xtest]))
     #print("# ------------ Generator update, times passed: {} / {}".format(int(ytest),len(xtest)))
     print("#              Generator update, times passed: {} / {}".format(int(ytest),len(xtest)))
     
     
-
     print("# Iteration {}: G_loss= {}, Davg_loss= {}".format(n,gres,dloss))
     
 

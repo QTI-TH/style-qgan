@@ -30,7 +30,7 @@ from itertools import product
 qibo.set_threads(1)
 # retrieve the current number of threads
 current_threads = qibo.get_threads()
-print("Qibo runs with "+str(current_threads)+" thread(s)")
+print("# Qibo runs with "+str(current_threads)+" thread(s)")
 
 
 class single_qubit_classifier:
