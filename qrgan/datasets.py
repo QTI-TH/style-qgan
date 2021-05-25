@@ -19,7 +19,7 @@ import numpy as np
 from itertools import product
 
 # create set of samples, nsamp=number of samples in set, nmeas=number of points in sample
-def create_dataset(nmeas=10, nsamp=200, seed=0):
+def create_dataset(nmeas=10, nsamp=100, seed=0):
     
     data=np.zeros((nsamp,nmeas)) 
     # draw from a uniform distribution
@@ -30,7 +30,7 @@ def create_dataset(nmeas=10, nsamp=200, seed=0):
 
 
 # create one sample of the target distribution
-def create_target(name, nmeas=2000, seed=0):
+def create_target(name, nmeas=1000, seed=0):
     
     
     # draw from a Gaussian distribution
@@ -53,6 +53,41 @@ def create_target(name, nmeas=2000, seed=0):
         
     
     return target
+    
+
+# Create a mini batch with labels    
+def create_target_training(name, nmeas=10, nsamp=1, seed=0):
+    
+    data=np.zeros((nsamp,nmeas)) 
+    labl=np.zeros((nsamp,nmeas)) 
+        
+    # draw from a Gaussian distribution
+    if name in ['gauss']:
+        # target distribution parameters
+        m=0
+        sig=0.25
+        
+        # draw nsamples of nmeas length    
+        for n in range(0,nsamp): 
+            seed+=1
+            data[n,:] = np.random.default_rng(seed).normal(m, sig, nmeas)
+            labl[n,:]=1
+ 
+    # draw from a Log-normal distribution
+    if name in ['lognormal']:
+        # target distribution parameters
+        m=-0.5
+        sig=0.5
+        
+        # draw nsamples of nmeas length    
+        for n in range(0,nsamp): 
+            seed+=1
+            data[n,:] = np.random.default_rng(seed).lognormal(m, sig, nmeas)-1
+            labl[n,:]=1
+         
+    
+    return data, labl
+    
 
 
 # Discriminator training
@@ -63,7 +98,7 @@ def create_target(name, nmeas=2000, seed=0):
 #       target = gauss: uniform and lognormal - only option right now
 #       target = lognormal: uniform and gauss
 #
-def create_training(name, nmeas=10, nsamp=400, seed=0):
+def create_training(name, nmeas=10, nsamp=100, seed=0):
     
     data=np.zeros((nsamp,nmeas)) 
     labl=np.zeros(nsamp) 

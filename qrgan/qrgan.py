@@ -3,6 +3,7 @@
 import numpy as np
 from qgenerator import single_qubit_generator
 from qclassifier import single_qubit_classifier
+import datasets as ds
 
 # ###############################################################################
 #
@@ -25,97 +26,102 @@ from qclassifier import single_qubit_classifier
 
 
 # #########################
-# The discriminator
+# The GAN
 # #########################
 
 # set discriminator layers
-dlayers=4 
+dlayers=2
 
-# train a new qgenerator? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
-new_qdiscriminator=1
+# set generator layers
+glayers=2
 
-# Define discriminator
-print("# ### Discriminator with {} layers".format(dlayers))
-qd = single_qubit_classifier(dlayers)  
+# set size of mini batch
+nmeas=100
 
-qd.predict()
+# number of iterations in minimizer
+maxiter=10
 
-# Run discriminator training
-if new_qdiscriminator==1:
-    print('# Running new discriminator parameters')
+# set up the generator and discriminator
+qd = single_qubit_classifier(dlayers)
+qg = single_qubit_generator(glayers,dlayers)
+
+
+dseed=1
+gseed=1
+# loop over epochs
+for n in range(0,10):
+
+    dseed+=1
+    gseed+=1
     
-    # do not use the scipy minimize as before, the search space is too small
-    #dresult, dparameters = qd.minimize(method='l-bfgs-b', options={'disp': True, 'maxiter': 3}) 
+    # create a sample of real data with labels=1
+    xreal, yreal = ds.create_target_training('gauss',nmeas,dseed)
+
+    # set the generator parameters from last iteration, except if it's the first iteration
+    if n==0:
+        gpar = qg.params
+        dpar = qd.params
+    else:
+        qg.set_parameters(gpar)
+        qd.set_parameters(dpar)
     
-    # genetic algorithm seems to work better
-    dresult, dparameters = qd.minimize(method='cma', options={'seed':113895, 'maxiter': 10})
+    # create a sample of fake data with labels=0    
+    xinput = ds.create_dataset(nmeas,1,gseed)
+    xfake = qg.generate(xinput,gpar)
+    yfake = np.zeros(nmeas)
 
-    outf=open("./out.qdsc.parameters", "w")
+    # train the discriminator on these two samples, just one iteration of the minimizer
+
+    # first the real
+    qd.set_data(xreal,yreal)
+    #dres_real, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': 2}) 
+    dres_real, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
+    qd.set_parameters(dpar)
+    #print("# Real train:", qd.params,dres_real)
+    #qd.predict(xreal,dpar)
+    #print("#        Real train got it right {}%".format( (1-np.sum(yreal-qd.predict(xreal,dpar)))*100 )  )
+    rreal=0
+    for i in range(0,len(yfake)):
+        yguess=qd.predict(xreal,dpar)
+        qtst=(yreal[0][i]-yguess[i])
+        if qtst==0:
+            rreal+=1
+
+    # then the fake, the first guess parameters have been set by the previous training
+    qd.set_data([xfake],[yfake])
+    #dres_fake, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': 2}) 
+    dres_fake, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
+    qd.set_parameters(dpar)
+    #qd.predict([xfake],dpar)
+    #print("#        Fake train got it right {}%".format( (1-np.sum(yfake-qd.predict([xfake],dpar)))*100 )  )
+    rfake=0
+    for i in range(0,len(yfake)):
+        yguess=qd.predict([xfake],dpar)
+        qtst=(yfake[i]-yguess[i])
+        if qtst==0:
+            rfake+=1
+                        
+    #print(rreal,rfake)
+    print("# -------- Discriminator update, correct guess: Real {}/{}, Fake {}/{}".format(rreal,nmeas,rfake,nmeas))
+        
+
+    dloss= 0.5*(dres_real + dres_fake)
+    #print("# Averaged discriminator loss:", dloss)
+
+
+    # pass this info to the generator and minimize, just one iteration of the minimizer
+    qg.set_dparameters(dpar)
+    #print(qg.dparams, qg.params)
+    qg.cost_function()
+    #gres, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': 2}) 
+    gres, gpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': maxiter}) 
     
-    for n in range(0,len(dparameters)):
-        outf.write("%13e " %(dparameters[n]) )
-    outf.flush()
-    outf.close    
-else:
-    print('# Reading qgenerator parameters...')
-    gparameters = np.loadtxt("./out.qdsc.parameters"); 
+    # these are the new generator values, repeat the calculation
+    qg.set_parameters(gpar)
+    #print("# Real gen:", qg.params,gres)
 
-# Output parameters and generate data      
-print("# Parameters are:")
-print(dparameters) 
-
-qd.set_parameters(dparameters)
-qd.predict()
-
-value_loss = qd.cost_function()
-print('# The value of the qdiscriminator cost function achieved is %.6f' % value_loss.numpy())
-
-
-
-# #########################
-# The generator
-# #########################
-
-# No discriminator, Kolmogorov-Smirnov instead
-
-# generator layers, discriminator layer needs to be set irrespectively
-glayers=1
-
-# train a new qgenerator? 1=yes, 0=no - requires parameters to be saved in out.qlassi.parameters
-new_qgenerator=0
-
-# Define generator
-print("# ### Generator with {} layers".format(glayers))
-qg = single_qubit_generator(glayers,dlayers)  
-
-# Run generator training
-if new_qgenerator==1:
-    print('# Running new qgenerator parameters')
+    print("# Epoch {}: G_loss= {}, Davg_loss= {}".format(n,gres,dloss))
     
-    # do not use the scipy minimize as before, the search space is too small
-    #gresult, gparameters = qg.minimize(method='l-bfgs-b', options={'disp': True, 'maxiter': 3}) 
-    
-    # genetic algorithm seems to work better
-    gresult, gparameters = qg.minimize(method='cma', options={'seed':113895, 'maxiter': 3})
-
-    outf=open("./out.qgen.parameters", "w")
-    
-    for n in range(0,len(gparameters)):
-        outf.write("%13e " %(gparameters[n]) )
-    outf.flush()
-    outf.close    
-else:
-    print('# Reading qgenerator parameters...')
-    gparameters = np.loadtxt("./out.qgen.parameters"); 
 
 
 
-# Output parameters and generate data      
-print("# Parameters are:")
-print(gparameters) 
-
-qg.set_parameters(gparameters)
-qg.generate()
-
-value_loss = qg.cost_function()
-print('# The value of the qgenerator cost function achieved is %.6f' % value_loss.numpy())

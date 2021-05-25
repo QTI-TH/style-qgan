@@ -19,14 +19,11 @@
 from qibo.models import Circuit
 from qibo import hamiltonians, gates, models
 import numpy as np
-from datasets import create_dataset, create_target
+from datasets import create_training
 import tensorflow as tf
 import os
 import qibo as qibo
 from itertools import product
-from scipy.stats import entropy
-from scipy.stats import gaussian_kde
-from scipy.stats import ks_2samp
 
 
 # set the number of threads to 1, if you want to
@@ -36,37 +33,51 @@ current_threads = qibo.get_threads()
 print("Qibo runs with "+str(current_threads)+" thread(s)")
 
 
-class single_qubit_generator:
-    def __init__(self, glayers, dlayers, nmeas=10, grid=None, seed=0):
+class single_qubit_classifier:
+    def __init__(self, layers, grid=None, seed=0):
        
        
-        print('# Setting up quantum generator...')
-         
+        print('# Starting quantum classifier ...')
+        #qlassi = np.loadtxt("./out.qlassi.parameters");
+        #self.qlassi = qlassi
+        
         np.random.seed(seed)
-        self.glayers = glayers
-        self.dlayers = dlayers
-        self.nmeas = nmeas
-                     
-        self.params = np.random.randn(glayers * 4)
+        self.layers = layers
+        
+        self.training = create_training('gauss')
+               
+        #outf = open("./out.qdsc.training", "w")
+        #for x in self.training:
+        #     outf.write("%.7e\n" % ( x ))
+        #outf.close
+        
+        
+        self.params = np.random.randn(layers * 4)
         self._circuit = self._initialize_circuit() # initialise with random parameters
- 
-        self.dparams = np.random.randn(dlayers * 4)
-        self._dcircuit = self._initialize_dcircuit() # initialise with random parameters
+        
+        # some tests of the initial labels and cost function labels 
+        print("# Testing, no minimisation:")
+        test_out=self.cost_function()
+        print("# --- initial cost function: {} ".format(test_out))
                     
-                    
-                    
-    # generator circuit      
+        try:
+            os.makedirs('results/generate'+self.name+'/%s_layers' % self.layers)
+        except:
+            pass
+            
+
     def set_parameters(self, new_params):
         """Method for updating parameters of the class.
         Args:
             new_params (array): New parameters to update
         """
-        self.params = new_params       
-    
+        self.params = new_params
+        
+    # generator circuit  
     def _initialize_circuit(self):
         """Creates variational circuit."""
         C = Circuit(1)
-        for l in range(self.glayers):
+        for l in range(self.layers):
             C.add(gates.RY(0, theta=0))
             C.add(gates.RZ(0, theta=0))
         return C            
@@ -79,84 +90,71 @@ class single_qubit_generator:
             Qibo circuit.
         """
         params = []
-        for i in range(0, 4 * self.glayers, 4):
+        for i in range(0, 4 * self.layers, 4):
             params.append(self.params[i] * x + self.params[i + 1]) # x is scalar in this case
             params.append(self.params[i + 2] * x + self.params[i + 3])  # x is scalar in this case
         self._circuit.set_parameters(params)
         return self._circuit
   
-    # discriminator circuit      
-    def set_dparameters(self, new_params):
-        """Method for updating parameters of the class.
+                       
+    def cost_function(self, params=None):
+        """Method for computing the cost function for the training set, using fidelity.
         Args:
-            new_params (array): New parameters to update
-        """
-        self.dparams = new_params       
-    
-    def _initialize_dcircuit(self):
-        """Creates variational circuit."""
-        D = Circuit(1)
-        for l in range(self.dlayers):
-            D.add(gates.RY(0, theta=0))
-            D.add(gates.RZ(0, theta=0))
-        return D            
-
-    def dcircuit(self, x):
-        """Method creating the circuit for a point (in the datasets).
-        Args:
-            x (array): Point to create the circuit.
+            params(array): new parameters to update before computing
         Returns:
-            Qibo circuit.
+            float with the cost function.
         """
-        dparams = []
-        for i in range(0, 4 * self.dlayers, 4):
-            dparams.append(self.dparams[i] * x + self.dparams[i + 1]) # x is scalar in this case
-            dparams.append(self.dparams[i + 2] * x + self.dparams[i + 3])  # x is scalar in this case
-        self._dcircuit.set_parameters(dparams)
-        return self._dcircuit
-  
-    def dpredict(self, xval):   
-             
+        
         # need a blank state to contract fidelity against
         blank_state = [np.array([1, 0], dtype='complex'), np.array([0, 1], dtype='complex')]
-        
-        labels = [[0]] * len(xval[0])
-        for j, x in enumerate(xval[0]):
-            D = self.dcircuit(x)
-            state = D.execute()
-            fids = np.empty(len(blank_state))
-            for i, t in enumerate(blank_state):
-                fids[i] = fidelity(state, t)
-            labels[j] = float(np.argmax(fids))
-
-        return labels   
-  
-  
-                      
-    def cost_function(self, params=None):
         
         # setup parameters
         if params is None:
             params = self.params       
 
-        self.set_parameters(params)
-               
-        # First create another set of fake data, using the gparams, this time the labels are set to 1
-        gseed=10
-        xinput = create_dataset(self.nmeas,1,gseed)
-        xfake = self.generate(xinput,params)
-        yfake = np.ones(self.nmeas)
+        self.set_parameters(params)        
         
-        # Now guess the labels using the discriminator
-        yguess = self.dpredict([xfake])
-        #print(yfake,yguess)
+        #print(self.training[0], self.training[1])
         
+        # initiate cost function and calculate it
+        cf=0
+        tots=len(self.training[0])
+        quali=0
         
-        cf = tf.keras.losses.binary_crossentropy(yfake, yguess)
-        cf = tf.reduce_mean(cf)
-    
-        #tflabel = tf.convert_to_tensor(cf, dtype=tf.float64)
-        #cf=(tflabel)
+        for i in range(0,len(self.training[0])):
+                    
+            slabl=0    
+            for x in self.training[0][i]:
+                #y=self.training[1][i]
+                #print(x,y)   
+            
+                # generate the output from our circuit     
+                C = self.circuit(x)
+                state1 = C.execute()   
+                 
+                # label is projected out via fidelity: y=yes -> blank_state[1], y=no -> blank_state[0]
+                #slabl += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
+                # not a good cost function, would prefer something that is based on how many it got right. Like in the predict case
+           
+           #slabl/=(len(self.training[0][0]))        
+           #cf+=slabl
+           
+                # from predict, in this cost function cf=0 when all labels are right
+                fids = np.empty(len(blank_state))
+                for j, t in enumerate(blank_state):
+                    fids[j] = fidelity(state1, t)
+                slabl += np.argmax(fids)
+                
+            slabl/=(len(self.training[0][0]))     
+
+            qtest = self.training[1][i] - slabl
+            if qtest == 0.0:
+                quali+=1
+                
+        cf=tots-quali    
+        
+        tflabel = tf.convert_to_tensor(cf, dtype=tf.float64)
+        cf=(tflabel)
         #print(params,float(cf))
         
         return cf    
@@ -165,7 +163,7 @@ class single_qubit_generator:
 
     def minimize(self, method='BFGS', options=None, compile=True):
         loss = self.cost_function
-        #print("# Run minimisation:")
+        print("# Run minimisation:")
 
 
         if method == 'cma':
@@ -230,26 +228,38 @@ class single_qubit_generator:
         return result, parameters
 
 
-    def generate(self, xval, params=None):
-        
-        if params is None:
-            params = self.params       
 
-        self.set_parameters(params)        
-        
-        
-        y=np.zeros((len(xval[0])))
-        
-        i=0
-        for x in xval[0]:
-            
-            C = self.circuit(x)
-            state = C.execute()
-            y[i] = qgen_real_out(state)
-            i+=1
-                
+    def predict(self):
     
-        return y  
+  
+        # need a blank state to contract fidelity against
+        blank_state = [np.array([1, 0], dtype='complex'), np.array([0, 1], dtype='complex')]
+        
+        tots=len(self.training[0])
+        quali=0
+        for i in range(0,len(self.training[0])):
+            
+            slabl=0
+            for x in self.training[0][i]:
+                
+                # generate the output from our circuit     
+                C = self.circuit(x)
+                state1 = C.execute()
+
+                fids = np.empty(len(blank_state))
+                for j, t in enumerate(blank_state):
+                    fids[j] = fidelity(state1, t)
+                slabl += np.argmax(fids)
+                
+            slabl/=(len(self.training[0][0]))     
+
+            qtest = self.training[1][i] - slabl
+            if qtest == 0.0:
+                quali+=1
+            
+        print("# The discriminator got {} of {} right in training".format(quali, tots))    
+            
+        return quali, tots
 
 
 def qgen_real_out(state):
