@@ -80,8 +80,14 @@ class single_qubit_classifier:
         self.data = xval
         self.labl = yval
         #print(self.data,self.labl)
-        
-                       
+
+    def set_fake(self, xval, yval):
+        self.fake = xval
+        self.fabl = yval
+        #print(self.data,self.labl)
+
+
+    # discriminator cost function needs both real and fake data                  
     def cost_function(self, params=None):
         
         # need a blank state to contract fidelity against
@@ -92,9 +98,10 @@ class single_qubit_classifier:
             params = self.params       
 
         self.set_parameters(params)                  
-                    
+          
+        # real data component            
         tots=len(self.data[0])
-        cf=0
+        cf1=0
         i=0
         for x in self.data[0]:
             
@@ -107,9 +114,30 @@ class single_qubit_classifier:
             state1 = C.execute()
             
             # associate cost
-            cf += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
-          
-        cf /= tots 
+            cf1 += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
+         
+        cf1 /= tots  
+        
+        # fake data component
+        cf2=0    
+        i=0    
+        for z in self.fake[0]:
+            
+            # set label
+            w=self.fabl[0][i]
+            i+=1
+                
+            # generate the output from our circuit     
+            C = self.circuit(z)
+            state1 = C.execute()
+            
+            # associate cost
+            cf2 += .5 * (1 - fidelity(state1, blank_state[int(w)])) ** 2
+                      
+        cf2 /= tots 
+        
+        
+        cf=0.5*(cf1+cf2)
         
         tflabel = tf.convert_to_tensor(cf, dtype=tf.float64)
         cf=(tflabel)

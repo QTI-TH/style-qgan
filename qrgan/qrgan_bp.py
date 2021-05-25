@@ -4,7 +4,6 @@ import numpy as np
 from qgenerator import single_qubit_generator
 from qclassifier import single_qubit_classifier
 import datasets as ds
-import tensorflow as tf
 
 # ###############################################################################
 #
@@ -31,20 +30,20 @@ import tensorflow as tf
 # #########################
 
 # set discriminator layers
-dlayers=3
+dlayers=2
 
 # set generator layers
-glayers=3
+glayers=2
 
 # set size of mini batch
-nmeas=50
+nmeas=100
 
 # number of iterations in minimizer
-dmaxiter=2
-gmaxiter=2
+dmaxiter=1
+gmaxiter=1
 
 # set number of epochs
-nepoch=100
+nepoch=200
 
 # set up the generator and discriminator
 qd = single_qubit_classifier(dlayers)
@@ -88,14 +87,26 @@ for n in range(0,nepoch+1):
 
     # train the discriminator on these two samples
 
-    # set the real and fake data, then update in joined cost function
+    # first the real
     qd.set_data(xreal,yreal)
-    qd.set_fake([xfake],[yfake])
-    dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
-    #dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
+    dres_real, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
+    #dres_real, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
     qd.set_parameters(dpar)
 
- 
+    # figure out how many times it managed to make the label be the passed one
+    rreal=0
+    for i in range(0,len(yfake)):
+        yguess=qd.predict(xreal,dpar)
+        qtst=(yreal[0][i]-yguess[i])
+        if qtst==0:
+            rreal+=1
+
+    # then the fake, the first guess parameters have been set by the previous training
+    qd.set_data([xfake],[yfake])
+    dres_fake, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
+    #dres_fake, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
+    qd.set_parameters(dpar)
+
     # figure out how many times it managed to make the label be the passed one
     rfake=0
     for i in range(0,len(yfake)):
@@ -104,23 +115,25 @@ for n in range(0,nepoch+1):
         if qtst==0:
             rfake+=1
             
-    rreal=0
+    rreal2=0
     for i in range(0,len(yreal)):
         yguess=qd.predict(xreal,dpar)
         qtst=(yreal[0][i]-yguess[i])
         if qtst==0:
-            rreal+=1        
+            rreal2+=1        
                           
     #print("# ------------ Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
-    print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {} ".format(rreal,nmeas,rfake,nmeas))
-
+    print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {} (Real: {})".format(rreal,nmeas,rfake,nmeas,rreal2))
         
+    dloss= 0.5*(dres_real + dres_fake)
+    #print("# Averaged discriminator loss:", dloss)
+
     # pass this info to the generator and minimize
     qg.set_dparameters(dpar)
     qg.set_seed(fseed)
     qg.cost_function()
-    gloss, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': gmaxiter}) 
-    #gloss, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': gmaxiter}) 
+    gres, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': gmaxiter}) 
+    #gres, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': gmaxiter}) 
     
     # these are the new generator values, repeat the calculation
     qg.set_parameters(gpar)
@@ -135,11 +148,8 @@ for n in range(0,nepoch+1):
     print("#              Generator update, times passed: {} / {}".format(int(ytest),len(xtest)))
     
     
-    print("# Iteration {}: G_loss= {}, Davg_loss= {}".format(n,gloss,dloss))
+    print("# Iteration {}: G_loss= {}, Davg_loss= {}".format(n,gres,dloss))
     
-    outf1 = open("./out.qgen.losses", "a")
-    outf1.write("%d %.7e %.7e\n" % ( n,gloss,dloss ))
-    outf1.close    
 
     # #########################
     # generate data on the fly
@@ -156,12 +166,12 @@ for n in range(0,nepoch+1):
         xinput = ds.create_dataset(nsamp,1,nseed)
         xgen = qg.generate(xinput,gpar)
 
-        outf2 = open("./out.qgen.samples.n{}".format(n), "w")
+        outf = open("./out.qgen.samples.n{}".format(n), "w")
 
         for i in range(0,nsamp):
-            outf2.write("%.7e\n" % ( xgen[i] ))
+            outf.write("%.7e\n" % ( xgen[i] ))
         
-        outf2.close
+        outf.close
 
 
 
@@ -179,9 +189,9 @@ qg.set_parameters(gpar)
 xinput = ds.create_dataset(nsamp,1,nseed)
 xgen = qg.generate(xinput,gpar)
 
-outf3 = open("./out.qgen.samples", "w")
+outf = open("./out.qgen.samples", "w")
 
 for i in range(0,nsamp):
-    outf3.write("%.7e\n" % ( xgen[i] ))
+    outf.write("%.7e\n" % ( xgen[i] ))
         
-outf3.close
+outf.close
