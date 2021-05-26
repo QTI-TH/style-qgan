@@ -41,7 +41,7 @@ nmeas=100
 
 # number of iterations in minimizer
 dmaxiter=100
-gmaxiter=1000
+gmaxiter=100
 
 # set number of epochs and ksteps
 nepoch=10
@@ -98,8 +98,8 @@ for n in range(0,nepoch+1):
         qd.set_data(xreal,yreal)
         qd.set_fake([xfake],[yfake])
         #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
-        #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':1, 'maxiter': dmaxiter}) 
-        dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
+        dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'maxiter': dmaxiter}) 
+        #dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': True, 'maxiter': dmaxiter}) 
         qd.set_parameters(dpar)
 
         # figure out how many times it managed to make the label be the passed one

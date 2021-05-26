@@ -99,63 +99,45 @@ class single_qubit_classifier:
 
         self.set_parameters(params)                  
           
-        # real data component        
+        # real data component            
         tots=len(self.data[0])
         cf1=0
-        i=-1
-        yreal=np.zeros(tots)
+        i=0
         for x in self.data[0]:
             
-            i+=1
             # set label
             y=self.labl[0][i]
+            i+=1
                 
             # generate the output from our circuit     
             C = self.circuit(x)
             state1 = C.execute()
             
-            # associate cost via fidelity, works with bfgs
-            #cf1 += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
-        
-            # try it with cross entropy instead, i.e. first do label prediction, looks like this requires the cma 
-            fids = np.empty(len(blank_state))
-            for j, t in enumerate(blank_state):
-                fids[j] = fidelity(state1, t)
-            yreal[i] = float(np.argmax(fids))
-            
-        cf1 += tf.keras.losses.binary_crossentropy(yreal, self.labl[0])       
-        cf1 /= tots            
- 
+            # associate cost
+            cf1 += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
+         
+        cf1 /= tots  
         
         # fake data component
         cf2=0    
-        i=-1  
-        yfake=np.zeros(tots)  
+        i=0    
         for z in self.fake[0]:
             
-            i+=1
             # set label
             w=self.fabl[0][i]
+            i+=1
                 
             # generate the output from our circuit     
             C = self.circuit(z)
             state1 = C.execute()
             
-            # associate cost, works with bfgs
-            #cf2 += .5 * (1 - fidelity(state1, blank_state[int(w)])) ** 2                   
-        
-            # try it with cross entropy instead, i.e. first do label prediction, looks like this requires the cma
-            fids = np.empty(len(blank_state))
-            for j, t in enumerate(blank_state):
-                fids[j] = fidelity(state1, t)
-            yfake[i] = float(np.argmax(fids))
-          
-        cf2 += tf.keras.losses.binary_crossentropy(yfake, self.fabl[0])
+            # associate cost
+            cf2 += .5 * (1 - fidelity(state1, blank_state[int(w)])) ** 2
+                      
         cf2 /= tots 
-         
+        
         
         cf=0.5*(cf1+cf2)
-
         
         tflabel = tf.convert_to_tensor(cf, dtype=tf.float64)
         cf=(tflabel)
