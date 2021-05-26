@@ -44,7 +44,7 @@ dmaxiter=100
 gmaxiter=1000
 
 # set number of epochs and ksteps
-nepoch=1
+nepoch=10
 kstep=1
 
 # set up the generator and discriminator
@@ -79,7 +79,8 @@ for n in range(0,nepoch+1):
         xreal, yreal = ds.create_target_training('gauss',nmeas,dseed)
 
         # set the generator parameters from last iteration, except if it's the first iteration
-        if n==0:
+        if n==0 and k==0:
+            print("# Setting initial parameters")
             gpar = qg.params
             dpar = qd.params
         else:
@@ -115,6 +116,7 @@ for n in range(0,nepoch+1):
             qtst=(yreal[0][i]-yguess[i])
             if qtst==0:
                 rreal+=1        
+                
                           
         #print("# ------------ Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
         print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {} ".format(rreal,nmeas,rfake,nmeas))
@@ -142,9 +144,14 @@ for n in range(0,nepoch+1):
     
     
     print("# Iteration {}: G_loss= {}, Davg_loss= {}".format(n,gloss,dloss))
+
+    dres_real=rreal/nmeas
+    dres_fake=rfake/nmeas
+    dres=0.5*(dres_real+dres_fake)
+    gres=ytest/len(xtest)
     
     outf1 = open("./out.qgen.losses", "a")
-    outf1.write("%d %.7e %.7e\n" % ( n,gloss,dloss ))
+    outf1.write("%d  %.7e %.7e  %.2e %.2e\n" % ( n,gloss,dloss,gres,dres ))
     outf1.close    
 
     # #########################
