@@ -41,11 +41,11 @@ nmeas=100
 
 # number of iterations in minimizer
 dmaxiter=100
-gmaxiter=100
+gmaxiter=1000
 
 # set number of epochs and ksteps
 nepoch=10
-kstep=2
+kstep=1
 
 # set up the generator and discriminator
 qd = single_qubit_classifier(dlayers)
@@ -88,7 +88,7 @@ for n in range(0,nepoch+1):
             qd.set_parameters(dpar)
     
         # create a sample of fake data with labels=0    
-        xinput = ds.create_dataset(nmeas,1,gseed)
+        xinput = ds.create_dataset('uniform_prior',nmeas,1,gseed)
         xfake = qg.generate(xinput,gpar)
         yfake = np.zeros(nmeas)
 
@@ -130,7 +130,7 @@ for n in range(0,nepoch+1):
     qg.set_parameters(gpar)
     
     # figure out how many times the generator passed
-    xinput = ds.create_dataset(nmeas,1,fseed)
+    xinput = ds.create_dataset('uniform_prior',nmeas,1,fseed)
     xtest = qg.generate(xinput,gpar)
     #ytest = np.sum(qd.predict([xtest])) # can also use the discriminator as cross-check
     ytest = np.sum(qg.dpredict([xtest]))
@@ -160,7 +160,7 @@ for n in range(0,nepoch+1):
         nseed=nsamp
 
         qg.set_parameters(gpar)
-        xinput = ds.create_dataset(nsamp,1,nseed)
+        xinput = ds.create_dataset('uniform_prior',nsamp,1,nseed)
         xgen = qg.generate(xinput,gpar)
 
         outf2 = open("./out.qgen.samples.n{}".format(n), "w")
@@ -183,7 +183,7 @@ nsamp=1000
 nseed=nsamp
 
 qg.set_parameters(gpar)
-xinput = ds.create_dataset(nsamp,1,nseed)
+xinput = ds.create_dataset('uniform_prior',nsamp,1,nseed)
 xgen = qg.generate(xinput,gpar)
 
 outf3 = open("./out.qgen.samples", "w")

@@ -145,7 +145,7 @@ class single_qubit_generator:
                
         # First create another set of fake data, using the gparams, this time the labels are set to 1
         gseed=self.seed
-        xinput = create_dataset(self.nmeas,1,gseed)
+        xinput = create_dataset('gauss_prior_fix',self.nmeas,1,gseed)
         xfake = self.generate(xinput,params)
         yfake = np.ones(self.nmeas)
         #print(xfake)
