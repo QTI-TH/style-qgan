@@ -8,7 +8,7 @@ import tensorflow as tf
 
 # ###############################################################################
 #
-# File qran.py
+# File qrgan.py
 #
 # Copyright (C) 2021 Anthony Francis
 #

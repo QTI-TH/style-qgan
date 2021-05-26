@@ -7,7 +7,7 @@
 # This software is distributed under the terms of the GNU General Public
 # License (GPL)
 #
-# Routines to run the QML quantum generator: 
+# Routines to run the QML quantum classifier: 
 # 
 # Code based on qibo qlassifier tutorial found at 
 # https://qibo.readthedocs.io/en/stable/tutorials/reuploading_classifier/README.html
