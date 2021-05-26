@@ -45,7 +45,7 @@ gmaxiter=1000
 
 # set number of epochs and ksteps
 nepoch=10
-kstep=1
+kstep=2
 
 # set up the generator and discriminator
 qd = single_qubit_classifier(dlayers)
@@ -108,17 +108,13 @@ for n in range(0,nepoch+1):
         for i in range(0,nmeas): 
             qtst=(yfake[i]-yguess[i])
             if qtst==0:
-                rfake+=1
-            
+                rfake+=1           
         rreal=0
         yguess=qd.predict(xreal,dpar)
         for i in range(0,nmeas): 
             qtst=(yreal[0][i]-yguess[i])
             if qtst==0:
                 rreal+=1        
-                
-                          
-        #print("# ------------ Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
         print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {} ".format(rreal,nmeas,rfake,nmeas))
 
         
@@ -132,14 +128,12 @@ for n in range(0,nepoch+1):
     
     # these are the new generator values, repeat the calculation
     qg.set_parameters(gpar)
-    #print("# Real gen:", qg.params,gres)
     
     # figure out how many times the generator passed
     xinput = ds.create_dataset(nmeas,1,fseed)
     xtest = qg.generate(xinput,gpar)
-    #ytest = np.sum(qd.predict([xtest]))
+    #ytest = np.sum(qd.predict([xtest])) # can also use the discriminator as cross-check
     ytest = np.sum(qg.dpredict([xtest]))
-    #print("# ------------ Generator update, times passed: {} / {}".format(int(ytest),len(xtest)))
     print("#              Generator update, times passed: {} / {}".format(int(ytest),len(xtest)))
     
     
