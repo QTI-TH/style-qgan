@@ -31,21 +31,22 @@ import tensorflow as tf
 # #########################
 
 # set discriminator layers
-dlayers=5
+dlayers=10
 
 # set generator layers
-glayers=5
+glayers=10
 
 # set size of mini batch
 nmeas=100
 
 # number of iterations in minimizer
-dmaxiter=100
+dmaxiter=2
 gmaxiter=1000
 
 # set number of epochs and ksteps
 nepoch=10
-kstep=1
+kwarm=10
+krun=1
 
 # set up the generator and discriminator
 qd = single_qubit_classifier(dlayers)
@@ -69,6 +70,19 @@ outf.close
 
 # loop over iterations
 for n in range(0,nepoch+1):
+    
+    # set the generator to initial
+    if n==0:
+        print("# Setting initial parameters")
+        gpar = qg.params
+        dpar = qd.params
+    
+    if n==0:
+        kstep=kwarm
+        print("# Warm up the discriminator: {} iterations".format(kwarm))
+    else:
+        kstep=krun
+    
     for k in range(0,kstep):
     
         dseed+=1
@@ -78,14 +92,9 @@ for n in range(0,nepoch+1):
         # create a mini-batch of real data with labels=1
         xreal, yreal = ds.create_target_training('gauss',nmeas,dseed)
 
-        # set the generator parameters from last iteration, except if it's the first iteration
-        if n==0 and k==0:
-            print("# Setting initial parameters")
-            gpar = qg.params
-            dpar = qd.params
-        else:
-            qg.set_parameters(gpar)
-            qd.set_parameters(dpar)
+        # set the generator parameters from last iteration or initial
+        qg.set_parameters(gpar)
+        qd.set_parameters(dpar)
     
         # create a sample of fake data with labels=0    
         xinput = ds.create_dataset('uniform_prior',nmeas,1,gseed)
