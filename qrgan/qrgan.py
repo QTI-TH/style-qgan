@@ -37,14 +37,15 @@ dlayers=5
 glayers=5
 
 # set size of mini batch
-nmeas=50
+nmeas=100
 
 # number of iterations in minimizer
-dmaxiter=10
-gmaxiter=10
+dmaxiter=100
+gmaxiter=1000
 
-# set number of epochs
-nepoch=100
+# set number of epochs and ksteps
+nepoch=1
+kstep=1
 
 # set up the generator and discriminator
 qd = single_qubit_classifier(dlayers)
@@ -68,53 +69,55 @@ outf.close
 
 # loop over iterations
 for n in range(0,nepoch+1):
-
-    dseed+=1
-    gseed+=1
-    fseed+=1
+    for k in range(0,kstep):
     
-    # create a mini-batch of real data with labels=1
-    xreal, yreal = ds.create_target_training('gauss',nmeas,dseed)
+        dseed+=1
+        gseed+=1
+        fseed+=1
+    
+        # create a mini-batch of real data with labels=1
+        xreal, yreal = ds.create_target_training('gauss',nmeas,dseed)
 
-    # set the generator parameters from last iteration, except if it's the first iteration
-    if n==0:
-        gpar = qg.params
-        dpar = qd.params
-    else:
-        qg.set_parameters(gpar)
+        # set the generator parameters from last iteration, except if it's the first iteration
+        if n==0:
+            gpar = qg.params
+            dpar = qd.params
+        else:
+            qg.set_parameters(gpar)
+            qd.set_parameters(dpar)
+    
+        # create a sample of fake data with labels=0    
+        xinput = ds.create_dataset(nmeas,1,gseed)
+        xfake = qg.generate(xinput,gpar)
+        yfake = np.zeros(nmeas)
+
+        # train the discriminator on these two samples
+
+        # set the real and fake data, then update in joined cost function
+        qd.set_data(xreal,yreal)
+        qd.set_fake([xfake],[yfake])
+        #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
+        #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':1, 'maxiter': dmaxiter}) 
+        dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
         qd.set_parameters(dpar)
-    
-    # create a sample of fake data with labels=0    
-    xinput = ds.create_dataset(nmeas,1,gseed)
-    xfake = qg.generate(xinput,gpar)
-    yfake = np.zeros(nmeas)
 
-    # train the discriminator on these two samples
-
-    # set the real and fake data, then update in joined cost function
-    qd.set_data(xreal,yreal)
-    qd.set_fake([xfake],[yfake])
-    #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
-    dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
-    qd.set_parameters(dpar)
-
-    # figure out how many times it managed to make the label be the passed one
-    rfake=0
-    yguess=qd.predict([xfake],dpar)
-    for i in range(0,nmeas): 
-        qtst=(yfake[i]-yguess[i])
-        if qtst==0:
-            rfake+=1
+        # figure out how many times it managed to make the label be the passed one
+        rfake=0
+        yguess=qd.predict([xfake],dpar)
+        for i in range(0,nmeas): 
+            qtst=(yfake[i]-yguess[i])
+            if qtst==0:
+                rfake+=1
             
-    rreal=0
-    yguess=qd.predict(xreal,dpar)
-    for i in range(0,nmeas): 
-        qtst=(yreal[0][i]-yguess[i])
-        if qtst==0:
-            rreal+=1        
+        rreal=0
+        yguess=qd.predict(xreal,dpar)
+        for i in range(0,nmeas): 
+            qtst=(yreal[0][i]-yguess[i])
+            if qtst==0:
+                rreal+=1        
                           
-    #print("# ------------ Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
-    print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {} ".format(rreal,nmeas,rfake,nmeas))
+        #print("# ------------ Discriminator update, correct guess: Real {} / {}, Fake {} / {}".format(rreal,nmeas,rfake,nmeas))
+        print("#              Discriminator update, correct guess: Real {} / {}, Fake {} / {} ".format(rreal,nmeas,rfake,nmeas))
 
         
     # pass this info to the generator and minimize
@@ -122,7 +125,8 @@ for n in range(0,nepoch+1):
     qg.set_seed(fseed)
     qg.cost_function()
     #gloss, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': gmaxiter}) 
-    gloss, gpar = qg.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': gmaxiter}) 
+    gloss, gpar = qg.minimize(method='cma', options={'verb_disp':0, 'maxiter': gmaxiter}) 
+    #gloss, gpar = qg.minimize(method='l-bfgs-b', options={'disp': True, 'maxiter': gmaxiter}) 
     
     # these are the new generator values, repeat the calculation
     qg.set_parameters(gpar)
@@ -147,7 +151,7 @@ for n in range(0,nepoch+1):
     # generate data on the fly
     # #########################
 
-    if n%10==0:
+    if n%2==0:
         #print ("# ============ Generate a few test samples")
         print ("#              Generate a few test samples")
 
