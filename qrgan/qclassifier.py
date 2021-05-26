@@ -19,7 +19,6 @@
 from qibo.models import Circuit
 from qibo import hamiltonians, gates, models
 import numpy as np
-from datasets import create_training
 import tensorflow as tf
 import os
 import qibo as qibo
