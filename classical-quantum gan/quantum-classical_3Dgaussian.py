@@ -7,6 +7,7 @@ Created on Mon May  3 14:29:11 2021
 """
 # train a quantum-classical generative adversarial network on a gaussian probability distribution
 import numpy as np
+import tensorflow as tf
 from numpy.random import rand
 from numpy.random import randn
 from keras.models import Sequential, model_from_json
