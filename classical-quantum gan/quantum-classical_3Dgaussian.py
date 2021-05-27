@@ -137,30 +137,6 @@ def generate_fake_samples(params, latent_dim, samples):
     y = np.zeros((samples, 1))
     return X, y
  
-# evaluate the discriminator and plot real and fake distributions
-def summarize_performance(epoch, params, discriminator, latent_dim, samples, nbins, d_loss, g_loss):
-    # prepare real samples
-    x_real, y_real = generate_real_samples(samples, )
-    # evaluate discriminator on real examples
-    _, acc_real = discriminator.evaluate(x_real, y_real, verbose=0)
-    # prepare fake examples
-    x_fake, y_fake = generate_fake_samples(params, latent_dim, samples)
-    # evaluate discriminator on fake examples
-    _, acc_fake = discriminator.evaluate(x_fake, y_fake, verbose=0)
-    # summarize discriminator performance
-    print('epoch: ',epoch, 'acc_real: ', acc_real, 'acc_fake: ', acc_fake)
-    # histogram plot real and fake data points
-    pyplot.hist(x_real, color='red', label='real', alpha=0.5)
-    pyplot.hist(x_fake.numpy(), color='blue', label='fake', alpha=0.5)
-    pyplot.legend()
-    pyplot.show()
-
-    # plot loss generator and discriminator
-    pyplot.plot(np.linspace(0, len(g_loss), len(g_loss)), g_loss, label='generator')
-    pyplot.plot(np.linspace(0, len(g_loss), len(g_loss)), d_loss, label='discriminator')
-    pyplot.legend()
-    pyplot.show() 
- 
 # train the generator and discriminator
 def train(d_model, latent_dim, n_epochs=30000, samples=128, nbins=49, n_eval=2):
     d_loss = []
@@ -192,9 +168,6 @@ def train(d_model, latent_dim, n_epochs=30000, samples=128, nbins=49, n_eval=2):
         np.savetxt(str(nqubits)+"_qGAN_"+str(layers)+"_layers_"+str(latent_dim)+"_latent_gloss", [g_loss], newline='')
         # serialize weights to HDF5
         discriminator.save_weights("discriminator_Quantum.h5")
-        # evaluate the model every n_eval epochs
-#        if (i+1) % n_eval == 0:
-#            summarize_performance(i+1, initial_params, d_model, latent_dim, samples, nbins, d_loss, g_loss)
 
 # size of the latent space
 latent_dim = 1
