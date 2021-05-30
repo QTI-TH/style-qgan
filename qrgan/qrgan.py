@@ -34,22 +34,22 @@ import tensorflow as tf
 dlayers=10
 
 # set generator layers
-glayers=10
+glayers=3
 
 # set size of mini batch
 nmeas=100
 
 # number of iterations in minimizer
-dmaxiter=2
-gmaxiter=1000
+dmaxiter=10
+gmaxiter=10
 
 # set number of epochs and ksteps
 nepoch=10
-kwarm=10
+kwarm=2
 krun=1
 
 # set up the generator and discriminator
-qd = single_qubit_classifier(dlayers)
+qd = single_qubit_classifier(dlayers,"fidelity")
 qg = single_qubit_generator(glayers,dlayers)
 
 # initiate seeds
@@ -107,8 +107,8 @@ for n in range(0,nepoch+1):
         qd.set_data(xreal,yreal)
         qd.set_fake([xfake],[yfake])
         #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'seed':113895, 'maxiter': dmaxiter}) 
-        dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'maxiter': dmaxiter}) 
-        #dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': True, 'maxiter': dmaxiter}) 
+        #dloss, dpar = qd.minimize(method='cma', options={'verb_disp':0, 'maxiter': dmaxiter}) 
+        dloss, dpar = qd.minimize(method='l-bfgs-b', options={'disp': False, 'maxiter': dmaxiter}) 
         qd.set_parameters(dpar)
 
         # figure out how many times it managed to make the label be the passed one

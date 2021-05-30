@@ -33,7 +33,7 @@ print("# Qibo runs with "+str(current_threads)+" thread(s)")
 
 
 class single_qubit_classifier:
-    def __init__(self, layers, grid=None, seed=0):
+    def __init__(self, layers, label, grid=None, seed=0):
        
        
         print('# Setting up quantum classifier ...')
@@ -44,6 +44,9 @@ class single_qubit_classifier:
         self.params = np.random.randn(layers * 4)
         self._circuit = self._initialize_circuit() # initialise with random parameters
                     
+        self.cost=label # alternative: "label"
+        print("# Discriminator cost set to: {}".format(self.cost))
+        
 
     def set_parameters(self, new_params):
         """Method for updating parameters of the class.
@@ -52,7 +55,7 @@ class single_qubit_classifier:
         """
         self.params = new_params
         
-    # generator circuit  
+    # discriminator circuit  
     def _initialize_circuit(self):
         """Creates variational circuit."""
         C = Circuit(1)
@@ -97,61 +100,101 @@ class single_qubit_classifier:
             params = self.params       
 
         self.set_parameters(params)                  
-          
-        # real data component        
-        tots=len(self.data[0])
-        cf1=0
-        i=-1
-        yreal=np.zeros(tots)
-        for x in self.data[0]:
-            
-            i+=1
-            # set label
-            y=self.labl[0][i]
-                
-            # generate the output from our circuit     
-            C = self.circuit(x)
-            state1 = C.execute()
-            
-            # associate cost via fidelity, works with bfgs
-            #cf1 += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
+                    
         
-            # try it with cross entropy instead, i.e. first do label prediction, looks like this requires the cma 
-            fids = np.empty(len(blank_state))
-            for j, t in enumerate(blank_state):
-                fids[j] = fidelity(state1, t)
-            yreal[i] = float(np.argmax(fids))
+        if self.cost == "label":
+            # real data component        
+            tots=len(self.data[0])
+            cf1=0
+            i=-1
+            yreal=np.zeros(tots)
+            for x in self.data[0]:
             
-        cf1 += tf.keras.losses.binary_crossentropy(yreal, self.labl[0])       
-        cf1 /= tots            
+                i+=1
+                # set label
+                y=self.labl[0][i]
+                
+                # generate the output from our circuit     
+                C = self.circuit(x)
+                state1 = C.execute()
+            
+                # associate cost via fidelity, works with bfgs
+                #cf1 += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
+        
+                # try it with cross entropy instead, i.e. first do label prediction, looks like this requires the cma 
+                fids = np.empty(len(blank_state))
+                for j, t in enumerate(blank_state):
+                    fids[j] = fidelity(state1, t)
+                yreal[i] = float(np.argmax(fids))
+            
+            cf1 += tf.keras.losses.binary_crossentropy(yreal, self.labl[0])       
+            cf1 /= tots            
  
         
-        # fake data component
-        cf2=0    
-        i=-1  
-        yfake=np.zeros(tots)  
-        for z in self.fake[0]:
+            # fake data component
+            cf2=0    
+            i=-1  
+            yfake=np.zeros(tots)  
+            for z in self.fake[0]:
             
-            i+=1
-            # set label
-            w=self.fabl[0][i]
+                i+=1
+                # set label
+                w=self.fabl[0][i]
                 
-            # generate the output from our circuit     
-            C = self.circuit(z)
-            state1 = C.execute()
+                # generate the output from our circuit     
+                C = self.circuit(z)
+                state1 = C.execute()
             
-            # associate cost, works with bfgs
-            #cf2 += .5 * (1 - fidelity(state1, blank_state[int(w)])) ** 2                   
+                # associate cost, works with bfgs
+                #cf2 += .5 * (1 - fidelity(state1, blank_state[int(w)])) ** 2                   
         
-            # try it with cross entropy instead, i.e. first do label prediction, looks like this requires the cma
-            fids = np.empty(len(blank_state))
-            for j, t in enumerate(blank_state):
-                fids[j] = fidelity(state1, t)
-            yfake[i] = float(np.argmax(fids))
+                # try it with cross entropy instead, i.e. first do label prediction, looks like this requires the cma
+                fids = np.empty(len(blank_state))
+                for j, t in enumerate(blank_state):
+                    fids[j] = fidelity(state1, t)
+                yfake[i] = float(np.argmax(fids))
           
-        cf2 += tf.keras.losses.binary_crossentropy(yfake, self.fabl[0])
-        cf2 /= tots 
+            cf2 += tf.keras.losses.binary_crossentropy(yfake, self.fabl[0])
+            cf2 /= tots 
          
+        elif self.cost == "fidelity":
+            # real data component       
+            tots=len(self.data[0])
+            cf1=0
+            i=-1
+            for x in self.data[0]:
+            
+                i+=1
+                # set label
+                y=self.labl[0][i]
+                
+                # generate the output from our circuit     
+                C = self.circuit(x)
+                state1 = C.execute()
+            
+                # associate cost via fidelity, works with bfgs
+                cf1 += .5 * (1 - fidelity(state1, blank_state[int(y)])) ** 2
+          
+            cf1 /= tots            
+            
+            # fake data component
+            cf2=0    
+            i=-1  
+            for z in self.fake[0]:
+            
+                i+=1
+                # set label
+                w=self.fabl[0][i]
+                
+                # generate the output from our circuit     
+                C = self.circuit(z)
+                state1 = C.execute()
+            
+                # associate cost, works with bfgs
+                cf2 += .5 * (1 - fidelity(state1, blank_state[int(w)])) ** 2                   
+        
+            cf2 /= tots       
+             
         
         cf=0.5*(cf1+cf2)
 
