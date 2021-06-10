@@ -52,9 +52,9 @@ def rotate(theta, x, latent_dim, layers, nqubits):
     return tf.matmul(x, theta[1:]) + theta[0]
  
 # define the combined generator and discriminator model, for updating the generator
-def define_cost_gan(params, discriminator, latent_dim, samples):
+def define_cost_gan(params, discriminator, latent_dim, samples, layers, nqubits):
     # generate fake samples
-    x_fake, y_fake = generate_fake_samples(params, latent_dim, samples)
+    x_fake, y_fake = generate_fake_samples(params, latent_dim, samples, layers, nqubits)
     # create inverted labels for the fake samples
     y_fake = np.ones((samples, 1))
     # evaluate discriminator on fake examples
@@ -173,7 +173,7 @@ def train(d_model, latent_dim, layers, nqubits, real_samples, discriminator, n_e
         d_loss.append((d_loss_real + d_loss_fake)/2)
         # update generator
         with tf.GradientTape() as tape:
-            loss = define_cost_gan(initial_params, d_model, latent_dim, samples)
+            loss = define_cost_gan(initial_params, d_model, latent_dim, samples, layers, nqubits)
         grads = tape.gradient(loss, initial_params)
         optimizer.apply_gradients([(grads, initial_params)])
         g_loss.append(loss)
