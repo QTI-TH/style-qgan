@@ -5,22 +5,24 @@ Created on Mon May  3 14:29:11 2021
 
 @author: carlos
 """
-# train a quantum-classical generative adversarial network on a gaussian probability distribution
-import numpy as np
 import tensorflow as tf
+import os
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+
+# train a quantum-classical generative adversarial network on a 3D correlated gaussian probability distribution
+import numpy as np
 from numpy.random import rand
 from numpy.random import randn
 from keras.models import Sequential, model_from_json
 from keras.optimizers import Adadelta
 from tensorflow.keras.layers import Dense, Conv2D, Conv2DTranspose, Dropout, Reshape, LeakyReLU, Flatten, BatchNormalization
 from qibo import gates, hamiltonians, models, set_backend
-from matplotlib import pyplot
-from scipy.optimize import minimize
+import argparse
 
 set_backend('tensorflow')
 
 # define the standalone discriminator model
-def define_discriminator(n_inputs=3, alpha=0.2, dropout=0.2):
+def define_discriminator(lr, n_inputs=3, alpha=0.2, dropout=0.2):
     model = Sequential()
         
     model.add(Dense(200, use_bias=False, input_dim=n_inputs))
@@ -44,18 +46,15 @@ def define_discriminator(n_inputs=3, alpha=0.2, dropout=0.2):
     model.add(Dense(1, activation='sigmoid'))
     
     # compile model
-    opt = Adadelta(learning_rate=0.1)
+    opt = Adadelta(learning_rate=lr)
     model.compile(loss='binary_crossentropy', optimizer=opt, metrics=['accuracy'])
     return model
 
-def rotate(theta, x):
-    theta = tf.reshape(theta, (latent_dim + 1, 2*layers*nqubits))
-    return tf.matmul(x, theta[1:]) + theta[0]
  
 # define the combined generator and discriminator model, for updating the generator
-def define_cost_gan(params, discriminator, latent_dim, samples):
+def define_cost_gan(params, discriminator, latent_dim, samples, circuit, nqubits, layers):
     # generate fake samples
-    x_fake, y_fake = generate_fake_samples(params, latent_dim, samples)
+    x_fake, y_fake = generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers)
     # create inverted labels for the fake samples
     y_fake = np.ones((samples, 1))
     # evaluate discriminator on fake examples
@@ -64,17 +63,44 @@ def define_cost_gan(params, discriminator, latent_dim, samples):
     loss = tf.reduce_mean(loss)
     return loss
 
-def generate_5k_real_samples(samples=5000, sigma=0.25, mu=0.0):
-  # generate 5k samples from the distribution
+def set_params(circuit, params, x_input, i, nqubits, layers):
+    p = []
+    index = 0
+    for l in range(layers):
+        for q in range(nqubits):
+            p.append(params[index]*x_input[q][i] + params[index+1])
+            index+=2
+            p.append(params[index]*x_input[q][i] + params[index+1])
+            index+=2
+        if l==4 or l==12:
+            p.append(params[index])
+            index+=1
+            p.append(params[index])
+            index+=1
+        if l==8 or l==16:
+            p.append(params[index])
+            index+=1
+            p.append(params[index])
+            index+=1
+    for q in range(nqubits):
+        p.append(params[index]*x_input[q][i] + params[index+1])
+        index+=2
+    circuit.set_parameters(p)
+
+def generate_training_real_samples(samples):
+  # generate training samples from the distribution
     s = []
-    s1 = np.reshape(np.random.normal(mu, sigma, samples), (samples,1))
-    s2 = np.reshape(np.random.normal(mu, sigma, samples), (samples,1))
-    s3 = np.reshape(np.random.normal(mu, sigma, samples), (samples,1))
+    mean = [0, 0, 0]
+    cov = [[0.5, 0.1, 0.25], [0.5, 0.25, 0.1], [0.5, 0.5, 0.1]]        
+    x, y, z = np.random.multivariate_normal(mean, cov, samples).T/4
+    s1 = np.reshape(x, (samples,1))
+    s2 = np.reshape(y, (samples,1))
+    s3 = np.reshape(z, (samples,1))
     s = np.hstack((s1,s2,s3))
     return s
  
 # generate real samples with class labels
-def generate_real_samples(samples, distribution, total_samples=5000):
+def generate_real_samples(samples, distribution, total_samples):
     # generate samples from the distribution
     idx = np.random.randint(total_samples, size=samples)
     X = distribution[idx,:]
@@ -87,21 +113,21 @@ def hamiltonian1():
     id = [[1, 0], [0, 1]]
     m0 = hamiltonians.Z(1, numpy=True).matrix
     m0 = np.kron(id, np.kron(id, m0))
-    ham = hamiltonians.Hamiltonian(nqubits, m0)
+    ham = hamiltonians.Hamiltonian(3, m0)
     return ham
 
 def hamiltonian2():
     id = [[1, 0], [0, 1]]
     m0 = hamiltonians.Z(1, numpy=True).matrix
     m0 = np.kron(id, np.kron(m0, id))
-    ham = hamiltonians.Hamiltonian(nqubits, m0)
+    ham = hamiltonians.Hamiltonian(3, m0)
     return ham
 
 def hamiltonian3():
     id = [[1, 0], [0, 1]]
     m0 = hamiltonians.Z(1, numpy=True).matrix
     m0 = np.kron(m0, np.kron(id, id))
-    ham = hamiltonians.Hamiltonian(nqubits, m0)
+    ham = hamiltonians.Hamiltonian(3, m0)
     return ham
  
 # generate points in latent space as input for the generator
@@ -113,21 +139,17 @@ def generate_latent_points(latent_dim, samples):
     return x_input
  
 # use the generator to generate fake examples, with class labels
-def generate_fake_samples(params, latent_dim, samples):
+def generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers):
     # generate points in latent space
     x_input = generate_latent_points(latent_dim, samples)
-    # quantum generator circuit
-    circuit = models.Circuit(nqubits)
-    for l in range(layers):
-      circuit.add((gates.RY(q, theta=0) for q in range(nqubits)))
-      circuit.add((gates.RZ(q, theta=0) for q in range(nqubits)))
+    x_input = np.transpose(x_input)
     # generator outputs
     X1 = []
     X2 = []
     X3 = []
-    newparams = rotate(params, x_input)
-    for newparams_i in newparams:
-        circuit.set_parameters(newparams_i)
+    # quantum generator circuit
+    for i in range(samples):
+        set_params(circuit, params, x_input, i, nqubits, layers)   
         X1.append(hamiltonian1().expectation(circuit.execute()))
         X2.append(hamiltonian2().expectation(circuit.execute()))
         X3.append(hamiltonian3().expectation(circuit.execute()))
@@ -138,28 +160,28 @@ def generate_fake_samples(params, latent_dim, samples):
     return X, y
  
 # train the generator and discriminator
-def train(d_model, latent_dim, n_epochs=30000, samples=128, nbins=49, n_eval=2):
+def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator, circuit, n_epochs, samples, lr):
     d_loss = []
     g_loss = []
     # determine half the size of one batch, for updating the discriminator
     half_samples = int(samples / 2)
-    initial_params = tf.Variable(np.random.uniform(0, 2*np.pi, (latent_dim+1)*(2*layers*nqubits)))
-    optimizer = tf.optimizers.Adadelta(lr=0.1)
+    initial_params = tf.Variable(np.random.uniform(0, 2*np.pi, 4*layers*nqubits + 2*nqubits + int(0.4*layers)))
+    optimizer = tf.optimizers.Adadelta(learning_rate=lr)
     # prepare real samples
-    s = generate_5k_real_samples()
+    s = generate_training_real_samples(training_samples)
     # manually enumerate epochs
     for i in range(n_epochs):
         # prepare real samples
-        x_real, y_real = generate_real_samples(half_samples, s)
+        x_real, y_real = generate_real_samples(half_samples, s, training_samples)
         # prepare fake examples
-        x_fake, y_fake = generate_fake_samples(initial_params, latent_dim, half_samples)
+        x_fake, y_fake = generate_fake_samples(initial_params, latent_dim, half_samples, circuit, nqubits, layers)
         # update discriminator
         d_loss_real, _ = d_model.train_on_batch(x_real, y_real)
         d_loss_fake, _ = d_model.train_on_batch(x_fake, y_fake)
         d_loss.append((d_loss_real + d_loss_fake)/2)
         # update generator
         with tf.GradientTape() as tape:
-            loss = define_cost_gan(initial_params, d_model, latent_dim, samples)
+            loss = define_cost_gan(initial_params, d_model, latent_dim, samples, circuit, nqubits, layers)
         grads = tape.gradient(loss, initial_params)
         optimizer.apply_gradients([(grads, initial_params)])
         g_loss.append(loss)
@@ -169,13 +191,37 @@ def train(d_model, latent_dim, n_epochs=30000, samples=128, nbins=49, n_eval=2):
         # serialize weights to HDF5
         discriminator.save_weights("discriminator_Quantum.h5")
 
-# size of the latent space
-latent_dim = 1
-# number of layers generator
-layers = 10
-# number of qubits generator
-nqubits = 3
-# create the discriminator
-discriminator = define_discriminator()
-# train model
-train(discriminator, latent_dim)
+def main(layers, training_samples, n_epochs, batch_samples, lr):
+    # number of qubits generator
+    nqubits = 3
+    # latent dimension
+    latent_dim = 3          
+    # create quantum generator
+    circuit = models.Circuit(nqubits)
+    for l in range(layers):
+        for q in range(nqubits):
+            circuit.add(gates.RY(q, 0))
+            circuit.add(gates.RZ(q, 0))
+        if l==4 or l==12:
+            circuit.add(gates.CRY(0, 1, 0))
+            circuit.add(gates.CRY(0, 2, 0))
+        if l==8 or l==16:
+            circuit.add(gates.CRY(1, 2, 0))
+            circuit.add(gates.CRY(2, 0, 0))
+    for q in range(nqubits):
+        circuit.add(gates.RY(q, 0))   
+    # create classical discriminator
+    discriminator = define_discriminator(lr)
+    # train model
+    train(discriminator, latent_dim, layers, nqubits, training_samples, discriminator, circuit, n_epochs, batch_samples, lr)
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--layers", default=20, type=int)
+    parser.add_argument("--training_samples", default=10000, type=int)
+    parser.add_argument("--n_epochs", default=30000, type=int)
+    parser.add_argument("--batch_samples", default=128, type=int)
+    parser.add_argument("--lr", default=0.1, type=float)
+    args = vars(parser.parse_args())
+    main(**args)
