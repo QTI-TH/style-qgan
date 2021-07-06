@@ -9,13 +9,14 @@ os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 import numpy as np
 from numpy.random import rand
 from numpy.random import randn
-from keras.models import Sequential, model_from_json
-from keras.optimizers import Adadelta
+from tensorflow.keras.models import Sequential, model_from_json
+from tensorflow.keras.optimizers import Adadelta
 from tensorflow.keras.layers import Dense, Conv2D, Conv2DTranspose, Dropout, Reshape, LeakyReLU, Flatten, BatchNormalization
-from qibo import gates, hamiltonians, models, set_backend
+from qibo import gates, hamiltonians, models, set_backend, set_threads
 import argparse
 
 set_backend('tensorflow')
+set_threads(4)
 
 # define the standalone discriminator model
 def define_discriminator(lr, n_inputs=3, alpha=0.2, dropout=0.2):
@@ -68,12 +69,12 @@ def set_params(circuit, params, x_input, i, nqubits, layers):
             index+=2
             p.append(params[index]*x_input[q][i] + params[index+1])
             index+=2
-        if l==4 or l==12:
+        if l==1 or l==5 or l==9 or l==13 or l==17:
             p.append(params[index])
             index+=1
             p.append(params[index])
             index+=1
-        if l==8 or l==16:
+        if l==3 or l==7 or l==11 or l==15 or l==19:
             p.append(params[index])
             index+=1
             p.append(params[index])
@@ -161,7 +162,7 @@ def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator,
     g_loss = []
     # determine half the size of one batch, for updating the discriminator
     half_samples = int(samples / 2)
-    initial_params = tf.Variable(np.random.uniform(0, 2*np.pi, 4*layers*nqubits + 2*nqubits + int(0.4*layers)))
+    initial_params = tf.Variable(np.random.uniform(0, 2*np.pi, 4*layers*nqubits + 2*nqubits + layers))
     optimizer = tf.optimizers.Adadelta(learning_rate=lr)
     # prepare real samples
     s = generate_training_real_samples(training_samples)
@@ -185,7 +186,7 @@ def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator,
         np.savetxt(str(nqubits)+"_qGAN_"+str(layers)+"_layers_"+str(latent_dim)+"_latent_dloss", [d_loss], newline='')
         np.savetxt(str(nqubits)+"_qGAN_"+str(layers)+"_layers_"+str(latent_dim)+"_latent_gloss", [g_loss], newline='')
         # serialize weights to HDF5
-        discriminator.save_weights("discriminator_Quantum.h5")
+        discriminator.save_weights(f"discriminator_Quantum_{nqubits}_qubits_{layers}_layers_{latent_dim}_latent.h5")
 
 def main(layers, training_samples, n_epochs, batch_samples, lr):
     # number of qubits generator
@@ -198,10 +199,10 @@ def main(layers, training_samples, n_epochs, batch_samples, lr):
         for q in range(nqubits):
             circuit.add(gates.RY(q, 0))
             circuit.add(gates.RZ(q, 0))
-        if l==4 or l==12:
+        if l==1 or l==5 or l==9 or l==13 or l==17:
             circuit.add(gates.CRY(0, 1, 0))
             circuit.add(gates.CRY(0, 2, 0))
-        if l==8 or l==16:
+        if l==3 or l==7 or l==11 or l==15 or l==19:
             circuit.add(gates.CRY(1, 2, 0))
             circuit.add(gates.CRY(2, 0, 0))
     for q in range(nqubits):
