@@ -49,9 +49,9 @@ def define_discriminator(lr, n_inputs=3, alpha=0.2, dropout=0.2):
 
  
 # define the combined generator and discriminator model, for updating the generator
-def define_cost_gan(params, discriminator, latent_dim, samples, circuit, nqubits, layers):
+def define_cost_gan(params, discriminator, latent_dim, samples, circuit, nqubits, layers, hamiltonian1, hamiltonian2, hamiltonian3):
     # generate fake samples
-    x_fake, y_fake = generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers)
+    x_fake, y_fake = generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers, hamiltonian1, hamiltonian2, hamiltonian3)
     # create inverted labels for the fake samples
     y_fake = np.ones((samples, 1))
     # evaluate discriminator on fake examples
@@ -157,7 +157,7 @@ def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator,
         d_loss.append((d_loss_real + d_loss_fake)/2)
         # update generator
         with tf.GradientTape() as tape:
-            loss = define_cost_gan(initial_params, d_model, latent_dim, samples, circuit, nqubits, layers)
+            loss = define_cost_gan(initial_params, d_model, latent_dim, samples, circuit, nqubits, layers, hamiltonian1, hamiltonian2, hamiltonian3)
         grads = tape.gradient(loss, initial_params)
         optimizer.apply_gradients([(grads, initial_params)])
         g_loss.append(loss)
