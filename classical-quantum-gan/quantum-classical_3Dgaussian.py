@@ -70,15 +70,15 @@ def set_params(circuit, params, x_input, i, nqubits, layers):
             p.append(params[index]*x_input[q][i] + params[index+1])
             index+=2
         if l==1 or l==5 or l==9 or l==13 or l==17:
-            p.append(params[index])
-            index+=1
-            p.append(params[index])
-            index+=1
+            p.append(params[index]*x_input[1][i] + params[index+1])
+            index+=2
+            p.append(params[index]*x_input[2][i] + params[index+1])
+            index+=2
         if l==3 or l==7 or l==11 or l==15 or l==19:
-            p.append(params[index])
-            index+=1
-            p.append(params[index])
-            index+=1
+            p.append(params[index]*x_input[2][i] + params[index+1])
+            index+=2
+            p.append(params[index]*x_input[0][i] + params[index+1])
+            index+=2
     for q in range(nqubits):
         p.append(params[index]*x_input[q][i] + params[index+1])
         index+=2
@@ -104,28 +104,6 @@ def generate_real_samples(samples, distribution, total_samples):
     # generate class labels
     y = np.ones((samples, 1))
     return X, y
-
-# define hamiltonian to generate fake samples
-def hamiltonian1():
-    id = [[1, 0], [0, 1]]
-    m0 = hamiltonians.Z(1, numpy=True).matrix
-    m0 = np.kron(id, np.kron(id, m0))
-    ham = hamiltonians.Hamiltonian(3, m0)
-    return ham
-
-def hamiltonian2():
-    id = [[1, 0], [0, 1]]
-    m0 = hamiltonians.Z(1, numpy=True).matrix
-    m0 = np.kron(id, np.kron(m0, id))
-    ham = hamiltonians.Hamiltonian(3, m0)
-    return ham
-
-def hamiltonian3():
-    id = [[1, 0], [0, 1]]
-    m0 = hamiltonians.Z(1, numpy=True).matrix
-    m0 = np.kron(m0, np.kron(id, id))
-    ham = hamiltonians.Hamiltonian(3, m0)
-    return ham
  
 # generate points in latent space as input for the generator
 def generate_latent_points(latent_dim, samples):
@@ -136,7 +114,7 @@ def generate_latent_points(latent_dim, samples):
     return x_input
  
 # use the generator to generate fake examples, with class labels
-def generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers):
+def generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers, hamiltonian1, hamiltonian2, hamiltonian3):
     # generate points in latent space
     x_input = generate_latent_points(latent_dim, samples)
     x_input = np.transpose(x_input)
@@ -146,10 +124,11 @@ def generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers)
     X3 = []
     # quantum generator circuit
     for i in range(samples):
-        set_params(circuit, params, x_input, i, nqubits, layers)   
-        X1.append(hamiltonian1().expectation(circuit.execute()))
-        X2.append(hamiltonian2().expectation(circuit.execute()))
-        X3.append(hamiltonian3().expectation(circuit.execute()))
+        set_params(circuit, params, x_input, i, nqubits, layers)
+        circuit_execute = circuit.execute()
+        X1.append(hamiltonian1.expectation(circuit_execute))
+        X2.append(hamiltonian2.expectation(circuit_execute))
+        X3.append(hamiltonian3.expectation(circuit_execute))
     # shape array
     X = tf.stack((X1, X2, X3), axis=1)
     # create class labels
@@ -157,12 +136,12 @@ def generate_fake_samples(params, latent_dim, samples, circuit, nqubits, layers)
     return X, y
  
 # train the generator and discriminator
-def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator, circuit, n_epochs, samples, lr):
+def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator, circuit, n_epochs, samples, lr, hamiltonian1, hamiltonian2, hamiltonian3):
     d_loss = []
     g_loss = []
     # determine half the size of one batch, for updating the discriminator
     half_samples = int(samples / 2)
-    initial_params = tf.Variable(np.random.uniform(0, 2*np.pi, 4*layers*nqubits + 2*nqubits + layers))
+    initial_params = tf.Variable(np.random.uniform(0, 2*np.pi, 4*layers*nqubits + 2*nqubits + 2*layers))
     optimizer = tf.optimizers.Adadelta(learning_rate=lr)
     # prepare real samples
     s = generate_training_real_samples(training_samples)
@@ -171,7 +150,7 @@ def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator,
         # prepare real samples
         x_real, y_real = generate_real_samples(half_samples, s, training_samples)
         # prepare fake examples
-        x_fake, y_fake = generate_fake_samples(initial_params, latent_dim, half_samples, circuit, nqubits, layers)
+        x_fake, y_fake = generate_fake_samples(initial_params, latent_dim, half_samples, circuit, nqubits, layers, hamiltonian1, hamiltonian2, hamiltonian3)
         # update discriminator
         d_loss_real, _ = d_model.train_on_batch(x_real, y_real)
         d_loss_fake, _ = d_model.train_on_batch(x_fake, y_fake)
@@ -189,10 +168,37 @@ def train(d_model, latent_dim, layers, nqubits, training_samples, discriminator,
         discriminator.save_weights(f"discriminator_Quantum_{nqubits}_qubits_{layers}_layers_{latent_dim}_latent.h5")
 
 def main(layers, training_samples, n_epochs, batch_samples, lr):
+    
+    # define hamiltonian to generate fake samples
+    def hamiltonian1():
+        id = [[1, 0], [0, 1]]
+        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = np.kron(id, np.kron(id, m0))
+        ham = hamiltonians.Hamiltonian(3, m0)
+        return ham
+    
+    def hamiltonian2():
+        id = [[1, 0], [0, 1]]
+        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = np.kron(id, np.kron(m0, id))
+        ham = hamiltonians.Hamiltonian(3, m0)
+        return ham
+    
+    def hamiltonian3():
+        id = [[1, 0], [0, 1]]
+        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = np.kron(m0, np.kron(id, id))
+        ham = hamiltonians.Hamiltonian(3, m0)
+        return ham
+    
     # number of qubits generator
     nqubits = 3
     # latent dimension
-    latent_dim = 3          
+    latent_dim = 3
+    # create hamiltonians
+    hamiltonian1 = hamiltonian1()
+    hamiltonian2 = hamiltonian2()
+    hamiltonian3 = hamiltonian3()
     # create quantum generator
     circuit = models.Circuit(nqubits)
     for l in range(layers):
@@ -210,7 +216,7 @@ def main(layers, training_samples, n_epochs, batch_samples, lr):
     # create classical discriminator
     discriminator = define_discriminator(lr)
     # train model
-    train(discriminator, latent_dim, layers, nqubits, training_samples, discriminator, circuit, n_epochs, batch_samples, lr)
+    train(discriminator, latent_dim, layers, nqubits, training_samples, discriminator, circuit, n_epochs, batch_samples, lr, hamiltonian1, hamiltonian2, hamiltonian3)
 
 
 if __name__ == "__main__":
