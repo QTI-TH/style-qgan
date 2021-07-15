@@ -15,7 +15,6 @@ from qibo import gates, hamiltonians, models, set_backend, set_threads
 import argparse
 
 set_backend('tensorflow')
-set_threads(4)
 
 # define the standalone discriminator model
 def define_discriminator(n_inputs=3, alpha=0.2, dropout=0.2):
