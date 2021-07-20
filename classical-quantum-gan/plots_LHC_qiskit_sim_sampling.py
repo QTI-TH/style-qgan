@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import itertools
+import time
 import numpy as np
 import tensorflow as tf
 from numpy.random import randn
@@ -41,13 +42,22 @@ def generate_fake_samples(circuit, backend, noise_params, samples, batch_size, p
     def bind_params(i):
         return circuit.bind_parameters(dict(zip(noise_params, x_input[i])))
 
+    def execute_or_wait(batch):
+        wait_time = 60
+        while True:
+            try:
+                return qiskit.execute(batch, backend=backend, shots=nshots)
+            except qiskit.providers.ibmq.exceptions.IBMQBackendJobLimitError:
+                print(f'Reached maximum number of concurrent jobs. Retrying in {wait_time} seconds')
+                time.sleep(wait_time)
+
     def submit_job(start, stop):
         batch = [qiskit.transpile(bind_params(i), backend) for i in range(start, stop)]
         if start == 0:
             print("compiled circuit, noise id 0")
             print(batch[0])
             batch[0].draw(output='mpl', filename=f"compiled_generator_circuit_noise0_{samples}_{nqubits}_{latent_dim}.pdf")
-        job = qiskit.execute(batch, backend=backend, shots=nshots)
+        job = execute_or_wait(batch)
         print(f'job for batch from {start} to {stop-1} submitted', flush=True)
         with open(f"compiled_generator_circuits_{start}-{stop-1}_{job.job_id()}_{nqubits}_{latent_dim}.qpy", 'wb') as f:
             qiskit.circuit.qpy_serialization.dump(batch, f)
@@ -243,7 +253,7 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
         if noise_model is not None:
             raise ValueError('noise model can be specified only with the simulator backend')
         backend = get_backend(backend)
-        batch_size = 75 # it should be possible to get this programmatically
+        batch_size = backend.configuration().max_experiments
         parallel = True
     print_backend_info(backend)
     x_fake, _ = generate_fake_samples(circuit, backend, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots)
