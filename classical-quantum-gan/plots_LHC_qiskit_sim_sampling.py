@@ -32,25 +32,39 @@ def generate_latent_points(latent_dim, samples):
     x_input = x_input.reshape(samples, latent_dim)
     return x_input
 
+
 # use the generator to generate fake examples, with class labels
-def generate_fake_samples(circuit, backend, noise_params, samples, nqubits, layers, nshots):
+def generate_fake_samples(circuit, backend, noise_params, samples, batch_size, parallel, nqubits, layers, nshots):
     latent_dim = len(noise_params)
     # generate points in latent space
     x_input = generate_latent_points(latent_dim, samples)
     def bind_params(i):
         return circuit.bind_parameters(dict(zip(noise_params, x_input[i])))
-    circuits = [qiskit.transpile(bind_params(i), backend) for i in range(samples)]
-    print("compiled circuit, noise id 0")
-    print(circuits[0])
-    circuits[0].draw(output='mpl', filename=f"compiled_generator_circuit_noise0_{samples}_{nqubits}_{latent_dim}.pdf")
 
-    # run the simulation
-    job = qiskit.execute(circuits, backend=backend, shots=nshots)
-    result = job.result()
-    with open(f"compiled_generator_circuits_{job.job_id()}_{samples}_{nqubits}_{latent_dim}.qpy", 'wb') as f:
-        qiskit.circuit.qpy_serialization.dump(circuits, f)
-    np.savez(f"job_results_{backend.name()}_{job.job_id()}_{samples}_{nqubits}_{latent_dim}_{nshots}", **result.to_dict())
-    counts = result.get_counts()
+    def submit_job(start, stop):
+        batch = [qiskit.transpile(bind_params(i), backend) for i in range(start, stop)]
+        if start == 0:
+            print("compiled circuit, noise id 0")
+            print(batch[0])
+            batch[0].draw(output='mpl', filename=f"compiled_generator_circuit_noise0_{samples}_{nqubits}_{latent_dim}.pdf")
+        job = qiskit.execute(batch, backend=backend, shots=nshots)
+        print(f'job for batch from {start} to {stop-1} submitted', flush=True)
+        with open(f"compiled_generator_circuits_{start}-{stop-1}_{job.job_id()}_{nqubits}_{latent_dim}.qpy", 'wb') as f:
+            qiskit.circuit.qpy_serialization.dump(batch, f)
+        return job
+
+    def get_results(job):
+        result = job.result()
+        np.savez(f"job_results_{backend.name()}_{job.job_id()}_{nqubits}_{latent_dim}_{nshots}", **result.to_dict())
+        return result
+
+    # run the simulation in batches
+    if parallel:
+        jobs = [submit_job(i, min(i+batch_size, samples)) for i in range(0, samples, batch_size)]
+        results = [get_results(job) for job in jobs]
+    else:
+        results = [get_results(submit_job(i, min(i+batch_size, samples))) for i in range(0, samples, batch_size)]
+    counts = itertools.chain(*(res.get_counts() for res in results))
 
     # generator outputs
     X1 = []
@@ -206,6 +220,8 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     
     print('generating fake samples')   
     simulator = Aer.get_backend('aer_simulator')
+    batch_size = 1_000_000
+    parallel = False
     def get_backend(name, provider=None):
         IBMQ.load_account()
         if provider is None:
@@ -217,18 +233,20 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
             for b in provider.backends():
                 print(b)
             raise
-
     if backend == 'simulator':
         if noise_model:
             backend = simulator.from_backend(get_backend(noise_model))
+            batch_size = 1000 # limit the memory usage running jobs in smaller batches
         else:
             backend = simulator
     else:
         if noise_model is not None:
             raise ValueError('noise model can be specified only with the simulator backend')
         backend = get_backend(backend)
+        batch_size = 75 # it should be possible to get this programmatically
+        parallel = True
     print_backend_info(backend)
-    x_fake, _ = generate_fake_samples(circuit, backend, circuit_noise_params, samples, nqubits, layers, nshots)
+    x_fake, _ = generate_fake_samples(circuit, backend, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots)
     init = readInit('data/ppttbar_10k_events.lhe')
     evs = list(readEvent('data/ppttbar_10k_events.lhe'))    
     invar = np.zeros((len(evs),3))
