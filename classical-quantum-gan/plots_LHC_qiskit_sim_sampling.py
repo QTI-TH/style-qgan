@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import itertools
 import numpy as np
 import tensorflow as tf
 from numpy.random import randn
@@ -48,7 +49,7 @@ def generate_fake_samples(circuit, backend, noise_params, samples, nqubits, laye
     result = job.result()
     with open(f"compiled_generator_circuits_{job.job_id()}_{samples}_{nqubits}_{latent_dim}.qpy", 'wb') as f:
         qiskit.circuit.qpy_serialization.dump(circuits, f)
-    np.savez(f"job_results_{job.job_id()}_{samples}_{nqubits}_{latent_dim}.npy", **result.to_dict())
+    np.savez(f"job_results_{backend.name()}_{job.job_id()}_{samples}_{nqubits}_{latent_dim}_{nshots}", **result.to_dict())
     counts = result.get_counts()
 
     # generator outputs
@@ -152,7 +153,6 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
         return par
 
     circuit_noise_params = qiskit.circuit.ParameterVector('r', latent_dim)
-    import itertools
     circuit_noise_params_cycle = itertools.cycle(circuit_noise_params)
 
     def add_angle():
@@ -206,21 +206,29 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     
     print('generating fake samples')   
     simulator = Aer.get_backend('aer_simulator')
-    if noise_model:
+    def get_backend(name, provider=None):
         IBMQ.load_account()
-        provider = IBMQ.get_provider(hub='ibm-q', group='open', project='main')
+        if provider is None:
+            provider = IBMQ.get_provider(hub='ibm-q', group='open', project='main')
         try:
-            backend = provider.get_backend(noise_model)
+            return provider.get_backend(name)
         except qiskit.providers.exceptions.QiskitBackendNotFoundError:
             print('available backends')
             for b in provider.backends():
                 print(b)
             raise
-        backend = simulator.from_backend(backend)
+
+    if backend == 'simulator':
+        if noise_model:
+            backend = simulator.from_backend(get_backend(noise_model))
+        else:
+            backend = simulator
     else:
-        backend = simulator
+        if noise_model is not None:
+            raise ValueError('noise model can be specified only with the simulator backend')
+        backend = get_backend(backend)
     print_backend_info(backend)
-    x_fake, _ = generate_fake_samples(circuit, simulator, circuit_noise_params, samples, nqubits, layers, nshots)
+    x_fake, _ = generate_fake_samples(circuit, backend, circuit_noise_params, samples, nqubits, layers, nshots)
     init = readInit('data/ppttbar_10k_events.lhe')
     evs = list(readEvent('data/ppttbar_10k_events.lhe'))    
     invar = np.zeros((len(evs),3))
