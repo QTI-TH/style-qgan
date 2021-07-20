@@ -256,6 +256,12 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
         batch_size = backend.configuration().max_experiments
         parallel = True
     print_backend_info(backend)
+
+    circuit = qiskit.transpile(circuit, backend)
+    print("optimized generator circuit")
+    print(circuit)
+    circuit.draw(output='mpl', filename=f"generic_compiled_generator_circuit_{samples}_{nqubits}_{latent_dim}.pdf")
+
     x_fake, _ = generate_fake_samples(circuit, backend, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots)
     init = readInit('data/ppttbar_10k_events.lhe')
     evs = list(readEvent('data/ppttbar_10k_events.lhe'))    
