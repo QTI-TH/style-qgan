@@ -34,7 +34,7 @@ def generate_latent_points(latent_dim, samples):
 
 
 # use the generator to generate fake examples, with class labels
-def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_size, parallel, nqubits, layers, nshots):
+def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots):
     if merge:
         latent_dim = len(noise_params[0])
         if samples%merge != 0:
@@ -48,6 +48,10 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
         # generate points in latent space
         x_input = generate_latent_points(latent_dim, samples)
 
+    if nshots%parallel_shots != 0:
+        raise ValueError('the number of parallel circuits must divide the number of shots')
+    actual_nshots = nshots//parallel_shots
+
     def bind_params(i):
         if merge:
             return circuit.bind_parameters(dict(zip((p for np in noise_params for p in np), x_input[i])))
@@ -57,7 +61,7 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
         wait_time = 60
         while True:
             try:
-                return qiskit.execute(batch, backend=backend, shots=nshots)
+                return qiskit.execute(batch, backend=backend, shots=actual_nshots)
             except qiskit.providers.ibmq.exceptions.IBMQBackendJobLimitError:
                 print(f'Reached maximum number of concurrent jobs. Retrying in {wait_time} seconds')
                 time.sleep(wait_time)
@@ -93,13 +97,20 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
     X3 = []
     # quantum generator circuit
     for c in counts:
-        for i in range(0, len(circuit.clbits), 3):
-            c3 = qiskit.result.marginal_counts(c, [i+0])
-            X3.append((c3['1']-c3['0'])/nshots)
-            c2 = qiskit.result.marginal_counts(c, [i+1])
-            X2.append((c2['1']-c2['0'])/nshots)
-            c1 = qiskit.result.marginal_counts(c, [i+2])
-            X1.append((c1['1']-c1['0'])/nshots)
+        for i in range(0, len(circuit.clbits), 3*parallel_shots):
+            sum3 = 0
+            sum2 = 0
+            sum1 = 0
+            for j in range(i, i+3*parallel_shots, 3):
+                c3 = qiskit.result.marginal_counts(c, [j+0])
+                sum3 += c3['1']-c3['0']
+                c2 = qiskit.result.marginal_counts(c, [j+1])
+                sum2 += c2['1']-c2['0']
+                c1 = qiskit.result.marginal_counts(c, [j+2])
+                sum1 += c1['1']-c1['0']
+            X3.append(sum3/nshots)
+            X2.append(sum2/nshots)
+            X1.append(sum1/nshots)
 
     # shape array
     X = np.stack((X1, X2, X3), axis=1)
@@ -179,7 +190,7 @@ def print_backend_info(backend):
     describe_qubit(1, props)
     describe_qubit(2, props)
 
-def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr, plot_real, nshots, backend, noise_model, merge):
+def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr, plot_real, nshots, parallel_shots, backend, noise_model, merge):
     
     # number of qubits generator
     nqubits = 3
@@ -272,17 +283,27 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
         parallel = True
     print_backend_info(backend)
 
+    if parallel_shots:
+        qubits = qiskit.QuantumRegister(parallel_shots*nqubits, 'q')
+        bits = qiskit.ClassicalRegister(parallel_shots*nqubits, 'c')
+        parallel_circuit = qiskit.QuantumCircuit(qubits, bits)
+        for i in range(parallel_shots):
+            parallel_circuit.append(circuit, qubits[i*nqubits:i*nqubits+nqubits], bits[i*nqubits:i*nqubits+nqubits])
+        circuit = parallel_circuit
+    else:
+        parallel_shots = 1
+
     if merge and isinstance(merge, int):
+        pnq = parallel_shots*nqubits
         merged_circuits_noise_params = []
-        qubits = qiskit.QuantumRegister(merge*nqubits, 'q')
-        bits = qiskit.ClassicalRegister(merge*nqubits, 'c')
+        qubits = qiskit.QuantumRegister(merge*pnq, 'q')
+        bits = qiskit.ClassicalRegister(merge*pnq, 'c')
         merged_circuit = qiskit.QuantumCircuit(qubits, bits)
-        qr = merged_circuit.qregs[0]
         for i in range(merge):
             noise_p = qiskit.circuit.ParameterVector(f'r[{i}]', latent_dim)
             merged_circuits_noise_params.append(noise_p)
             circ = circuit.assign_parameters(dict(zip(circuit_noise_params, noise_p)))
-            merged_circuit.append(circ, qubits[i*nqubits:i*nqubits+nqubits], bits[i*nqubits:i*nqubits+nqubits])
+            merged_circuit.append(circ, qubits[i*pnq:i*pnq+pnq], bits[i*pnq:i*pnq+pnq])
         circuit = merged_circuit
         circuit_noise_params = merged_circuits_noise_params
 
@@ -291,7 +312,7 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     print(circuit)
     circuit.draw(output='mpl', filename=f"generic_compiled_generator_circuit_{samples}_{nqubits}_{latent_dim}.pdf")
 
-    x_fake, _ = generate_fake_samples(circuit, backend, merge, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots)
+    x_fake, _ = generate_fake_samples(circuit, backend, merge, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots)
     init = readInit('data/ppttbar_10k_events.lhe')
     evs = list(readEvent('data/ppttbar_10k_events.lhe'))    
     invar = np.zeros((len(evs),3))
@@ -451,6 +472,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--samples", default=1000, type=int)
     parser.add_argument("--nshots", default=1000, type=int)
+    parser.add_argument("--parallel_shots", default=False, type=int)
     parser.add_argument("--backend", default="simulator", type=str)
     parser.add_argument("--merge", default=False, type=int)
     parser.add_argument("--noise_model", default=None, type=str)
