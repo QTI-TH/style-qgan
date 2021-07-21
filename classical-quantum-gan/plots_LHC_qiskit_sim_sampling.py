@@ -3,7 +3,6 @@
 import itertools
 import time
 import numpy as np
-import tensorflow as tf
 from numpy.random import randn
 import qiskit, qiskit.circuit.qpy_serialization
 from qiskit import Aer, IBMQ
@@ -103,7 +102,7 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
             X1.append((c1['1']-c1['0'])/nshots)
 
     # shape array
-    X = tf.stack((X1, X2, X3), axis=1)
+    X = np.stack((X1, X2, X3), axis=1)
     # create class labels
     y = np.zeros((samples, 1))
     return X, y
