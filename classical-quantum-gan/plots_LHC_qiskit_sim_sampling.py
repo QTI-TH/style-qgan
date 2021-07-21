@@ -103,11 +103,11 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
             sum1 = 0
             for j in range(i, i+3*parallel_shots, 3):
                 c3 = qiskit.result.marginal_counts(c, [j+0])
-                sum3 += c3['1']-c3['0']
+                sum3 += c3.get('1', 0)-c3.get('0', 0)
                 c2 = qiskit.result.marginal_counts(c, [j+1])
-                sum2 += c2['1']-c2['0']
+                sum2 += c2.get('1', 0)-c2.get('0', 0)
                 c1 = qiskit.result.marginal_counts(c, [j+2])
-                sum1 += c1['1']-c1['0']
+                sum1 += c1.get('1', 0)-c1.get('0', 0)
             X3.append(sum3/nshots)
             X2.append(sum2/nshots)
             X1.append(sum1/nshots)
