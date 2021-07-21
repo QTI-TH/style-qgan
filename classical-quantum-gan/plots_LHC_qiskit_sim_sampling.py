@@ -64,7 +64,7 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
                 time.sleep(wait_time)
 
     def submit_job(start, stop):
-        batch = [qiskit.transpile(bind_params(i), backend) for i in range(start, stop)]
+        batch = [qiskit.transpile(bind_params(i), backend, optimization_level=3) for i in range(start, stop)]
         if start == 0:
             print("compiled circuit, noise id 0")
             print(batch[0])
@@ -287,7 +287,7 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
         circuit = merged_circuit
         circuit_noise_params = merged_circuits_noise_params
 
-    circuit = qiskit.transpile(circuit, backend)
+    circuit = qiskit.transpile(circuit, backend, optimization_level=3)
     print("optimized generator circuit")
     print(circuit)
     circuit.draw(output='mpl', filename=f"generic_compiled_generator_circuit_{samples}_{nqubits}_{latent_dim}.pdf")
