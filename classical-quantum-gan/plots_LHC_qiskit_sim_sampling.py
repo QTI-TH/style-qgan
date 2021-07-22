@@ -119,6 +119,51 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
     y = np.zeros((samples, 1))
     return X, y
 
+# use the generator to generate fake examples, with class labels
+def generate_fake_samples_pennylane(circuit, backend, merge, noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots):
+    if merge:
+        latent_dim = len(noise_params[0])
+        if samples%merge != 0:
+            raise ValueError('the number of combined circuits must divide the number of samples')
+        actual_samples = samples//merge
+        # generate points in latent space
+        x_input = generate_latent_points(latent_dim*merge, actual_samples)
+    else:
+        latent_dim = len(noise_params)
+        actual_samples = samples
+        # generate points in latent space
+        x_input = generate_latent_points(latent_dim, samples)
+
+    if nshots%parallel_shots != 0:
+        raise ValueError('the number of parallel circuits must divide the number of shots')
+    actual_nshots = nshots//parallel_shots
+
+    def bind_params(i):
+        if merge:
+            return circuit.bind_parameters(dict(zip((p for np in noise_params for p in np), x_input[i])))
+        return circuit.bind_parameters(dict(zip(noise_params, x_input[i])))
+
+    if merge or parallel_shots > 1:
+        raise NotImplementedError
+
+    import pennylane as qml
+    qml_circuit_template = qml.from_qiskit(circuit)
+    measures = {clbit[0].index: qubit[0].index for _, qubit, clbit in circuit.get_instructions('measure')}
+    dev = qml.device('braket.local.qubit', wires=len(circuit.qubits), shots=actual_nshots)
+    nw = len(circuit.qubits)
+    wires=list(range(nw))
+
+    @qml.qnode(dev)
+    def qc_function(i):
+        qml_circ = qml.from_qiskit(bind_params(i))
+        qml_circ(wires=wires)
+        return [qml.expval(qml.PauliZ(measures[w])) for w in range(3)]
+
+    X = -np.asarray([qc_function(i) for i in range(actual_samples)])[:, ::-1]
+    # create class labels
+    y = np.zeros((samples, 1))
+    return X, y
+
 def load_events(filename, samples=10000):
     init = readInit(filename)
     evs = list(readEvent(filename))
@@ -191,7 +236,7 @@ def print_backend_info(backend):
     describe_qubit(1, props)
     describe_qubit(2, props)
 
-def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr, plot_real, nshots, parallel_shots, backend, noise_model, merge):
+def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr, plot_real, nshots, parallel_shots, provider, backend, noise_model, merge):
     
     # number of qubits generator
     nqubits = 3
@@ -259,10 +304,17 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     simulator = Aer.get_backend('aer_simulator')
     batch_size = 1_000_000
     parallel = False
-    def get_backend(name, provider=None):
+
+    if provider == 'ibmq':
         IBMQ.load_account()
-        if provider is None:
-            provider = IBMQ.get_provider(hub='ibm-q', group='open', project='main')
+        provider = IBMQ.get_provider(hub='ibm-q', group='open', project='main')
+    elif provider == 'ionq':
+        import qiskit_ionq
+        provider = qiskit_ionq.IonQProvider()
+    else:
+        raise ValueError('unknow provider')
+
+    def get_backend(name):
         try:
             return provider.get_backend(name)
         except qiskit.providers.exceptions.QiskitBackendNotFoundError:
@@ -313,7 +365,10 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     print(circuit)
     circuit.draw(output='mpl', filename=f"generic_compiled_generator_circuit_{samples}_{nqubits}_{latent_dim}.pdf")
 
-    x_fake, _ = generate_fake_samples(circuit, backend, merge, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots)
+    if provider.name == 'ionq_provider':
+        x_fake, _ = generate_fake_samples_pennylane(circuit, backend, merge, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots)
+    else:
+        x_fake, _ = generate_fake_samples(circuit, backend, merge, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots)
     init = readInit('data/ppttbar_10k_events.lhe')
     evs = list(readEvent('data/ppttbar_10k_events.lhe'))    
     invar = np.zeros((len(evs),3))
@@ -474,6 +529,7 @@ if __name__ == "__main__":
     parser.add_argument("--samples", default=1000, type=int)
     parser.add_argument("--nshots", default=1000, type=int)
     parser.add_argument("--parallel_shots", default=False, type=int)
+    parser.add_argument("--provider", default="ibmq", type=str)
     parser.add_argument("--backend", default="simulator", type=str)
     parser.add_argument("--merge", default=False, type=int)
     parser.add_argument("--noise_model", default=None, type=str)
