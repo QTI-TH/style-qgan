@@ -67,7 +67,8 @@ def generate_fake_samples(circuit, backend, merge, noise_params, samples, batch_
                 time.sleep(wait_time)
 
     def submit_job(start, stop):
-        batch = [qiskit.transpile(bind_params(i), backend, optimization_level=3) for i in range(start, stop)]
+#        batch = [qiskit.transpile(bind_params(i), backend, optimization_level=3) for i in range(start, stop)]
+        batch = [bind_params(i) for i in range(start, stop)]
         if start == 0:
             print("compiled circuit, noise id 0")
             print(batch[0])
