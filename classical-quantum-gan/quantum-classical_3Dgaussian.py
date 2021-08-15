@@ -177,21 +177,21 @@ def main(latent_dim, layers, training_samples, n_epochs, batch_samples, lr):
     # define hamiltonian to generate fake samples
     def hamiltonian1():
         id = [[1, 0], [0, 1]]
-        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = hamiltonians.Z(1).matrix
         m0 = np.kron(id, np.kron(id, m0))
         ham = hamiltonians.Hamiltonian(3, m0)
         return ham
     
     def hamiltonian2():
         id = [[1, 0], [0, 1]]
-        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = hamiltonians.Z(1).matrix
         m0 = np.kron(id, np.kron(m0, id))
         ham = hamiltonians.Hamiltonian(3, m0)
         return ham
     
     def hamiltonian3():
         id = [[1, 0], [0, 1]]
-        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = hamiltonians.Z(1).matrix
         m0 = np.kron(m0, np.kron(id, id))
         ham = hamiltonians.Hamiltonian(3, m0)
         return ham
@@ -224,11 +224,11 @@ def main(latent_dim, layers, training_samples, n_epochs, batch_samples, lr):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--latent_dim", default=3, type=int)
-    parser.add_argument("--layers", default=20, type=int)
+    parser.add_argument("--latent_dim", default=6, type=int)
+    parser.add_argument("--layers", default=10, type=int)
     parser.add_argument("--training_samples", default=10000, type=int)
     parser.add_argument("--n_epochs", default=30000, type=int)
     parser.add_argument("--batch_samples", default=128, type=int)
-    parser.add_argument("--lr", default=0.1, type=float)
+    parser.add_argument("--lr", default=0.5, type=float)
     args = vars(parser.parse_args())
     main(**args)
