@@ -40,7 +40,7 @@
 \author{Julien Baglio}
 \affiliation{\CERNaff}
 
-\author{Marco Cè}
+\author{Marco C\`e}
 \affiliation{\CERNaff}
 
 \author{Anthony Francis}
@@ -62,21 +62,21 @@
     the recent developments of new algorithms and quantum hardware devices
     motivates the study of methodologies applied to HEP. In this work we
     identify architectures of variational quantum circuits suitable for
-    designing a generative model for Monte Carlo event generation. We show
-    experiments on artificial data generated from known underlying
-    distributions. Finally, we train a quantum GAN using Monte Carlo events and
-    benchmark the performance in terms of quality and performance.
+    designing a generative model for Monte Carlo event generation. We validate
+    the methodology by performing experiments on artificial data generated from
+    known underlying distributions. Finally, we model Monte Carlo simulated
+    events and benchmark the performance in terms of quality and performance.
 \end{abstract}
 
 \maketitle
 
 \section{Introduction}
 
-Quantum computing is a new computation paradigm that exploits the laws of
-quantum mechanics to provide new strategies for addressing problems that are
-nowadays considered to be difficult. The first quantum algorithms showing any
-advantage over their classical counterparts date from the 1990s, being Shor's
-algorithm for integer factorization and Grover's search the most prominent
+Quantum computing is a computation paradigm that exploits the laws of quantum
+mechanics to provide new strategies for addressing problems that are nowadays
+considered to be difficult. The first quantum algorithms showing any advantage
+over their classical counterparts date from the 1990s, being Shor's algorithm
+for integer factorization and Grover's search the most prominent
 ones~\cite{shor,grover}. During the last decade, we have witnessed an
 impressively fast development of quantum computing, both for theoretical work
 and hardware implementation perspectives. Nevertheless, currently existing
@@ -108,7 +108,7 @@ equations~\cite{bravoprieto:2020linear,xu:2019linear,huang:2019linear} and state
 diagonalization
 ~\cite{LaRose:2019diagonalization,BravoPrieto:2020diagonalization}. Some of
 these examples are already characterized as Quantum Machine Learning (QML)
-applications, based on variational~\cite{perezsalinas:2020reuploading,
+applications, based on variational~\cite{perezsalinas:2020reuploading,P_rez_Salinas_2021,
 mitarai:2018circuit,Zhu:2019circuit,Schuld:2020circuit,lloyd:2020embeddings} and
 non-variational~\cite{liu:2020svm,Rebentrost:2014svm,lloyd:2013ml} approaches.
 Furthermore, QML is a field that is expected to surpass the current performance
@@ -119,29 +119,33 @@ The QML approach to quantum computing is an interesting research topic which can
 be adapted and tested on research problems already addressed by ML techniques.
 Motivated by this idea, we propose to investigate the possibility to use quantum
 computing for the generation of Monte Carlo events through quantum generative
-adversarial circuits.
+adversarial circuits ({\tt QGMC}).
 
-There are different reasons for attempting a qMCGAN determination. First,
+{\color{red}[SC: review this block, rephrase and include reference/pro/cons of
+other quantum GAN models.]}
+
+There are different reasons for attempting a {\tt QGMC} determination. First,
 quantum computing is expected to have a reduced energy consumption when compared
 to an equivalent classical computer, and thus, we may expect saving power and
 reducing its environmental impact. Secondly, as we show in this work, the number
 of parameters needed to obtain an acceptable generator is in average lower with
-quantum models in comparison to modern GAN models. Furthermore, the qMCGAN
-approach may take advantage from quantum entanglement, since the potential
-outstanding power of quantum computing emerges from there. Finally, quantum
-hardware may bring performance improvements in terms of running time for this
-model when compared to the standard ML approach since the number of operations
-needed to obtain an acceptable solution is lower and the model has an exact
-hardware representation. On the other hand, we consider the qMCGAN model
-presented in this work as proof-of-concept for future implementations, given
-that the performance of quantum simulation on classical hardware and the
+quantum models in comparison to classical generative models. Furthermore, the
+{\tt QGMC} approach may take advantage from quantum entanglement, since the
+potential outstanding power of quantum computing emerges from there. Finally,
+quantum hardware may bring performance improvements in terms of running time for
+this model when compared to the standard ML approach since the number of
+operations needed to obtain an acceptable solution is lower and the model has an
+exact hardware representation. On the other hand, we consider the {\tt QGMC}
+model presented in this work as proof-of-concept for future implementations,
+given that the performance of quantum simulation on classical hardware and the
 stability of real quantum device measurements are not competitive yet.
 
 The paper is structured as follows. Sec.~\ref{sec:implementation} we identify
-the best qMCGAN architecture. In Sec.~\ref{sec:validation} we validate the
-qMCGAN model using toy data. In Sec.~\ref{sec:lhc} we train the qMCGAN generator
-on simulated LHC events. Finally, in Sec.~\ref{sec:conclusion} we present our
-conclusion and future development directions.
+the best {\tt QGMC} architecture. In Sec.~\ref{sec:validation} we validate the
+{\tt QGMC} model using toy data. In Sec.~\ref{sec:lhc} we train the {\tt QGMC}
+generator on simulated LHC events. Finally, in Sec.~\ref{sec:deployment} we test
+our final model on real quantum hardware and in Sec.~\ref{sec:conclusion} we
+present our conclusion and future development directions.
 
 \section{Implementation}
 \label{sec:implementation}
@@ -149,7 +153,6 @@ conclusion and future development directions.
 \begin{enumerate}
   \item Talk about model definition
   \item Talk about training procedure
-  \item Talk about circuit deployment changes between simulation and IBM
 \end{enumerate}
 
 \begin{figure*}
@@ -237,6 +240,7 @@ conclusion and future development directions.
 \end{figure*}
 
 \section{Sampling from real quantum hardware}
+\label{sec:deployment}
 
 {\color{red}[SC: Julien and Marco please summarize the experimental setup]}
 
@@ -278,35 +282,35 @@ In this work we proposed variational quantum circuit models for the generation
 of Monte Carlo events in the context of high energy physics (HEP). We have
 investigated and identified the most suitable Ansatz for the parametrization of
 a quantum generative network. Using quantum circuit simulation on classical
-hardware, we show that qMCGAN generators are suitable for Monte Carlo event
+hardware, we show that {\tt QGMC} generators are suitable for Monte Carlo event
 simulation.
 
-We highlight some advantages of the qMCGAN model when compared to the standard
+We highlight some advantages of the {\tt QGMC} model when compared to the standard
 machine learning methodology. From a hardware implementation point of view, the
-possibility to write the specific qMCGAN circuit in a quantum processor, using
+possibility to write the specific {\tt QGMC} circuit in a quantum processor, using
 its primitives (gates), will accelerate the evaluations and training performance
 of Monte Carlo sampling. We expect that real quantum devices will be more
 efficient in terms of energy power than classical hardware based on hardware
 accelerators such as graphical process units (GPUs).
 
-Furthermore, we propose a reconstruction method for evaluating the qMCGAN model
-in a real quantum device using measurements. This procedure brings all the
+Furthermore, we propose a reconstruction method for evaluating the {\tt QGMC}
+model in a real quantum device using measurements. This procedure brings all the
 difficulties that are typical of experimental quantum hardware, including noise,
 error corrections and decoherence. The implementation of accurate and stable
-qMCGAN in a real quantum device still requires the development of hardware
+{\tt QGMC} in a real quantum device still requires the development of hardware
 architecture with lower gate error tolerances in comparison to the current
 available machines.
 
 On the other hand, our results should be considered as a proof-of-concept
 exercise, given that the quantum simulation performance are still not
-competitive with an equivalent machine learning implementation. The qMCGAN
+competitive with an equivalent machine learning implementation. The {\tt QGMC}
 approach may show advantages when more precise quantum devices will be
 available.
 
 Nevertheless, this is a first attempt to bridge the power of quantum machine
 learning algorithms into the complexity of Monte Carlo simulation in HEP. We
-auspicate that the approach presented here will inspire new HEP applications
-which may benefit from quantum computing.
+wish that the approach presented here will inspire new HEP applications which
+may benefit from quantum computing.
 
 \acknowledgments
 
