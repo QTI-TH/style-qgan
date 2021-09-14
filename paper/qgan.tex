@@ -71,75 +71,15 @@
 \maketitle
 
 \section{Introduction}
+Quantum computing is a new paradigm whereby quantum phenomena are harnessed to perform computations. The current availability of noisy intermediate-scale quantum computers (NISQ)~\cite{nisq}, and recent achievements such as quantum computational supremacy~\cite{supremacy, zhong2020quantum}, have led to a growing interest in these devices to perform computational tasks faster than any classical machine. Among many of the near-term applications~\cite{cerezo2021variational, bharti2021noisy}, the field of Quantum Machine Learning (QML)~\cite{biamonte2017quantum, schuld2018supervised} is held as one of the most promising approaches to make use of NISQ computers.
 
-Quantum computing is a computation paradigm that exploits the laws of quantum
-mechanics to provide new strategies for addressing problems that are nowadays
-considered to be difficult. The first quantum algorithms showing any advantage
-over their classical counterparts date from the 1990s, being Shor's algorithm
-for integer factorization and Grover's search the most prominent
-ones~\cite{shor,grover}. During the last decade, we have witnessed an
-impressively fast development of quantum computing, both for theoretical work
-and hardware implementation perspectives. Nevertheless, currently existing
-quantum devices are not powerful enough to run competitive quantum algorithms,
-with respect to the state of the art of the classical ones.
+Early work in QML was mostly focused on speeding up linear algebra subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm, kerenidis2020quantum}, widely used in classical machine learning, by leveraging the HHL algorithm~\cite{harrow2009quantum}. Notice that this approach holds promise for the future, when large-scale quantum computers exist with low gates errors and enough qubits for quantum error correction. On the other hand, more recent proposals suggest using the quantum devices to define a parameterized quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility, bravo2020scaling}, or quantum neural network (QNN), which then can be trained to implement a function class~\cite{schuld2021effect, goto2021universal, perez2021one}. For example, several QNNs have been proposed for pattern classification~\cite{havlivcek2019supervised, Schuld:2020circuit, perezsalinas:2020reuploading} or data compression~\cite{romero2017quantum, bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum computing is a research topic that can be adapted, improved, and tested on many research problems. Motivated by this idea, we propose to investigate the possibility to use QNNs for generative modeling~\cite{benedetti2019generative, hamilton2019generative, coyle2020born}. More specifically, for the generation of Monte Carlo events through quantum generative adversarial networks (qGANs)~\cite{dallaire2018quantum, lloyd2018quantum}.
 
-Recent achievements such as {\sl quantum supremacy}~\cite{supremacy} have
-introduced the so-called Noisy Intermediate-Scale Quantum (NISQ)
-stage~\cite{nisq}. NISQ devices suffer from errors due to decoherence, noisy
-gates and erratic read-out measurements, and thus, its performance is limited.
-However, even at this early stage, quantum technologies may provide useful tools
-for a broad range of applications. On the one hand, some standard fully
-determined algorithms are well suited for NISQ
-processors~\cite{cerveralierta:2018ising,suba:2019spectroscopy,bravyi:2018shallow,Bravyi:2020noisyshallow,ramoscalderer:2020unary}.
-In particular, there also exist some examples of quantum algorithms designed to
-address some problems in high energy physics
-(HEP)~\cite{Perez-Salinas:2020nem,hep_amplitudes-bepari2020, hep_simulation-bauer2019,
-hep_gluon-alexandru2019, hep_parton-lamm2020}. On the other hand, the approach
-usually taken to harness the computational power of these imperfect machines is
-based on hybrid methods combining quantum and classical resources. For example,
-variational algorithms can be created whose purpose is to optimize some quantity
-encoding a solution for a specific problem. Among the great variety of quantum
-variational algorithms it is possible to find examples in quantum
-chemistry~\cite{peruzzo:2014vqe,higgott:2019vqe,aspuru:2005molecular,hempel:2018chemistry,jones:2019vqe},
-quantum
-simulation~\cite{li:2017simulation,kokail:2019simulation,cirstoiu:2020simulation},
-combinatorial optimization~\cite{farhi:2014qoao}, solving linear systems of
-equations~\cite{bravoprieto:2020linear,xu:2019linear,huang:2019linear} and state
-diagonalization
-~\cite{LaRose:2019diagonalization,BravoPrieto:2020diagonalization}. Some of
-these examples are already characterized as Quantum Machine Learning (QML)
-applications, based on variational~\cite{perezsalinas:2020reuploading,P_rez_Salinas_2021,
-mitarai:2018circuit,Zhu:2019circuit,Schuld:2020circuit,lloyd:2020embeddings} and
-non-variational~\cite{liu:2020svm,Rebentrost:2014svm,lloyd:2013ml} approaches.
-Furthermore, QML is a field that is expected to surpass the current performance
-and ubiquity of classical Machine Learning (ML) when the current limitations of
-quantum devices will be overcome.
+The generative adversarial framework employs two competing networks that are trained alternatively, the generator and the discriminator~\cite{goodfellow2014generative}. The generator produces candidates while the discriminator evaluates them. The objective of the discriminator is to distinguish the real samples from the generated ones. That is, the discriminator plays the role of the generator's adversary, and therefore, their competition is a zero-sum two-player game. Substituting either the discriminator, the generator, or both with quantum systems we translate the scheme to quantum computing.
 
-The QML approach to quantum computing is an interesting research topic which can
-be adapted and tested on research problems already addressed by ML techniques.
-Motivated by this idea, we propose to investigate the possibility to use quantum
-computing for the generation of Monte Carlo events through quantum generative
-adversarial circuits ({\tt QGMC}).
+In recent months, the spreading interest in QML has led to different qGAN implementations~\cite{zoufal2019quantum, zeng2019learning, situ2020quantum, hu2019quantum, benedetti2019adversarial, romero2021variational, niu2021entangling}. However, our contribution here can be summarized in three distinct aspects. (1) Previous proposals employ toy data for their qGAN training. Moreover, in some cases, it is classical data. It has been recently conjectured that if QML ever provides any speed up, it will likely appear from learning the data of a quantum process~\cite{huang2021information, kubler2021inductive}. We, therefore, train our qGAN model with artificial LHC data. (2) We propose an alternative quantum generator architecture. In contrast to previous proposals where the prior noise distribution, or latent dimension, is encoded at the beginning of the generator, we instead encode it on every layer of the network. This permits to the new generator to process and decide in which parts of the network the latent variables should play a relevant role. This allowed us to achieve improved state-of-the-art results with shallow QNNs using adversarial learning. Let us remark as well that this has been proven extremely useful in the classical context~\cite{karras2019style}. (3) We validate and assess our qGAN in quantum hardware. Specifically, we successfully implement our model in two different quantum architectures, namely, ion traps and superconducting qubits.
 
-{\color{red}[SC: review this block, rephrase and include reference/pro/cons of
-other quantum GAN models.]}
-
-There are different reasons for attempting a {\tt QGMC} determination. First,
-quantum computing is expected to have a reduced energy consumption when compared
-to an equivalent classical computer, and thus, we may expect saving power and
-reducing its environmental impact. Secondly, as we show in this work, the number
-of parameters needed to obtain an acceptable generator is in average lower with
-quantum models in comparison to classical generative models. Furthermore, the
-{\tt QGMC} approach may take advantage from quantum entanglement, since the
-potential outstanding power of quantum computing emerges from there. Finally,
-quantum hardware may bring performance improvements in terms of running time for
-this model when compared to the standard ML approach since the number of
-operations needed to obtain an acceptable solution is lower and the model has an
-exact hardware representation. On the other hand, we consider the {\tt QGMC}
-model presented in this work as proof-of-concept for future implementations,
-given that the performance of quantum simulation on classical hardware and the
-stability of real quantum device measurements are not competitive yet.
-
+% To be modified
 The paper is structured as follows. Sec.~\ref{sec:implementation} we identify
 the best {\tt QGMC} architecture. In Sec.~\ref{sec:validation} we validate the
 {\tt QGMC} model using toy data. In Sec.~\ref{sec:lhc} we train the {\tt QGMC}
@@ -157,7 +97,7 @@ present our conclusion and future development directions.
 
 \begin{figure*}
   \includegraphics[width=0.8\textwidth]{plots/ansatz1.pdf}
-  \caption{\label{fig:circuit}Ansatz for the quantum generator.}
+  \caption{\label{fig:circuit}Ansatz 1 for the quantum generator.}
 \end{figure*}
 
 \section{Validation}
@@ -169,15 +109,10 @@ present our conclusion and future development directions.
   \item Show 3D gaussian example for different (layers, latent) dim.
 \end{enumerate}
 
-\begin{figure*}
-  \includegraphics[width=0.49\textwidth]{plots/1Dgamma/1Dgamma_distribution_10k.pdf}
-  \includegraphics[width=0.49\textwidth]{plots/1Dgamma/1Dgamma_distribution_100k.pdf}
-  \caption{Example of 1D gamma distribution.}
-\end{figure*}
-
 \begin{figure}
-  \includegraphics[width=0.5\textwidth]{plots/1Dgamma/1Dgamma_loss.pdf}
-  \caption{Example of loss function evolution.}
+  \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1-distribution_100000_100_1_3_2_10000_128_0.5.pdf}\\
+  \includegraphics[width=0.45\textwidth]{plots/1Dgamma/loss_100000_100_1_3_2_10000_128_0.5.pdf}
+  \caption{Example of 1D gamma distribution.}
 \end{figure}
 
 \begin{figure*}
@@ -311,6 +246,11 @@ Nevertheless, this is a first attempt to bridge the power of quantum machine
 learning algorithms into the complexity of Monte Carlo simulation in HEP. We
 wish that the approach presented here will inspire new HEP applications which
 may benefit from quantum computing.
+
+{\color{red}{C: Include references HEP somewhere in the conclusions:  there also exist some examples of quantum algorithms designed to
+address some problems in high energy physics
+(HEP)~\cite{Perez-Salinas:2020nem,hep_amplitudes-bepari2020, hep_simulation-bauer2019,
+hep_gluon-alexandru2019, hep_parton-lamm2020}.}}
 
 \acknowledgments
 
