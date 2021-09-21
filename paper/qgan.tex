@@ -71,18 +71,84 @@
 \maketitle
 
 \section{Introduction}
-Quantum computing is a new paradigm whereby quantum phenomena are harnessed to perform computations. The current availability of noisy intermediate-scale quantum computers (NISQ)~\cite{nisq}, and recent achievements such as quantum computational supremacy~\cite{supremacy, zhong2020quantum}, have led to a growing interest in these devices to perform computational tasks faster than any classical machine. Among many of the near-term applications~\cite{cerezo2021variational, bharti2021noisy}, the field of Quantum Machine Learning (QML)~\cite{biamonte2017quantum, schuld2018supervised} is held as one of the most promising approaches to make use of NISQ computers.
 
-Early work in QML was mostly focused on speeding up linear algebra subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm, kerenidis2020quantum}, widely used in classical machine learning, by leveraging the HHL algorithm~\cite{harrow2009quantum}. Notice that this approach holds promise for the future, when large-scale quantum computers exist with low gates errors and enough qubits for quantum error correction. On the other hand, more recent proposals suggest using the quantum devices to define a parameterized quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility, bravo2020scaling}, or quantum neural network (QNN), which then can be trained to implement a function class~\cite{schuld2021effect, goto2021universal, perez2021one}. For example, several QNNs have been proposed for pattern classification~\cite{havlivcek2019supervised, Schuld:2020circuit, perezsalinas:2020reuploading} or data compression~\cite{romero2017quantum, bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum computing is a research topic that can be adapted, improved, and tested on many research problems. Motivated by this idea, we propose to investigate the possibility to use QNNs for generative modeling~\cite{benedetti2019generative, hamilton2019generative, coyle2020born}. More specifically, for the generation of Monte Carlo events through quantum generative adversarial networks (qGANs)~\cite{dallaire2018quantum, lloyd2018quantum}.
+Quantum computing is a new paradigm whereby quantum phenomena are harnessed to
+perform computations. The current availability of noisy intermediate-scale
+quantum computers (NISQ)~\cite{nisq}, and recent achievements such as quantum
+computational supremacy~\cite{supremacy, zhong2020quantum}, have led to a
+growing interest in these devices to perform computational tasks faster than any
+classical machine. Among many of the near-term
+applications~\cite{cerezo2021variational, bharti2021noisy}, the field of Quantum
+Machine Learning (QML)~\cite{biamonte2017quantum, schuld2018supervised} is held
+as one of the most promising approaches to make use of NISQ computers.
 
-The generative adversarial framework employs two competing networks that are trained alternatively, the generator and the discriminator~\cite{goodfellow2014generative}. The generator produces candidates while the discriminator evaluates them. The objective of the discriminator is to distinguish the real samples from the generated ones. That is, the discriminator plays the role of the generator's adversary, and therefore, their competition is a zero-sum two-player game. Substituting either the discriminator, the generator, or both with quantum systems we translate the scheme to quantum computing.
+Early work in QML was mostly focused on speeding up linear algebra
+subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm,
+kerenidis2020quantum}, widely used in classical machine learning, by leveraging
+the HHL algorithm~\cite{harrow2009quantum}. Notice that this approach holds
+promise for the future, when large-scale quantum computers exist with low gates
+errors and enough qubits for quantum error correction. On the other hand, more
+recent proposals suggest using the quantum devices to define a parameterized
+quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
+bravo2020scaling}, or quantum neural network (QNN), which then can be trained to
+implement a function class~\cite{schuld2021effect, goto2021universal,
+perez2021one}. For example, several QNNs have been proposed for pattern
+classification~\cite{havlivcek2019supervised, Schuld:2020circuit,
+perezsalinas:2020reuploading} or data compression~\cite{romero2017quantum,
+bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum
+computing is a research topic that can be adapted, improved, and tested on many
+research problems. Motivated by this idea, we propose to investigate the
+possibility to use QNNs for generative modeling~\cite{benedetti2019generative,
+hamilton2019generative, coyle2020born}. More specifically, for the generation of
+Monte Carlo events through quantum generative adversarial networks
+(qGANs)~\cite{dallaire2018quantum, lloyd2018quantum}.
 
-In recent months, the spreading interest in QML has led to different qGAN implementations~\cite{zoufal2019quantum, zeng2019learning, situ2020quantum, hu2019quantum, benedetti2019adversarial, romero2021variational, niu2021entangling}. However, our contribution here can be summarized in three distinct aspects. (1) Previous proposals employ toy data for their qGAN training. Moreover, in some cases, it is classical data. It has been recently conjectured that if QML ever provides any speed up, it will likely appear from learning the data of a quantum process~\cite{huang2021information, kubler2021inductive}. We, therefore, train our qGAN model with artificial LHC data. (2) We propose an alternative quantum generator architecture. In contrast to previous proposals where the prior noise distribution, or latent dimension, is encoded at the beginning of the generator, we instead encode it on every layer of the network. This permits to the new generator to process and decide in which parts of the network the latent variables should play a relevant role. This allowed us to achieve improved state-of-the-art results with shallow QNNs using adversarial learning. Let us remark as well that this has been proven extremely useful in the classical context~\cite{karras2019style}. (3) We validate and assess our qGAN in quantum hardware. Specifically, we successfully implement our model in two different quantum architectures, namely, ion traps and superconducting qubits.
+The generative adversarial framework employs two competing networks that are
+trained alternatively, the generator and the
+discriminator~\cite{goodfellow2014generative}. The generator produces candidates
+while the discriminator evaluates them. The objective of the discriminator is to
+distinguish the real samples from the generated ones. That is, the discriminator
+plays the role of the generator's adversary, and therefore, their competition is
+a zero-sum two-player game. Substituting either the discriminator, the
+generator, or both with quantum systems we translate the scheme to quantum
+computing.
+
+In recent months, the spreading interest in QML has led to different qGAN
+implementations~\cite{zoufal2019quantum, zeng2019learning, situ2020quantum,
+hu2019quantum, benedetti2019adversarial, romero2021variational,
+niu2021entangling}. However, our contribution here can be summarized in three
+distinct aspects. (1) Previous proposals employ toy data for their qGAN
+training. Moreover, in some cases, it is classical data. It has been recently
+conjectured that if QML ever provides any speed up, it will likely appear from
+learning the data of a quantum process~\cite{huang2021information,
+kubler2021inductive}. Therefore, we first train and validate our qGAN model with
+artificial data from known underlying probability density functions. Then, in
+order to test our model in a realistic setup, we use as training set simulated
+Monte Carlo events for particle physics processes at the Large Hadron Collider
+(LHC) at CERN. (2) We propose an alternative quantum generator architecture. In contrast to
+previous proposals where the prior noise distribution, or latent dimension, is
+encoded at the beginning of the generator, we instead encode it on every layer
+of the network. This permits to the new generator to process and decide in which
+parts of the network the latent variables should play a relevant role. This
+allowed us to achieve improved state-of-the-art results with shallow QNNs using
+adversarial learning. Let us remark as well that this has been proven extremely
+useful in the classical context~\cite{karras2019style}. (3) We validate and
+assess our qGAN in quantum hardware. Specifically, we successfully implement our
+model in two different quantum architectures, namely, ion traps and
+superconducting qubits.
+
+It is important to highlight that several research groups from the high-energy
+physics (HEP) community are investigating potential applications of quantum
+technologies in HEP applications and obtaining interesting
+results~\cite{P_rez_Salinas_2021,Guan_2021,chang2021quantum,Chang_2021,Belis_2021,khattak2021fast}.
+Therefore, the study presented in this manuscript should be considered as
+proof-of-concept, providing a robust and reproducible starting point for future
+investigations.
 
 % To be modified
 The paper is structured as follows. Sec.~\ref{sec:implementation} we identify
-the best {\tt QGMC} architecture. In Sec.~\ref{sec:validation} we validate the
-{\tt QGMC} model using toy data. In Sec.~\ref{sec:lhc} we train the {\tt QGMC}
+the best qGAN architecture for sampling. In Sec.~\ref{sec:validation} we
+validate the qGAN model using toy data. In Sec.~\ref{sec:lhc} we train the qGAN
 generator on simulated LHC events. Finally, in Sec.~\ref{sec:deployment} we test
 our final model on real quantum hardware and in Sec.~\ref{sec:conclusion} we
 present our conclusion and future development directions.
@@ -90,29 +156,43 @@ present our conclusion and future development directions.
 \section{Implementation}
 \label{sec:implementation}
 
+\subsection{Workflow design}
+
+The classical implementation of a GAN model~\cite{goodfellow2014generative}
+involves at least three required components: the discriminator model, the
+generator model, and the adversarial training procedure. In this work, we
+decided to consider a hybrid classical-quantum system, where the generator model
+has a quantum representation through variational quantum circuits, while the
+discriminator is a classical neural-network model. This choice is motivated by
+the practical implications of a generative model that can be deployed in a real
+quantum device. In fact, the idea of using a quantum device for the generation
+of samples by delegating the complicated aspects of density modelling and
+sampling to a hardware architecture is very attractive.
+
+The implementation of generative adversarial models requires the definition of a
+generator and discriminator models in a training procedure where the generator
+learns how to extract fake samples with realistic
+
+Talk about quantum-quantum vs classical-quantum
+
+Figure~\ref{fig:scheme} we show schematically the components discussed above.
+
 \begin{figure}
   \includegraphics[width=0.4\textwidth]{plots/scheme.pdf}
-  \caption{\label{fig:scheme} Schematic workflow for the implementation of {\tt QGMC}.}
+  \caption{\label{fig:scheme} Schematic steps involved in the qGAN training.}
 \end{figure}
 
-\begin{enumerate}
-  \item Talk about model definition
-  \item Talk about training procedure
-\end{enumerate}
+\subsection{Ansatz determination}
 
 \begin{figure*}
   \includegraphics[width=0.8\textwidth]{plots/ansatz1.pdf}
-  \caption{\label{fig:circuit}Ansatz 1 for the quantum generator.}
+  \caption{\label{fig:circuit}Ansatz structure for the quantum generator circuit model.}
 \end{figure*}
 
 \section{Validation}
 \label{sec:validation}
 
-\begin{enumerate}
-  \item Show 1D example (histograms + KL) for different (layers, latent) dim.
-  \item Show 2D example (histograms + KL) for different (layers, latent) dim.
-  \item Show 3D gaussian example for different (layers, latent) dim.
-\end{enumerate}
+In Figure
 
 \begin{figure}
   \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1Dgamma_distribution_10k.pdf}
@@ -120,11 +200,12 @@ present our conclusion and future development directions.
   \caption{Example of 1D gamma distribution.}
 \end{figure}
 
-
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{plots/1Dgamma/1Dgamma_loss.pdf}
   \caption{Example of 1D gamma distribution.}
 \end{figure}
+
+Show table with parameters for both examples.
 
 \begin{figure*}
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_REAL_10k.pdf}%
