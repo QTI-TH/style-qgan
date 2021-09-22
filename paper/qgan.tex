@@ -86,7 +86,7 @@ Early work in QML was mostly focused on speeding up linear algebra
 subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm,
 kerenidis2020quantum}, widely used in classical machine learning, by leveraging
 the HHL algorithm~\cite{harrow2009quantum}. Notice that this approach holds
-promise for the future, when large-scale quantum computers exist with low gates
+promise for the future, when large-scale quantum computers exist with low gate
 errors and enough qubits for quantum error correction. On the other hand, more
 recent proposals suggest using the quantum devices to define a parameterized
 quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
@@ -162,7 +162,7 @@ The classical implementation of a GAN model~\cite{goodfellow2014generative}
 involves at least three required components: the discriminator model, the
 generator model, and the adversarial training procedure. In this work, we
 consider a hybrid classical-quantum system, where the generator model has a
-quantum representation through a variational quantum circuit, while the
+quantum representation through a QNN, while the
 discriminator is a classical neural-network model. This choice is motivated by
 the practical positive implications of a hardware based generative model, in
 particular, the possibility to obtain performance improvements in a real quantum
@@ -171,22 +171,22 @@ samples, by delegating the complicated aspects of density modelling and sampling
 to a hardware architecture, is very attractive.
 %
 There are alternative approaches where both models could be represented by a
-variational quantum circuit, however after testing some prototype algorithms we
+QNN, however after testing some prototype algorithms we
 have observed faster convergence when using a classical discriminator.
 
-Figure~\ref{fig:scheme} we show schematically the steps involved in the qGAN
+In Figure~\ref{fig:scheme} we show schematically the steps involved in the qGAN
 presented here. The procedure starts from the preparation of samples from an
 known distribution function that we would like to encode in the quantum
-generator model. At the same, we define a parametric quantum circuit model where
+generator model. At the same, we define a QNN model where
 we inject stochastic noise in the latent space variables which are used to
 define quantum gates. The generator model is then used to extract fake samples
 that after the training procedure should match the quality of the known input
 distribution. Both set of samples are then used to train the discriminator
 model. The quality of the training is measured by an appropriate loss function
-which is monitored and optimized classically by minimization algorithm based on
+which is monitored and optimized classically by a minimization algorithm based on
 the adversarial approach. The training process consists in a simultaneous
 stochastic gradient decent for both models which after reaching convergence
-delivers a generator model with realistic sampling.
+delivers a quantum generator model with realistic sampling.
 
 \begin{figure}
   \includegraphics[width=0.4\textwidth]{plots/scheme.pdf}
