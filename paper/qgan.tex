@@ -161,21 +161,32 @@ present our conclusion and future development directions.
 The classical implementation of a GAN model~\cite{goodfellow2014generative}
 involves at least three required components: the discriminator model, the
 generator model, and the adversarial training procedure. In this work, we
-decided to consider a hybrid classical-quantum system, where the generator model
-has a quantum representation through variational quantum circuits, while the
+consider a hybrid classical-quantum system, where the generator model has a
+quantum representation through a variational quantum circuit, while the
 discriminator is a classical neural-network model. This choice is motivated by
-the practical implications of a generative model that can be deployed in a real
-quantum device. In fact, the idea of using a quantum device for the generation
-of samples by delegating the complicated aspects of density modelling and
-sampling to a hardware architecture is very attractive.
+the practical positive implications of a hardware based generative model, in
+particular, the possibility to obtain performance improvements in a real quantum
+device. In fact, the idea of using a quantum device for the generation of
+samples, by delegating the complicated aspects of density modelling and sampling
+to a hardware architecture, is very attractive.
+%
+There are alternative approaches where both models could be represented by a
+variational quantum circuit, however after testing some prototype algorithms we
+have observed faster convergence when using a classical discriminator.
 
-The implementation of generative adversarial models requires the definition of a
-generator and discriminator models in a training procedure where the generator
-learns how to extract fake samples with realistic
-
-Talk about quantum-quantum vs classical-quantum
-
-Figure~\ref{fig:scheme} we show schematically the components discussed above.
+Figure~\ref{fig:scheme} we show schematically the steps involved in the qGAN
+presented here. The procedure starts from the preparation of samples from an
+known distribution function that we would like to encode in the quantum
+generator model. At the same, we define a parametric quantum circuit model where
+we inject stochastic noise in the latent space variables which are used to
+define quantum gates. The generator model is then used to extract fake samples
+that after the training procedure should match the quality of the known input
+distribution. Both set of samples are then used to train the discriminator
+model. The quality of the training is measured by an appropriate loss function
+which is monitored and optimized classically by minimization algorithm based on
+the adversarial approach. The training process consists in a simultaneous
+stochastic gradient decent for both models which after reaching convergence
+delivers a generator model with realistic sampling.
 
 \begin{figure}
   \includegraphics[width=0.4\textwidth]{plots/scheme.pdf}
