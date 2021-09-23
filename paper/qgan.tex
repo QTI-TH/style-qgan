@@ -17,7 +17,7 @@
 
 \title{
   Style-based Quantum Generative Adversarial Networks for Monte Carlo events
-}
+ }
 
 \preprint{CERN-TH-xx, TIF-UNIMI-2021-xx}
 
@@ -56,16 +56,16 @@
 
 
 \begin{abstract}
-  We present a first attempt to design a quantum circuit for the generation of
-  Monte Carlo simulated events using quantum generative models, in the context
-  of high energy physics (HEP). The growing interest in quantum computing and
-  the recent developments of new algorithms and quantum hardware devices
-  motivates the study of methodologies applied to HEP. In this work we
-  identify architectures of variational quantum circuits suitable for
-  designing a generative model for Monte Carlo event generation. We validate
-  the methodology by performing experiments on artificial data generated from
-  known underlying distributions. Finally, we model Monte Carlo simulated
-  events and benchmark the performance in terms of quality and performance.
+    We present a first attempt to design a quantum circuit for the generation of
+    Monte Carlo simulated events using quantum generative models, in the context
+    of high energy physics (HEP). The growing interest in quantum computing and
+    the recent developments of new algorithms and quantum hardware devices
+    motivates the study of methodologies applied to HEP. In this work we
+    identify architectures of variational quantum circuits suitable for
+    designing a generative model for Monte Carlo event generation. We validate
+    the methodology by performing experiments on artificial data generated from
+    known underlying distributions. Finally, we model Monte Carlo simulated
+    events and benchmark the performance in terms of quality and performance.
 \end{abstract}
 
 \maketitle
@@ -84,22 +84,22 @@ as one of the most promising approaches to make use of NISQ computers.
 
 Early work in QML was mostly focused on speeding up linear algebra
 subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm,
-  kerenidis2020quantum}, widely used in classical machine learning, by leveraging
+kerenidis2020quantum}, widely used in classical machine learning, by leveraging
 the HHL algorithm~\cite{harrow2009quantum}. Notice that this approach holds
 promise for the future, when large-scale quantum computers exist with low gate
 errors and enough qubits for quantum error correction. On the other hand, more
 recent proposals suggest using the quantum devices to define a parameterized
 quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
-  bravo2020scaling}, or quantum neural network (QNN), which then can be trained to
+bravo2020scaling}, or quantum neural network (QNN), which then can be trained to
 implement a function class~\cite{schuld2021effect, goto2021universal,
-  perez2021one}. For example, several QNNs have been proposed for pattern
+perez2021one}. For example, several QNNs have been proposed for pattern
 classification~\cite{havlivcek2019supervised, Schuld:2020circuit,
-  perezsalinas:2020reuploading} or data compression~\cite{romero2017quantum,
-  bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum
+perezsalinas:2020reuploading} or data compression~\cite{romero2017quantum,
+bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum
 computing is a research topic that can be adapted, improved, and tested on many
 research problems. Motivated by this idea, we propose to investigate the
 possibility to use QNNs for generative modeling~\cite{benedetti2019generative,
-  hamilton2019generative, coyle2020born}. More specifically, for the generation of
+hamilton2019generative, coyle2020born}. More specifically, for the generation of
 Monte Carlo events through quantum generative adversarial networks
 (qGANs)~\cite{dallaire2018quantum, lloyd2018quantum}.
 
@@ -115,13 +115,13 @@ computing.
 
 In recent months, the spreading interest in QML has led to different qGAN
 implementations~\cite{zoufal2019quantum, zeng2019learning, situ2020quantum,
-  hu2019quantum, benedetti2019adversarial, romero2021variational,
-  niu2021entangling}. However, our contribution here can be summarized in three
+hu2019quantum, benedetti2019adversarial, romero2021variational,
+niu2021entangling}. However, our contribution here can be summarized in three
 distinct aspects. (1) Previous proposals employ toy data for their qGAN
 training. Moreover, in some cases, it is classical data. It has been recently
 conjectured that if QML ever provides any speed up, it will likely appear from
 learning the data of a quantum process~\cite{huang2021information,
-  kubler2021inductive}. Therefore, we first train and validate our qGAN model with
+kubler2021inductive}. Therefore, we first train and validate our qGAN model with
 artificial data from known underlying probability density functions. Then, in
 order to test our model in a realistic setup, we use as training set simulated
 Monte Carlo events for particle physics processes at the Large Hadron Collider
@@ -188,25 +188,6 @@ the adversarial approach. The training process consists in a simultaneous
 stochastic gradient decent for both models which after reaching convergence
 delivers a quantum generator model with realistic sampling.
 
-In the next paragraphs we first introduce the Ansatz model for the quantum
-generator network and validate the procedure by using samples from known
-distribution functions and quantum simulation on classical hardware. Then, we
-train our qGAN model with Monte Carlo generated LHC events using quantum
-simulation. Finally, the best trained model is deployed on real quantum hardware
-devices based on superconducting and trapped ion technologies.
-
-All calculations involving quantum circuits simulation are performed using the
-{\tt Qibo} v0.1.6~\cite{efthymiou2020qibo,stavros_efthymiou_2021_5088103} on
-classical hardware. For this particular project, we have used the {\tt
-tensorflow}~\cite{tensorflow2015-whitepaper} backend which provides the
-possibility to use gradient descent optimizers during the training step. The
-qGAN model is publicly available through the {\tt Qibo} API. The experimental
-implementation of this model was done using {\tt
-Qiskit}~\cite{gadi_aleksandrowicz_2019_2562111} from the {\tt
-OpenQASM}~\cite{cross2017open} code generated by {\tt Qibo}.
-
-{\color{red}[SC: Marco, Julien please include other packages you have used for IonQ/IBM.]}
-
 \begin{figure}
   \includegraphics[width=0.4\textwidth]{plots/scheme.pdf}
   \caption{\label{fig:scheme} Schematic steps involved in the qGAN training.}
@@ -214,89 +195,43 @@ OpenQASM}~\cite{cross2017open} code generated by {\tt Qibo}.
 
 \subsection{Ansatz determination}
 
-{\color{red}[SC: Carlos please describe the model and how the model has been
-    obtained.]}
+{\color{red}[SC: Carlos please describe the model and how the model has been obtained, I think we should include here the loss definition and some details of the optimization procedure.]}
 
-\begin{itemize}
-  \item explain the ansatz structure
-  \item describe Figure~\ref{fig:circuit}
-  \item include technical details concerning the optimization procedure.
-\end{itemize}
-
-\begin{figure*}
-  \includegraphics[width=0.8\textwidth]{plots/ansatz1.pdf}
-  \caption{\label{fig:circuit}Ansatz structure for the quantum generator circuit model.}
-\end{figure*}
-
-\section{Validation examples}
-\label{sec:validation}
-
-In this section we show examples of qGAN models obtained for known prior
-distribution functions in one and three dimensions. The results presented here
-have been obtained after a systematic process of fine tuning and manual
-hyper-optimization of the Ansatz model.
-
-\subsection{1D Gamma distribution}
-
-In order to test the framework proposed in the paragraph above, we have
-considered the sampling of a 1D gamma distribution with probability density
-function reading
-\begin{equation}
-  p_\gamma (x, \alpha, \beta) = \frac{\beta x^{\alpha-1} e^{\beta x}}{\Gamma(\alpha)}.
-\end{equation}
-In this example we take {\color{red} $p_\gamma (x, A, B)$} as input distribution
-and train a qGAN with 1 qubit, using $10^4$ samples from the input distribution.
-%
-In Figure~\ref{fig:loss} we show the evolution of the loss function for the
-generator and discriminator models in terms number of epochs. We observe the
-typical behaviour of GAN training and a convergence region after 15000 epochs.
-%
-The qGAN is trained with batch sizes of {\color{red}XXX} samples.
+In Figure~\ref{fig:circuit}
 
 \begin{figure}
-  \includegraphics[width=0.5\textwidth]{plots/1Dgamma/1Dgamma_loss.pdf}
-  \caption{\label{fig:loss}Example of loss function convergence. After an
-  initial warn-up phase the loss function of both models converge.}
+  \includegraphics[width=1.0\columnwidth]{plots/ansatz1.pdf}
+  \caption{\label{fig:circuit}Ansatz structure for the quantum generator circuit model.}
 \end{figure}
 
-The image on the top of Figure~\ref{fig:gamma} compares the output generated by
-the qGAN model (blue histogram) with the reference input distribution function
-(red histogram) for $10^4$ samples. We observe that the distributions are
-statistically similar, in fact, the Kullback-Leibler divergence
-(KL)~\cite{kullback1951information} between both distributions is 0.141.
-%
-In order to verify the quality of the qGAN model, we compare both distribution
-with $10^5$ samples in the bottom image of Figure~\ref{fig:gamma}. In this case,
-the number of sampled points is one order of magnitude larger than input
-training set. The agreement between both distribution is remarkably good,
-obtaining a small KL distance of 0.041
-%
-This behaviour confirms that the qGAN model is able to learn the underlying
-distribution function even if trained with a small training sample set. Such
-feature is particularly interesting in a context of data augmentation
-applications, where few samples are available the qGAN model can generalize and
-learn the underlying distribution with satisfactory outcome.
+\section{Validation}
+\label{sec:validation}
+
+\subsection{Numerical setup}
+
+In Figure
+
+\subsection{Examples}
+
+{\color{red}[SC: Carlos please include a table with the model setup for both examples.]}
 
 \begin{figure}
   \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1Dgamma_distribution_10k.pdf}
   \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1Dgamma_distribution_100k.pdf}
-  \caption{\label{fig:gamma} Examples of 1D gamma distribution sampling for the
-  reference underlying distribution (red) and the qGAN model (blue) trained with
-  $10^4$ samples. On the top we compare the $10^4$ samples, while the figure in
-  the bottom shows $10^5$ samples. We observe a good level of agreement between
-  both distributions with low values of the Kullback-Leibler distance.}
+  \caption{Example of 1D gamma distribution.}
 \end{figure}
 
-\subsection{3D Gaussian distribution}
+\begin{figure}
+  \includegraphics[width=0.5\textwidth]{plots/1Dgamma/1Dgamma_loss.pdf}
+  \caption{Example of 1D gamma distribution.}
+\end{figure}
 
-The previous example shows that a quantum neural network architecture for the
-generator model is
-
+Show table with parameters for both examples.
 
 \begin{figure*}
-  % \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_REAL_10k.pdf}%
-  % \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/2-3_REAL_10k.pdf}%
-  % \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_REAL_10k.pdf}
+  \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_REAL_10k.pdf}%
+  \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/2-3_REAL_10k.pdf}%
+  \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_REAL_10k.pdf}
 
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_FAKE_10k.pdf}%
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/2-3_FAKE_10k.pdf}%
@@ -307,13 +242,13 @@ generator model is
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_RATIO_10k.pdf}
 
   \caption{\label{fig:3dgauss}Example of samples generated for a 3D correlated
-    multivariate normal distribution using a QGAN generator model 10k samples.}
+  multivariate normal distribution using a QGAN generator model 10k samples.}
 \end{figure*}
 
 \begin{figure*}
-  % \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_REAL_100k.pdf}%
-  % \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/2-3_REAL_100k.pdf}%
-  % \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_REAL_100k.pdf}
+  \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_REAL_100k.pdf}%
+  \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/2-3_REAL_100k.pdf}%
+  \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_REAL_100k.pdf}
 
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_FAKE_100k.pdf}%
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/2-3_FAKE_100k.pdf}%
@@ -324,7 +259,7 @@ generator model is
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_RATIO_100k.pdf}
 
   \caption{\label{fig:3dgauss}Example of samples generated for a 3D correlated
-    multivariate normal distribution using a QGAN generator model 100k samples from 10k training set.}
+  multivariate normal distribution using a QGAN generator model 100k samples from 10k training set.}
 \end{figure*}
 
 \begin{figure*}
@@ -337,30 +272,10 @@ generator model is
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-distribution_3dgaussian_100k.pdf}
 
   \caption{\label{fig:3dgauss}Example of samples generated for a 3D correlated
-    multivariate normal distribution using a QGAN generator model.}
+  multivariate normal distribution using a QGAN generator model.}
 \end{figure*}
 
-\begin{table}
-  \begin{tabular}{l|c|c}
-     & {\bf 1D gamma} & {\bf 3D gaussian} \tabularnewline
-    \hline
-    Qubits & 1 & 3 \tabularnewline
-    Layers & & \tabularnewline
-    Epochs & & \tabularnewline
-    Parameters & & \tabularnewline
-    $U_{\rm ent}$ & & \tabularnewline
-    \hline
-  \end{tabular}
 
-  \caption{\label{table:summary} Summary of the Ansatz parameters for the 1D
-  gamma distribution and the 3D gaussian distribution.}
-
-\end{table}
-
-Finally, in Table~\ref{table:summary} we summarize the qGAN configurations
-obtained for both examples.
-
-{\color{red}[SC: Carlos please update table~\ref{table:summary}.]}
 
 \section{Generating LHC events}
 \label{sec:lhc}
@@ -369,7 +284,7 @@ obtained for both examples.
   \item Show ttbar and WW results, histograms, KL, correlations, etc.
   \item Provide hints concerning data augmentation.
   \item Show experimental results obtained with quantum hardware, identify the
-        best features, pro and cons of different hardware.
+  best features, pro and cons of different hardware.
 \end{enumerate}
 
 \begin{figure*}
@@ -378,7 +293,7 @@ obtained for both examples.
   \includegraphics[width=0.3\textwidth]{plots/LHCttbar/y-distribution_LHCdata_100k.pdf}
 
   \caption{\label{fig:3dgauss}Example of samples generated for a $t\bar{t}$
-    production using a QGAN generator model.}
+  production using a QGAN generator model.}
 \end{figure*}
 
 \begin{figure*}
@@ -391,7 +306,7 @@ obtained for both examples.
   \includegraphics[width=0.31\textwidth]{plots/LHCttbar/y-s_FAKE_100k.pdf}
 
   \caption{\label{fig:3dgauss}Example of samples generated for a $t\bar{t}$
-    production using a QGAN generator model.}
+  production using a QGAN generator model.}
 \end{figure*}
 
 \section{Sampling from real quantum hardware}
@@ -409,7 +324,7 @@ obtained for both examples.
   \includegraphics[width=0.25\textwidth]{plots/hardware_1k/ibm_lagos/y-s_FAKE_1000_100_3_5_2_10000_128_0.5_1024.pdf}
 
   \caption{\label{fig:3dgauss}Example of samples generated for a $t\bar{t}$
-    production using a QGAN generator model on IBM Lagos.}
+  production using a QGAN generator model on IBM Lagos.}
 \end{figure*}
 
 \begin{figure*}
@@ -422,13 +337,13 @@ obtained for both examples.
   \includegraphics[width=0.25\textwidth]{plots/hardware_1k/ionQ/y-s_FAKE_1000_100_3_5_2_10000_128_0.5_1024.pdf}
 
   \caption{\label{fig:3dgauss}Example of samples generated for a $t\bar{t}$
-    production using a QGAN generator model on IonQ.}
+  production using a QGAN generator model on IonQ.}
 \end{figure*}
 
 
 \section{Correlation analysis}
 
- {\color{red}[SC: Anthony please summarize your results]}
+{\color{red}[SC: Anthony please summarize your results]}
 
 \section{Conclusion}
 \label{sec:conclusion}
@@ -437,28 +352,28 @@ In this work we proposed variational quantum circuit models for the generation
 of Monte Carlo events in the context of high energy physics (HEP). We have
 investigated and identified the most suitable Ansatz for the parametrization of
 a quantum generative network. Using quantum circuit simulation on classical
-hardware, we show that qGAN generators are suitable for Monte Carlo event
+hardware, we show that {\tt QGMC} generators are suitable for Monte Carlo event
 simulation.
 
-We highlight some advantages of the qGAN model when compared to the standard
+We highlight some advantages of the {\tt QGMC} model when compared to the standard
 machine learning methodology. From a hardware implementation point of view, the
-possibility to write the specific qGAN circuit in a quantum processor, using
+possibility to write the specific {\tt QGMC} circuit in a quantum processor, using
 its primitives (gates), will accelerate the evaluations and training performance
 of Monte Carlo sampling. We expect that real quantum devices will be more
 efficient in terms of energy power than classical hardware based on hardware
 accelerators such as graphical process units (GPUs).
 
-Furthermore, we propose a reconstruction method for evaluating the qGAN
+Furthermore, we propose a reconstruction method for evaluating the {\tt QGMC}
 model in a real quantum device using measurements. This procedure brings all the
 difficulties that are typical of experimental quantum hardware, including noise,
 error corrections and decoherence. The implementation of accurate and stable
-qGAN in a real quantum device still requires the development of hardware
+{\tt QGMC} in a real quantum device still requires the development of hardware
 architecture with lower gate error tolerances in comparison to the current
 available machines.
 
 On the other hand, our results should be considered as a proof-of-concept
 exercise, given that the quantum simulation performance are still not
-competitive with an equivalent machine learning implementation. The qGAN
+competitive with an equivalent machine learning implementation. The {\tt QGMC}
 approach may show advantages when more precise quantum devices will be
 available.
 
@@ -468,9 +383,9 @@ wish that the approach presented here will inspire new HEP applications which
 may benefit from quantum computing.
 
 {\color{red}{C: Include references HEP somewhere in the conclusions:  there also exist some examples of quantum algorithms designed to
-      address some problems in high energy physics
-      (HEP)~\cite{Perez-Salinas:2020nem,hep_amplitudes-bepari2020, hep_simulation-bauer2019,
-        hep_gluon-alexandru2019, hep_parton-lamm2020}.}}
+address some problems in high energy physics
+(HEP)~\cite{Perez-Salinas:2020nem,hep_amplitudes-bepari2020, hep_simulation-bauer2019,
+hep_gluon-alexandru2019, hep_parton-lamm2020}.}}
 
 \acknowledgments
 
