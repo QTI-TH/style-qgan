@@ -87,10 +87,10 @@ subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm,
   kerenidis2020quantum}, widely used in classical machine learning, by leveraging
 the HHL algorithm~\cite{harrow2009quantum}. Notice that this approach holds
 promise for the future, when large-scale quantum computers exist with low gate
-errors and enough qubits for quantum error correction. On the other hand, more
-recent proposals suggest using the quantum devices to define a parameterized
+errors and enough qubits to perform quantum error correction. On the other hand, more
+recent proposals suggest using the quantum devices to define a quantum neural network (QNN), or parameterized
 quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
-  bravo2020scaling}, or quantum neural network (QNN), which then can be trained to
+  bravo2020scaling}, which then can be trained to
 implement a function class~\cite{schuld2021effect, goto2021universal,
   perez2021one}. For example, several QNNs have been proposed for pattern
 classification~\cite{havlivcek2019supervised, Schuld:2020circuit,
@@ -146,9 +146,9 @@ proof-of-concept, providing a robust and reproducible starting point for future
 investigations.
 
 % To be modified
-The paper is structured as follows. Sec.~\ref{sec:implementation} we identify
+The paper is structured as follows. In Sec.~\ref{sec:implementation} we identify
 the best qGAN architecture for sampling. In Sec.~\ref{sec:validation} we
-validate the qGAN model using toy data. In Sec.~\ref{sec:lhc} we train the qGAN
+validate the qGAN model using toy data. Then, in Sec.~\ref{sec:lhc} we train the qGAN
 generator on simulated LHC events. Finally, in Sec.~\ref{sec:deployment} we test
 our final model on real quantum hardware and in Sec.~\ref{sec:conclusion} we
 present our conclusion and future development directions.
@@ -161,38 +161,38 @@ present our conclusion and future development directions.
 The classical implementation of a GAN model~\cite{goodfellow2014generative}
 involves at least three required components: the discriminator model, the
 generator model, and the adversarial training procedure. In this work, we
-consider a hybrid classical-quantum system, where the generator model has a
+consider a hybrid quantum-classical system, where the generator model has a
 quantum representation through a QNN, while the
-discriminator is a classical neural-network model. This choice is motivated by
+discriminator is a classical neural network model. This choice is motivated by
 the practical positive implications of a hardware based generative model, in
 particular, the possibility to obtain performance improvements in a real quantum
 device. In fact, the idea of using a quantum device for the generation of
-samples, by delegating the complicated aspects of density modelling and sampling
+samples, by delegating the complicated aspects of density modeling and sampling
 to a hardware architecture, is very attractive.
 %
 There are alternative approaches where both models could be represented by a
-QNN, however after testing some prototype algorithms we
+QNN~\cite{add_cite}, however after testing some prototype architectures we
 have observed faster convergence when using a classical discriminator.
 
 In Figure~\ref{fig:scheme} we show schematically the steps involved in the qGAN
-presented here. The procedure starts from the preparation of samples from an
+presented here. The procedure starts from the preparation of samples from a
 known distribution function that we would like to encode in the quantum
-generator model. At the same, we define a QNN model where
+generator model. At the same time, we define a QNN model where
 we inject stochastic noise in the latent space variables which are used to
 define quantum gates. The generator model is then used to extract fake samples
 that after the training procedure should match the quality of the known input
-distribution. Both set of samples are then used to train the discriminator
+distribution. Both sets of samples are then used to train the discriminator
 model. The quality of the training is measured by an appropriate loss function
 which is monitored and optimized classically by a minimization algorithm based on
-the adversarial approach. The training process consists in a simultaneous
-stochastic gradient decent for both models which after reaching convergence
+the adversarial approach. The training process consists of a simultaneous
+stochastic gradient descent for both models which after reaching convergence
 delivers a quantum generator model with realistic sampling.
 
-In the next paragraphs we first introduce the Ansatz model for the quantum
+In the next paragraphs, we first introduce the Ansatz model for the quantum
 generator network and validate the procedure by using samples from known
 distribution functions and quantum simulation on classical hardware. Then, we
 train our qGAN model with Monte Carlo generated LHC events using quantum
-simulation. Finally, the best trained model is deployed on real quantum hardware
+simulation. Finally, the best-trained model is deployed on real quantum hardware
 devices based on superconducting and trapped ion technologies.
 
 All calculations involving quantum circuits simulation are performed using the
@@ -242,16 +242,16 @@ In order to test the framework proposed in the paragraph above, we have
 considered the sampling of a 1D gamma distribution with probability density
 function reading
 \begin{equation}
-  p_\gamma (x, \alpha, \beta) = \frac{\beta x^{\alpha-1} e^{\beta x}}{\Gamma(\alpha)}.
+  p_\gamma (x, \alpha, \beta) = x^{\alpha-1} \frac{e^{-x/\beta}}{\beta^\alpha \Gamma(\alpha)},
 \end{equation}
-In this example we take {\color{red} $p_\gamma (x, A, B)$} as input distribution
+where $\Gamma$ is the Gamma function. In this example we take $p_\gamma (x, 1, 1)$ as input distribution
 and train a qGAN with 1 qubit, using $10^4$ samples from the input distribution.
 %
 In Figure~\ref{fig:loss} we show the evolution of the loss function for the
 generator and discriminator models in terms number of epochs. We observe the
 typical behaviour of GAN training and a convergence region after 15000 epochs.
 %
-The qGAN is trained with batch sizes of {\color{red}XXX} samples.
+The qGAN is trained with batch sizes of 128 samples.
 
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{plots/1Dgamma/1Dgamma_loss.pdf}
@@ -274,7 +274,7 @@ obtaining a small KL distance of 0.041
 This behaviour confirms that the qGAN model is able to learn the underlying
 distribution function even if trained with a small training sample set. Such
 feature is particularly interesting in a context of data augmentation
-applications, where few samples are available the qGAN model can generalize and
+applications~\cite{add_cite}, where few samples are available the qGAN model can generalize and
 learn the underlying distribution with satisfactory outcome.
 
 \begin{figure}
@@ -337,10 +337,11 @@ generator model is
      & {\bf 1D gamma} & {\bf 3D gaussian} \tabularnewline
     \hline
     Qubits & 1 & 3 \tabularnewline
-    Layers & & \tabularnewline
-    Epochs & & \tabularnewline
-    Parameters & & \tabularnewline
-    $U_{\rm ent}$ & & \tabularnewline
+    Latent dim & 1 & 3 \tabularnewline
+    Layers & 1 & 1 \tabularnewline
+    Epochs & $3\times10^4$ & $1.3\times10^4$ \tabularnewline
+    Parameters & 10 & 34 \tabularnewline
+    $U_{\rm ent}$ & None & 2 sequential C$R_y$ gates \tabularnewline
     \hline
   \end{tabular}
 
@@ -351,8 +352,6 @@ generator model is
 
 Finally, in Table~\ref{table:summary} we summarize the qGAN configurations
 obtained for both examples.
-
-{\color{red}[SC: Carlos please update table~\ref{table:summary}.]}
 
 \section{Generating LHC events}
 \label{sec:lhc}
