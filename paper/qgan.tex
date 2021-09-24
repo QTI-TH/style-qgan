@@ -295,6 +295,7 @@ generalize and learn the underlying distribution with satisfactory outcome.
 
 \subsection{3D Gaussian distribution}
 
+The previous test does not code Uent
 
 % \begin{figure*}
 %   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/1-2_FAKE_10k.pdf}%
@@ -318,8 +319,9 @@ generalize and learn the underlying distribution with satisfactory outcome.
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/2-3_RATIO_100k.pdf}%
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_RATIO_100k.pdf}
 
-  \caption{\label{fig:3dgauss}Example of samples generated for a 3D correlated
-    multivariate normal distribution using a QGAN generator model 100k samples from 10k training set.}
+  \caption{\label{fig:3dgauss}Samples generated for a 3D correlated Gaussian
+    distribution using the qGAN model 100k samples trained on $10^4$ data
+    points.}
 \end{figure*}
 
 \begin{figure*}
@@ -337,12 +339,14 @@ generalize and learn the underlying distribution with satisfactory outcome.
 
 \begin{table}
   \begin{tabular}{l|c|c}
-     & {\bf 1D gamma} & {\bf 3D gaussian} \tabularnewline
+     & {\bf 1D gamma} & {\bf 3D Gaussian} \tabularnewline
     \hline
     Qubits & 1 & 3 \tabularnewline
     Latent dim & 1 & 3 \tabularnewline
     Layers & 1 & 1 \tabularnewline
     Epochs & $3\times10^4$ & $1.3\times10^4$ \tabularnewline
+    Training set & $10^4$ & $10^4$ \tabularnewline
+    Batch size & 128 & 128 \tabularnewline
     Parameters & 10 & 34 \tabularnewline
     $U_{\rm ent}$ & None & 2 sequential C$R_y$ gates \tabularnewline
     \hline
@@ -354,7 +358,7 @@ generalize and learn the underlying distribution with satisfactory outcome.
 \end{table}
 
 Finally, in Table~\ref{table:summary} we summarize the qGAN configurations
-obtained for both examples.
+obtained for both examples discussed in this section.
 
 \section{Generating LHC events}
 \label{sec:lhc}
