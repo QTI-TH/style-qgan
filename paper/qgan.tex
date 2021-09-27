@@ -465,7 +465,14 @@ corresponding KL distances are quite small and close to each other.
 \section{Sampling from real quantum hardware}
 \label{sec:deployment}
 
-{\color{red}[SC: Julien and Marco please summarize the experimental setup]}
+We investigated the deployment of the quantum generator on real quantum hardware.
+As a proof-of-concept, we implemented the generator of LHC $t\bar{t}$ production events on two platforms: the IBM Q superconducting qubit quantum computers~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's roadmap for scaling quantum technology}, Sept. 2020.} and the IonQ trapped ion quantum computers~\footnote{\href{https://ionq.com/posts/december-09-2020-scaling-quantum-computer-roadmap}{Scaling IonQ's Quantum Computers: The Roadmap}, Dec. 2020.}.
+
+In the IBM Q case, we tested our generator on the \texttt{ibmq\_bogota} and \texttt{ibmq\_santiago} 5-qubit Falcon r4L quantum processors.
+For our circuit we need only three qubits with at least one connected to both the other two.
+We use an translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo} and the quantum hardware to automatically select the three qubits out of the five available with the best noise property.
+
+{\color{red}[MC: Julien do you want to add something on IonQ?]}
 
 \begin{figure*}
 
