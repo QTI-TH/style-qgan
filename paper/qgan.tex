@@ -85,7 +85,7 @@ as one of the most promising approaches to make use of NISQ computers.
 Early work in QML was mostly focused on speeding up linear algebra
 subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm,
   kerenidis2020quantum}, widely used in classical machine learning, by leveraging
-the HHL algorithm~\cite{harrow2009quantum}. Notice that this approach holds
+the HHL algorithm~\cite{harrow2009quantum}. Notice, however, that this approach holds
 promise for the future, when large-scale quantum computers exist with low gate
 errors and enough qubits to perform quantum error correction. On the other hand, more
 recent proposals suggest using the quantum devices to define a quantum neural network (QNN), or parameterized
@@ -94,7 +94,7 @@ quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
 implement a function class~\cite{schuld2021effect, goto2021universal,
   perez2021one}. For example, several QNNs have been proposed for pattern
 classification~\cite{havlivcek2019supervised, Schuld:2020circuit,
-  perezsalinas:2020reuploading} or data compression~\cite{romero2017quantum,
+  perezsalinas:2020reuploading, dutta2021realization} or data compression~\cite{romero2017quantum,
   bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum
 computing is a research topic that can be adapted, improved, and tested on many
 research problems. Motivated by this idea, we propose to investigate the
@@ -125,15 +125,11 @@ learning the data of a quantum process~\cite{huang2021information,
 artificial data from known underlying probability density functions. Then, in
 order to test our model in a realistic setup, we use as training set simulated
 Monte Carlo events for particle physics processes at the Large Hadron Collider
-(LHC) at CERN. (2) We propose an alternative quantum generator architecture. In contrast to
-previous proposals where the prior noise distribution, or latent dimension, is
-encoded at the beginning of the generator, we instead encode it on every layer
-of the network. This permits to the new generator to process and decide in which
-parts of the network the latent variables should play a relevant role. This
+(LHC) at CERN. (2) We propose an alternative quantum generator architecture. Traditionally, the prior noise distribution, or latent variable in the language of generative models, is provided to the quantum generator through its first layer. We, instead, embed it on every layer
+of the network. This
 allowed us to achieve improved state-of-the-art results with shallow QNNs using
-adversarial learning. Let us remark as well that this has been proven extremely
-useful in the classical context~\cite{karras2019style}. (3) We validate and
-assess our qGAN in quantum hardware. Specifically, we successfully implement our
+adversarial learning. Let us remark as well that a similar concept was introduced in the classical context~\cite{karras2019style}, which was proven to be extremely useful, coined as style-based GAN. Given the analogies with the classical literature, from now on we refer to our qGAN model as style-qGAN. (3) We validate and
+assess our style-qGAN in quantum hardware. Specifically, we successfully implement our
 model in two different quantum architectures, namely, ion traps and
 superconducting qubits.
 
@@ -154,7 +150,7 @@ results.
 % To be modified
 The paper is structured as follows. In Sec.~\ref{sec:implementation} we identify
 the best qGAN architecture for sampling. In Sec.~\ref{sec:validation} we
-validate the qGAN model using toy data. Then, in Sec.~\ref{sec:lhc} we train the qGAN
+validate the style-qGAN model using toy data. Then, in Sec.~\ref{sec:lhc} we train the style-qGAN
 generator on simulated LHC events. Finally, in Sec.~\ref{sec:deployment} we test
 our final model on real quantum hardware and in Sec.~\ref{sec:conclusion} we
 present our conclusion and future development directions.
@@ -180,7 +176,7 @@ There are alternative approaches where both models could be represented by a
 QNN~\cite{dallaire2018quantum, hu2019quantum, benedetti2019adversarial, romero2021variational, niu2021entangling}. However, after testing some prototype architectures we
 have observed faster convergence when using a classical discriminator.
 
-In Figure~\ref{fig:scheme} we schematically show the steps involved in the qGAN
+In Figure~\ref{fig:scheme} we schematically show the steps involved in the style-qGAN
 presented here. The procedure starts from the preparation of samples from a
 known distribution function that we would like to encode in the quantum
 generator model. At the same time, we define a QNN model where
@@ -194,19 +190,19 @@ the adversarial approach. The training process consists of a simultaneous
 stochastic gradient descent for both models which after reaching convergence
 delivers a quantum generator model with realistic sampling.
 
-In the next paragraphs, we first introduce the Ansatz model for the quantum
+In the next paragraphs, we first introduce the quantum
 generator network and validate the procedure by using samples from known
 distribution functions and quantum simulation on classical hardware. Then, we
-train our qGAN model with Monte Carlo generated LHC events using quantum
+train our style-qGAN model with Monte Carlo generated LHC events using quantum
 simulation. Finally, the best-trained model is deployed on real quantum hardware
 devices based on superconducting and trapped ion technologies.
 
-All calculations involving quantum circuits simulation are performed using the
+All calculations involving quantum circuit simulation are performed using the
 {\tt Qibo} v0.1.6~\cite{efthymiou2020qibo,stavros_efthymiou_2021_5088103} on
 classical hardware. For this particular project, we have used the {\tt
 tensorflow}~\cite{tensorflow2015-whitepaper} backend which provides the
 possibility to use gradient descent optimizers during the training step. The
-qGAN model is publicly available through the {\tt Qibo} API. The experimental
+qGAN model is publicly available through the {\tt Qibo} API~\cite{add_cite_tutorial}. The experimental
 implementation of this model was done using {\tt
 Qiskit}~\cite{gadi_aleksandrowicz_2019_2562111} from the {\tt
 OpenQASM}~\cite{cross2017open} code generated by {\tt Qibo}.
@@ -218,7 +214,7 @@ OpenQASM}~\cite{cross2017open} code generated by {\tt Qibo}.
 
 \subsection{Optimization procedure}
 
-As previously discussed, our qGAN comprises a QNN for the generator $G(\phi_g)$ and a classical network for the discriminator $D(\phi_d)$. The quantum generator transforms samples from a prior Gaussian noise distribution $z \sim p_{prior}(z)$ into samples generated by $G(\phi_g)$, thus mapping $p_{prior}(z)$ to a different distribution $p_{fake}$ of generated data. On the other hand, the discriminator takes as input samples $x$ and tries to distinguish between fake data from the generator and real data from the reference input distribution $p_{real}$. The training corresponds to an adversarial game, where we alternate between improving the discriminator to distinguish fake and real data, and the generator to cheat the discriminator with new fake data.
+As previously discussed, our style-qGAN comprises a QNN for the generator $G(\phi_g)$ and a classical network for the discriminator $D(\phi_d)$. The quantum generator transforms samples from a prior Gaussian noise distribution $z \sim p_{prior}(z)$, also called latent variables, into samples generated by $G(\phi_g)$, thus mapping $p_{prior}(z)$ to a different distribution $p_{fake}$ of generated data. On the other hand, the discriminator takes as input samples $x$ and tries to distinguish between fake data from the generator and real data from the reference input distribution $p_{real}$. The training corresponds to an adversarial game, where we alternate between improving the discriminator to distinguish fake and real data, and the generator to cheat the discriminator with new fake data.
 
 In this work, we consider the binary cross-entropy for the optimization objective. The generator's loss function can be defined as
 \begin{equation}
@@ -242,29 +238,37 @@ where the optimum uniquely corresponds to the Nash equilibrium between the loss 
 The optimization of the parameters $\phi_g$ and $\phi_d$ is done alternatively by updating the quantum generator and classical discriminator. The optimizer used to update the steps in this work is the ADADELTA~\cite{zeiler2012adadelta}, which is a stochastic gradient descent method that monotonically decreases its learning rate. To be specific, the starting learning rates utilized are $0.1$ for the classical discriminator and $0.5$ for the quantum generator.
 
 \subsection{Quantum generator architecture}
-The quantum generator
+The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$, that we shall specify for each example, preceded by two alternating $R_y$ and $R_z$ single-qubit rotations, where $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that the number of layers can be modified to tune the capacity of the quantum generator. However, as we shall see in the following sections, we manage to obtain improved state-of-the-art results with shallow QNNs, namely, with only one and two layers.
 
-
-{\color{red}[SC: Carlos please describe the model and how the model has been
-    obtained.]}
-
-\begin{itemize}
-  \item explain the ansatz structure
-  \item describe Figure~\ref{fig:circuit}
-\end{itemize}
+Let us emphasize here the novelty of the quantum generator architecture used for the style-qGAN model, where the action of each qubit rotation is parameterized by the set of trainable parameters $\phi_g$ and, most importantly, the latent vector $\xi$. Specifically, we encode them by using a linear function as
+\begin{equation}
+    \label{eq:rotation} R_{y,z}^{(i,j)}\left(\phi_g, \xi\right) = R_{y,z}\left(\phi_g^{(i)} \xi^{(j)} + \phi_g^{(i+1)}\right)\,,
+\end{equation}
+where $i,j$ indicates the component of the vector. The length of the latent vector $\xi$ will depend on the choice of latent dimension for each implementation. Notice that our quantum generator embeds the input latent variables into all the quantum gates of the network, in contrast to previous proposals for qGANs. This permits the new architecture to process and decide in which
+parts of the QNN the latent variables should play a relevant role.
 
 \begin{figure}
   \includegraphics[width=1.0\columnwidth]{plots/ansatz1.pdf}
-  \caption{\label{fig:circuit}Ansatz structure for the quantum generator circuit model.}
+  \caption{\label{fig:circuit}Quantum neural network employed for the qGAN model. As indicated by the dashed box, each layer is composed of a set of entangling gates $U_{\rm ent}$, to be specified for each example, preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied.}
 \end{figure}
+
+Finally, recall that the quantum generator has the task of creating fake samples to fool the classical discriminator. The fake samples are prepared by acting with the parameterized QNN on the initial $n$-qubit state $\ket{0}^{\otimes n}$, and then measuring in the computational basis. For our implementations, each qubit delivers one sample component. That is, the sample $x \in \mathbb{R}^n$ is generated as
+\begin{equation}
+    \label{eq:samples} x = \left[\left\langle\sigma_z^1\right\rangle,\left\langle\sigma_z^2\right\rangle,\hdots,\left\langle\sigma_z^n\right\rangle\right]\,,
+\end{equation}
+with 
+\begin{equation}
+    \label{eq:expectation}\left\langle\sigma_z^i\right\rangle = \left\langle\Psi(\phi_g,\xi)\left|\,\sigma_z^i\,\right|\Psi(\phi_g,\xi)\right\rangle \,,
+\end{equation}
+where $\Psi(\phi_g,\xi)$ is the output state from the quantum generator. Notice, however, that for other models, more sophisticated ways of generating fake samples could be more convenient to implement. For instance, one could generate a sample component by computing expectation values involving several qubits.
 
 \section{Validation examples}
 \label{sec:validation}
 
-In this section we show examples of qGAN models obtained for known prior
+In this section we show examples of style-qGAN models obtained for known prior
 distribution functions in one and three dimensions. The results presented here
 have been obtained after a systematic process of fine tuning and manual
-hyper-optimization of the Ansatz model.
+hyper-optimization of the training and quantum generator model.
 
 \subsection{1D Gamma distribution}
 \label{sec:gamma}
@@ -276,45 +280,45 @@ function reading
   p_\gamma (x, \alpha, \beta) = x^{\alpha-1} \frac{e^{-x/\beta}}{\beta^\alpha \Gamma(\alpha)}\,,
 \end{equation}
 where $\Gamma$ is the Gamma function. In this example we take $p_\gamma (x, 1,
-1)$ as input distribution and train a qGAN with 1 qubit, 1 latent dimension and
+1)$ as input distribution and train a style-qGAN with 1 qubit, 1 latent dimension and
 1 layer using $10^4$ samples from the input distribution.
 %
 In Figure~\ref{fig:loss} we show the evolution of the loss function for the
-generator and discriminator models in terms number of epochs. We observe the
-typical behaviour of GAN training and a convergence region after 15000 epochs.
+generator and discriminator models in terms of the number of epochs. We observe the
+typical behavior of GAN training and a convergence region after 15000 epochs.
 %
-The qGAN is trained with batch sizes of 128 samples.
+The style-qGAN is trained with batch sizes of 128 samples.
 
 \begin{figure}
   \includegraphics[width=0.5\textwidth]{plots/1Dgamma/1Dgamma_loss.pdf}
   \caption{\label{fig:loss}Example of loss function convergence. After an
-  initial warn-up phase the loss function of both models converge.}
+  initial warm-up phase, the loss function of both models converges.}
 \end{figure}
 
 The image on the top of Figure~\ref{fig:gamma} compares the output generated by
-the qGAN model (blue histogram) with the reference input distribution function
+the style-qGAN model (blue histogram) with the reference input distribution function
 (red histogram) for $10^4$ samples. We observe that the distributions are
-statistically similar, in fact, the Kullback-Leibler divergence
+statistically similar. In particular, the Kullback-Leibler divergence
 (KL)~\cite{kullback1951information} between both distributions is 0.141.
 %
-In order to verify the quality of the qGAN model, we compare both distribution
+In order to verify the quality of the style-qGAN model, we compare both distributions
 with $10^5$ samples in the bottom image of Figure~\ref{fig:gamma}. In this case,
-the number of sampled points is one order of magnitude larger than input
-training set. The agreement between both distribution is remarkably good,
+the number of sampled points is one order of magnitude larger than the input
+training set. The agreement between both distributions is remarkably good,
 obtaining a small KL distance of 0.041
 %
-This behaviour confirms that the qGAN model is able to learn the underlying
+This behavior confirms that the style-qGAN model is able to learn the underlying
 distribution function even if trained with a small training sample set. Such
-feature is particularly interesting in a context of data augmentation
+feature is particularly interesting in the context of data augmentation
 applications~\cite{frid2018synthetic,tanaka2019data}, where few samples are
-available the qGAN model can generalize and learn the underlying distribution
+available, nonetheless the style-qGAN model can generalize and learn the underlying distribution
 with satisfactory outcome.
 
 \begin{figure}
   \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1Dgamma_distribution_10k.pdf}
   \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1Dgamma_distribution_100k.pdf}
   \caption{\label{fig:gamma} Examples of 1D gamma distribution sampling for the
-  reference underlying distribution (red) and the qGAN model (blue) trained with
+  reference underlying distribution (red) and the style-qGAN model (blue) trained with
   $10^4$ samples. On the top we compare the $10^4$ samples, while the figure in
   the bottom shows $10^5$ samples. We observe a good level of agreement between
   both distributions with low values of the Kullback-Leibler distance.}
@@ -322,40 +326,40 @@ with satisfactory outcome.
 
 \subsection{3D Gaussian distribution}
 
-The previous test shows that the qGAN model based on a single qubit can be
+The previous test shows that the style-qGAN model based on a single qubit can be
 trained and produce acceptable results. However, this particular setup does not
 include entanglement between qubits. In order to study the impact of the
-entanglement term $U_{\rm ent}$ in the considered ansatz, we select as an
-underlying distribution a 3D Gaussian distribution centered at
+entanglement term $U_{\rm ent}$ in the considered QNN, we select as an
+underlying distribution a 3D correlated Gaussian distribution centered at
 $\overline{\mu}=(0,0,0)$ with covariance matrix
 \begin{equation}
   \sigma =
 \begin{pmatrix}
   0.5 & 0.1 & 0.25\\
-  0.5 & 0.25 & 0.1\\
-  0.5 & 0.5 & 0.1\\
+  0.1 & 0.5 & 0.1\\
+  0.25 & 0.1 & 0.5\\
   \end{pmatrix}.
 \end{equation}
 
-For this specific setup we consider a 3 qubit model with 3 latent dimensions and
-1 layer. The $U_{\rm ent}$ consists in two sequential controlled-$R_{y}$ gates.
+For this specific setup, we consider a 3-qubit model with 3 latent dimensions and
+1 layer. The $U_{\rm ent}$ consists of two controlled-$R_{y}$ gates acting sequentially on the 3 qubits.
 The total number of variational parameters is 34. In Table~\ref{table:summary}
-we summarize the qGAN configurations obtained for both examples discussed in
+we summarize the style-qGAN configurations obtained for both examples discussed in
 this section.
 
 Following the same training procedure employed in Section~\ref{sec:gamma}, in
 the first row of Figure~\ref{fig:3dgauss} we show $10^5$ samples produced by the
-qGAN model in two-dimensional projections.
+style-qGAN model in two-dimensional projections.
 %
-The second row of plots in Figure~\ref{fig:3dgauss} show the ratio between
-samples generated from the prior reference distribution and the qGAN model. We
+The second row of plots in Figure~\ref{fig:3dgauss} shows the ratio between
+samples generated from the prior reference distribution and the style-qGAN model. We
 observe a good level of agreement, in particular in those regions where the
-sampling frequency is larger. We observe that the qGAN learns the correlations
+sampling frequency is larger. We observe that the style-qGAN learns the correlations
 between the three dimensions.
 
 In Figure~\ref{fig:3dgauss_2} we compare the one dimensional cumulative
-projections of samples generated by the qGAN model with the reference input
-distribution function (red histogram) for $10^5$ samples. Also for this example
+projections of samples generated by the style-qGAN model with the reference input
+distribution function (red histogram) for $10^5$ samples. Also for this example,
 we observe that the distributions are statistically similar, in fact, the
 corresponding KL distances are quite small and close to each other.
 
@@ -370,9 +374,9 @@ corresponding KL distances are quite small and close to each other.
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_RATIO_100k.pdf}
 
   \caption{\label{fig:3dgauss}Two-dimensional sampling projections of a 3D
-  Gaussian distribution for the qGAN model (top row) trained with $10^4$ samples
+  Gaussian distribution for the style-qGAN model (top row) trained with $10^4$ samples
   and the corresponding ratio to the reference underlying prior distribution
-  (bottom row). The qGAN generator model learns the correlations and provides
+  (bottom row). The style-qGAN generator model learns the correlations and provides
   acceptable samples when compared to the reference distribution.}
 \end{figure*}
 
@@ -393,7 +397,7 @@ corresponding KL distances are quite small and close to each other.
      & {\bf 1D gamma} & {\bf 3D Gaussian} \tabularnewline
     \hline
     Qubits & 1 & 3 \tabularnewline
-    Latent dim & 1 & 3 \tabularnewline
+    Latent dim. & 1 & 3 \tabularnewline
     Layers & 1 & 1 \tabularnewline
     Epochs & $3\times10^4$ & $1.3\times10^4$ \tabularnewline
     Training set & $10^4$ & $10^4$ \tabularnewline
@@ -403,8 +407,8 @@ corresponding KL distances are quite small and close to each other.
     \hline
   \end{tabular}
 
-  \caption{\label{table:summary} Summary of the Ansatz parameters for the 1D
-  gamma distribution and the 3D Gaussian distribution.}
+  \caption{\label{table:summary} Summary of the style-qGAN setup for the 1D
+  gamma distribution and the 3D correlated Gaussian distribution.}
 \end{table}
 
 
@@ -530,10 +534,10 @@ may benefit from quantum computing.
 
 \acknowledgments
 
-This project is supported by CERN's QTI. SC is supported by the European
+C.B.-P. acknowledges Stavros Efthymiou for useful discussions about the realization of the project's code. S.C.~thanks Marco Zaro and Luigi
+Favaro for discussions about classical GAN models applied to Monte Carlo events. This project is supported by CERN's QTI. SC is supported by the European
 Research Council under the European Union's Horizon 2020 research and innovation
-Programme (grant agreement number 740006). S.C.~thanks Marco Zaro and Luigi
-Favaro for discussions about classical GAN models applied to Monte Carlo events.
+Programme (grant agreement number 740006).
 
 \bibliography{qgan.bib}
 
