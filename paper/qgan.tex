@@ -94,7 +94,7 @@ quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
 implement a function class~\cite{schuld2021effect, goto2021universal,
   perez2021one}. For example, several QNNs have been proposed for pattern
 classification~\cite{havlivcek2019supervised, Schuld:2020circuit,
-  perezsalinas:2020reuploading, dutta2021realization} or data compression~\cite{romero2017quantum,
+  perezsalinas:2020reuploading, dutta2021realization} or data compression~\cite{romero2017quantum, pepper2019experimental,
   bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum
 computing is a research topic that can be adapted, improved, and tested on many
 research problems. Motivated by this idea, we propose to investigate the
@@ -127,8 +127,7 @@ order to test our model in a realistic setup, we use as training set simulated
 Monte Carlo events for particle physics processes at the Large Hadron Collider
 (LHC) at CERN. (2) We propose an alternative quantum generator architecture. Traditionally, the prior noise distribution, or latent variable in the language of generative models, is provided to the quantum generator through its firsts quantum gates. We, instead, embed it on every layer
 of the network. This
-allowed us to achieve improved state-of-the-art results with shallow QNNs using
-adversarial learning. Let us remark as well that a similar concept was introduced in the classical context~\cite{karras2019style}, which was proven to be extremely useful, coined as style-based GAN. Given the analogies with the classical literature, from now on we refer to our qGAN model as style-qGAN. (3) We validate and
+allowed us to achieve improved state-of-the-art results with shallow QNNs. Let us remark as well that a similar concept was introduced in the classical context~\cite{karras2019style}, which was proven to be extremely useful, coined as style-based GAN. Given the analogies with the classical literature, from now on we refer to our qGAN model as style-qGAN. (3) We validate and
 assess our style-qGAN in quantum hardware. Specifically, we successfully implement our
 model in two different quantum architectures, namely, ion traps and
 superconducting qubits.
@@ -197,7 +196,7 @@ train our style-qGAN model with Monte Carlo generated LHC events using quantum
 simulation. Finally, the best-trained model is deployed on real quantum hardware
 devices based on superconducting and trapped ion technologies.
 
-All calculations involving quantum circuit simulation are performed using the
+All calculations involving quantum circuit simulation are performed using
 {\tt Qibo} v0.1.6~\cite{efthymiou2020qibo,stavros_efthymiou_2021_5088103} on
 classical hardware. For this particular project, we have used the {\tt
 tensorflow}~\cite{tensorflow2015-whitepaper} backend which provides the
@@ -252,7 +251,7 @@ parts of the QNN the latent variables should play a relevant role.
   \caption{\label{fig:circuit}Quantum neural network employed for the qGAN model. As indicated by the dashed box, each layer is composed of a set of entangling gates $U_{\rm ent}$, to be specified for each example, preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied.}
 \end{figure}
 
-Recall that the quantum generator has the task of creating fake samples to fool the classical discriminator. The fake samples are prepared by acting with the parameterized QNN on the initial $n$-qubit state $\ket{0}^{\otimes n}$, and then measuring in the computational basis. For our implementations, each qubit delivers one sample component. That is, the sample $x \in \mathbb{R}^n$ is generated as
+Recall that the quantum generator's task is creating fake samples to fool the classical discriminator. The fake samples are prepared by acting with the parameterized QNN on the initial $n$-qubit state $\ket{0}^{\otimes n}$, and then measuring in the computational basis. For our implementations, each qubit delivers one sample component. That is, the sample $x \in \mathbb{R}^n$ is generated as
 \begin{equation}
     \label{eq:samples} x = \left[\left\langle\sigma_z^1\right\rangle,\left\langle\sigma_z^2\right\rangle,\hdots,\left\langle\sigma_z^n\right\rangle\right]\,,
 \end{equation}
@@ -260,7 +259,7 @@ with
 \begin{equation}
     \label{eq:expectation}\left\langle\sigma_z^i\right\rangle = \left\langle\Psi(\phi_g,\xi)\left|\,\sigma_z^i\,\right|\Psi(\phi_g,\xi)\right\rangle \,,
 \end{equation}
-where $\Psi(\phi_g,\xi)$ is the output state from the quantum generator. Notice, however, that for other models, more sophisticated ways of generating fake samples could be more convenient to implement. For instance, one could generate a sample component by computing expectation values involving several qubits. Finally, let us briefly comment that we used a deep convolutional neural network for the discriminator. More details about the classical discriminator can be found in the code~\cite{cite_code}.
+where $\Psi(\phi_g,\xi)$ is the output state from the quantum generator. Notice, however, that for other models, more sophisticated ways of generating fake samples could be more convenient to implement. For instance, one could generate a sample component by computing expectation values involving several qubits. Finally, let us briefly comment that we used a deep convolutional neural network for the discriminator. More details about the classical discriminator implementation can be found in the code~\cite{cite_code}.
 
 \section{Validation examples}
 \label{sec:validation}
@@ -374,7 +373,7 @@ corresponding KL distances are quite small and close to each other.
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_RATIO_100k.pdf}
 
   \caption{\label{fig:3dgauss}Two-dimensional sampling projections of a 3D
-  Gaussian distribution for the style-qGAN model (top row) trained with $10^4$ samples
+  correlated Gaussian distribution for the style-qGAN model (top row) trained with $10^4$ samples
   and the corresponding ratio to the reference underlying prior distribution
   (bottom row). The style-qGAN generator model learns the correlations and provides
   acceptable samples when compared to the reference distribution.}
@@ -436,15 +435,15 @@ style-qGAN model in two-dimensional projections.
 %
 The second row of plots in Figure~\ref{fig:ttbar} shows the ratio between
 samples generated from the prior original MC distribution and the style-qGAN
-model. We observe a good level of agreement, in particular in those regions
-where the sampling frequency is larger. We observe that the style-qGAN learns
+model. Again, even for this non-toy model, we observe a remarkably level of agreement, in particular in those regions
+where the sampling frequency is larger. Most importantly, we observe as well that the style-qGAN learns
 the correlations between the three dimensions.
 
 In Figure~\ref{fig:ttbar_2} we compare the one dimensional cumulative
 projections of samples generated by the style-qGAN model with the reference
 input distribution function (red histogram) for $10^5$ samples. Also for this
-example, we observe that the distributions are statistically similar, in fact,
-the corresponding KL distances are quite small and close to each other.
+example, the distributions are statistically similar, with
+the corresponding KL distance being small and close to each other.
 
 \begin{figure*}
   \includegraphics[width=0.32\textwidth]{plots/LHCttbar/s-t_FAKE_100k.pdf}%
@@ -488,8 +487,11 @@ the corresponding KL distances are quite small and close to each other.
   \includegraphics[width=0.305\textwidth]{plots/hardware_1k/ibm_lagos/t-y_RATIO_IBM_10k.pdf}%
   \includegraphics[width=0.31\textwidth]{plots/hardware_1k/ibm_lagos/y-s_RATIO_IBM_10k.pdf}
 
-  \caption{\label{fig:ibm}Example of samples generated for a $t\bar{t}$
-    production using a QGAN generator model on IBM Lagos.}
+  \caption{\label{fig:ibm}Example of two-dimensional sampling projections for
+  $pp \rightarrow t\bar{t}$ production using the style-qGAN generator model on IBM Santiago (top row) trained
+  with $10^4$ samples and the corresponding ratio to the reference underlying
+  prior MC distribution (bottom row). The style-qGAN generator model deployed in this quantum hardware still manages to capture the correlations and provides reasonably good samples when compared to the reference
+  distribution.}
 \end{figure*}
 
 \begin{figure*}
@@ -502,7 +504,7 @@ the corresponding KL distances are quite small and close to each other.
   \includegraphics[width=0.32\textwidth]{plots/hardware_1k/ionQ/y-s_FAKE_ionQ_1k.pdf}
 
   \caption{\label{fig:ionq}Example of samples generated for a $t\bar{t}$
-    production using a QGAN generator model on IonQ.}
+    production using a style-qGAN generator model on IonQ.}
 \end{figure*}
 
 
