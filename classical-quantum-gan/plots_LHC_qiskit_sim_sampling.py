@@ -295,7 +295,7 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     x_real1 = []
     x_real2 = []
     x_real3 = []
-    for i in range(samples):
+    for i in range(training_samples):
         x_real1.append(x_real[i][0])
         x_real2.append(x_real[i][1])
         x_real3.append(x_real[i][2])
