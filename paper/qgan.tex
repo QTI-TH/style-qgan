@@ -482,6 +482,13 @@ the corresponding KL distance being small and close to each other.
 \section{Sampling from quantum hardware}
 \label{sec:deployment}
 
+We investigated the deployment of the quantum generator on real quantum hardware.
+As a proof-of-concept, we implemented the generator of LHC $t\bar{t}$ production events on two platforms: the IBM Q superconducting qubit quantum computers~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's roadmap for scaling quantum technology}, Sept. 2020.} and the IonQ trapped ion quantum computers~\footnote{\href{https://ionq.com/posts/december-09-2020-scaling-quantum-computer-roadmap}{Scaling IonQ's Quantum Computers: The Roadmap}, Dec. 2020.}.
+
+In the IBM Q case, we tested our generator on the \texttt{ibmq\_bogota} and \texttt{ibmq\_santiago} 5-qubit Falcon r4L quantum processors.
+For our circuit we need only three qubits with at least one connected to both the other two.
+We use an translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo} and the quantum hardware to automatically select the three qubits out of the five available with the best noise property.
+
 {\color{red}[SC: Julien and Marco please summarize the experimental
   setup]}
 
@@ -621,6 +628,7 @@ discussions about classical GAN models applied to Monte Carlo events. This
 project is supported by CERN's QTI. SC is supported by the European Research
 Council under the European Union's Horizon 2020 research and innovation
 Programme (grant agreement number 740006).
+M.C.\ is supported by the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement number 843134.
 
 \bibliography{qgan.bib}
 

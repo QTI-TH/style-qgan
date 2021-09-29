@@ -308,6 +308,12 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     if provider == 'ibmq':
         IBMQ.load_account()
         provider = IBMQ.get_provider(hub='ibm-q', group='open', project='main')
+    elif provider == 'ibmq-research-open':
+        IBMQ.load_account()
+        provider = IBMQ.get_provider(hub='ibm-q-research-2', group='cern-3', project='main')
+    elif provider == 'ibmq-cern-internal':
+        IBMQ.load_account()
+        provider = IBMQ.get_provider(hub='ibm-q-cern', group='internal', project='qml4eg')
     elif provider == 'ionq':
         import qiskit_ionq
         provider = qiskit_ionq.IonQProvider()
@@ -365,7 +371,7 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     print(circuit)
     circuit.draw(output='mpl', filename=f"generic_compiled_generator_circuit_{samples}_{nqubits}_{latent_dim}.pdf")
 
-    if provider.name == 'ionq_provider':
+    if False: #provider.name == 'ionq_provider':
         x_fake, _ = generate_fake_samples_pennylane(circuit, backend, merge, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots)
     else:
         x_fake, _ = generate_fake_samples(circuit, backend, merge, circuit_noise_params, samples, batch_size, parallel, nqubits, layers, nshots, parallel_shots)
@@ -391,6 +397,15 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
         x_fake2.append(x_fake[i][1])
         x_fake3.append(x_fake[i][2])
     
+    # saving samples to disk
+    np.savetxt(f'real1_LHCttbar_{backend.name()}_{nqubits}_{latent_dim}_{layers}_{training_samples}_{samples}_{lr}_{nshots}', x_real1)
+    np.savetxt(f'real2_LHCttbar_{backend.name()}_{nqubits}_{latent_dim}_{layers}_{training_samples}_{samples}_{lr}_{nshots}', x_real2)
+    np.savetxt(f'real3_LHCttbar_{backend.name()}_{nqubits}_{latent_dim}_{layers}_{training_samples}_{samples}_{lr}_{nshots}', x_real3)
+
+    np.savetxt(f'fake1_LHCttbar_{backend.name()}_{nqubits}_{latent_dim}_{layers}_{training_samples}_{samples}_{lr}_{nshots}', x_fake1)
+    np.savetxt(f'fake2_LHCttbar_{backend.name()}_{nqubits}_{latent_dim}_{layers}_{training_samples}_{samples}_{lr}_{nshots}', x_fake2)
+    np.savetxt(f'fake3_LHCttbar_{backend.name()}_{nqubits}_{latent_dim}_{layers}_{training_samples}_{samples}_{lr}_{nshots}', x_fake3)
+
     print('1D distributions')
     real, _ = np.array(np.histogram(x_real1, np.logspace(np.log10(min(x_real1)),np.log10(max(x_real1)),bins)))/samples
     fake, _ = np.array(np.histogram(x_fake1, np.logspace(np.log10(min(x_real1)),np.log10(max(x_real1)),bins)))/samples
