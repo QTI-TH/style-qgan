@@ -88,7 +88,7 @@ subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm,
 the HHL algorithm~\cite{harrow2009quantum}. Notice, however, that this approach holds
 promise for the future, when large-scale quantum computers exist with low gate
 errors and enough qubits to perform quantum error correction. On the other hand, more
-recent proposals suggest using the quantum devices to define a quantum neural network (QNN), or parameterized
+recent proposals suggest using current quantum devices to define a quantum neural network (QNN), or parameterized
 quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
   bravo2020scaling}, which then can be trained to
 implement a function class~\cite{schuld2021effect, goto2021universal,
@@ -121,13 +121,13 @@ distinct aspects. (1) Previous proposals employ toy data for their qGAN
 training. Moreover, in some cases, it is classical data. It has been recently
 conjectured that if QML ever provides any speed up, it will likely appear from
 learning the data of a quantum process~\cite{huang2021information,
-  kubler2021inductive}. Therefore, we first train and validate our qGAN model with
+  kubler2021inductive}. We first train and validate our qGAN model with
 artificial data from known underlying probability density functions. Then, in
 order to test our model in a realistic setup, we use as training set simulated
 Monte Carlo events for particle physics processes at the Large Hadron Collider
-(LHC) at CERN. (2) We propose an alternative quantum generator architecture. Traditionally, the prior noise distribution, or latent variable in the language of generative models, is provided to the quantum generator through its firsts quantum gates. We, instead, embed it on every layer
+(LHC) at CERN. (2) We propose an alternative quantum generator architecture. Traditionally, the prior noise distribution, or latent dimension in the language of generative models, is provided to the quantum generator through its firsts quantum gates. We, instead, embed it on every layer
 of the network. This
-allowed us to achieve improved state-of-the-art results with shallow QNNs. Let us remark as well that a similar concept was introduced in the classical context~\cite{karras2019style}, which was proven to be extremely useful, coined as style-based GAN. Given the analogies with the classical literature, from now on we refer to our qGAN model as style-qGAN. (3) We validate and
+allowed us to achieve improved state-of-the-art results with shallow QNNs. Let us remark as well that a similar concept was introduced in the classical context~\cite{karras2019style}, which was proven to be extremely useful, coined as style-based GAN. Given this analogy with the classical literature, from now on we refer to our qGAN model as style-qGAN. (3) We validate and
 assess our style-qGAN in quantum hardware. Specifically, we successfully implement our
 model in two different quantum architectures, namely, ion traps and
 superconducting qubits.
@@ -140,15 +140,14 @@ Therefore, the study presented in this manuscript should be considered as
 proof-of-concept, providing a robust and reproducible starting point for future
 investigations. In particular, the introduction of GAN models in HEP Monte Carlo
 simulation has been discussed extensively in the last years, see
-Ref.~\cite{baldi2021gan,Backes_2021,butter2020generative,Butter_2021,Butter_2020,Bellagente_2020,Butter_2019}.
-In this work we consider the possibility to use a qGAN model in a data
+Refs.~\cite{baldi2021gan,Backes_2021,butter2020generative,Butter_2021,Butter_2020,Bellagente_2020,Butter_2019}.
+In this work, we consider the possibility to use a qGAN model in a data
 augmentation context, where the model is trained with a small amount of input
 samples and it learns how to sample the underlying distribution with reliable
 results.
 
 % To be modified
-The paper is structured as follows. In Sec.~\ref{sec:implementation} we identify
-the best qGAN architecture for sampling. In Sec.~\ref{sec:validation} we
+The paper is structured as follows. In Sec.~\ref{sec:implementation} we define our style-qGAN model. In Sec.~\ref{sec:validation} we
 validate the style-qGAN model using toy data. Then, in Sec.~\ref{sec:lhc} we train the style-qGAN
 generator on simulated LHC events. Finally, in Sec.~\ref{sec:deployment} we test
 our final model on real quantum hardware and in Sec.~\ref{sec:conclusion} we
@@ -165,7 +164,7 @@ generator model, and the adversarial training procedure. In this work, we
 consider a hybrid quantum-classical system, where the generator model has a
 quantum representation through a QNN, while the
 discriminator is a classical neural network model. This choice is motivated by
-the practical positive implications of a hardware based generative model, in
+the practical positive implications of a hardware-based generative model, in
 particular, the possibility to obtain performance improvements in a real quantum
 device. In fact, the idea of using a quantum device for the generation of
 samples, by delegating the complicated aspects of density modeling and sampling
@@ -189,8 +188,8 @@ the adversarial approach. The training process consists of a simultaneous
 stochastic gradient descent for both models which after reaching convergence
 delivers a quantum generator model with realistic sampling.
 
-In the next paragraphs, we first introduce the quantum
-generator network and validate the procedure by using samples from known
+In the next paragraphs, we first introduce the optimization procedure and the quantum
+generator network, and validate the procedure by using samples from known
 distribution functions and quantum simulation on classical hardware. Then, we
 train our style-qGAN model with Monte Carlo generated LHC events using quantum
 simulation. Finally, the best-trained model is deployed on real quantum hardware
@@ -213,7 +212,7 @@ the {\tt OpenQASM}~\cite{cross2017open} code generated by {\tt Qibo}.
 
 \subsection{Optimization procedure}
 
-As previously discussed, our style-qGAN comprises a QNN for the generator $G(\phi_g)$ and a classical network for the discriminator $D(\phi_d)$. The quantum generator transforms samples from a prior Gaussian noise distribution $z \sim p_{prior}(z)$, also called latent variables, into samples generated by $G(\phi_g)$, thus mapping $p_{prior}(z)$ to a different distribution $p_{fake}$ of generated data. On the other hand, the discriminator takes as input samples $x$ and tries to distinguish between fake data from the generator and real data from the reference input distribution $p_{real}$. The training corresponds to an adversarial game, where we alternate between improving the discriminator to distinguish fake and real data, and the generator to cheat the discriminator with new fake data.
+As previously discussed, our style-qGAN comprises a QNN for the generator $G(\phi_g)$ and a classical network for the discriminator $D(\phi_d)$. The quantum generator transforms samples from a prior standard Gaussian noise distribution $z \sim p_{prior}(z)$, also called latent variables, into samples generated by $G(\phi_g)$, thus mapping $p_{prior}(z)$ to a different distribution $p_{fake}$ of generated data. On the other hand, the discriminator takes as input samples $x$ and tries to distinguish between fake data from the generator and real data from the reference input distribution $p_{real}$. The training corresponds to an adversarial game, where we alternate between improving the discriminator to distinguish fake and real data, and the generator to cheat the discriminator with new fake data.
 
 In this work, we consider the binary cross-entropy for the optimization objective. The generator's loss function can be defined as
 \begin{equation}
@@ -243,7 +242,7 @@ Let us emphasize here the novelty of the quantum generator architecture used for
 \begin{equation}
     \label{eq:rotation} R_{y,z}^{(i,j)}\left(\phi_g, \xi\right) = R_{y,z}\left(\phi_g^{(i)} \xi^{(j)} + \phi_g^{(i+1)}\right)\,,
 \end{equation}
-where $i,j$ indicates the component of the vector. The length of the latent vector $\xi$ will depend on the choice of latent dimension for each implementation. Notice that our quantum generator embeds the input latent variables into all the quantum gates of the network, in contrast to previous proposals for qGANs. This permits the new architecture to process and decide in which
+where $i,j$ indicates the component of the vector. The length of the latent vector $\xi$ will depend on the choice of latent dimension for each implementation. Notice that our quantum generator embeds the input latent variables into all the quantum gates of the network, in contrast to previous qGAN proposals. This permits the new architecture to process and decide in which
 parts of the QNN the latent variables should play a relevant role.
 
 \begin{figure}
@@ -272,7 +271,7 @@ hyper-optimization of the training and quantum generator model. {\color{red} C: 
 \subsection{1D Gamma distribution}
 \label{sec:gamma}
 
-In order to test the framework proposed in the paragraph above, we have
+In order to test the framework proposed in the paragraphs above, we have
 considered the sampling of a 1D gamma distribution with probability density
 function reading
 \begin{equation}
@@ -356,7 +355,7 @@ observe a good level of agreement, in particular in those regions where the
 sampling frequency is larger. We observe that the style-qGAN learns the correlations
 between the three dimensions.
 
-In the last row of Figure~\ref{fig:3dgaus} we compare the one dimensional
+In the last row of Figure~\ref{fig:3dgauss} we compare the one dimensional
 cumulative projections of samples generated by the style-qGAN model with the
 reference input distribution function (red histogram) for $10^5$ samples. Also
 for this example, we observe that the distributions are statistically similar,
@@ -417,20 +416,15 @@ to learn how a specific physical process generate events.
 In this context, we have generated $10^5$ MC events for $pp\rightarrow t\bar{t}$
 production at LHC with $\sqrt{s} = 13$ TeV with {\tt
 MG5\_aMC}~\cite{Alwall:2014hca,Frederix:2018nkq}. From this simulated events we
-sample the Mandelstam variables $(s,t)$ and the rapidity
-$y$. {\color{red} J. suggestion to make it clear for non-HEP readers: Here $s$
+sample the Mandelstam variables $(s,t)$ and the rapidity. Here, $s$
 and $t$ are understood as the local partonic variables,
 $s=(p_1^{}+p_2^{})^2$, $t=(p_1^{}-p_3^{})_{}^2$, where $p_1^{}$ and
-$p_2^{}$ are the four-momenta of the incoming quarks within the proton
-that collide to produce at top quark with four-momentum $p_3^{}$ and
-an anti-top quark with four-momentum $p_4^{}$, all momenta given in
-e.g. the center-of-mass frame.}
+$p_2^{}$ are the four-momenta of the incoming quarks within the proton that collide to produce at top quark with four-momentum $p_3^{}$ and an anti-top quark with four-momentum $p_4^{}$, all momenta given in, e.g. the center-of-mass frame.
 
 We consider a 3-qubit model with 5 latent dimensions and 2 layers. Again,
 $U_{\rm ent}$ consists of two controlled-$R_{y}$ gates acting sequentially on
 the 3 qubits. The total number of trainable parameters is 62. The style-qGAN
-model has been trained on $10^4$ samples. See Table~\ref{table:summary_lhc} for
-the more details. In this case, we perform a linear pre-processing of the data
+model has been trained on $10^4$ samples. See Table~\ref{table:summary_lhc} for more details. In this case, we perform a linear pre-processing of the data
 to fit the samples within $x \in [-1, 1]$ after a power
 transform~\cite{yeo2000new}. As previously, we undo this transformation after
 the training.
@@ -498,18 +492,18 @@ have performed several runs on two different types of
 architectures. This allows us to qualitatively assess the impact of
 decoherence and noise, issues that are typical for NISQ computers, and
 to check whether the model can give already good results without
-waiting for error-corrected machines. We have used on the one hand IBM~Q
+waiting for error-corrected machines. On the one hand, we have used IBM~Q
 quantum computers based on superconducting transmon
-qubits~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's roadmap for scaling quantum technology}, Sept. 2020.}, and IonQ quantum computers, based on trapped ion technology~\footnote{\href{https://IonQ.com/posts/december-09-2020-scaling-quantum-computer-roadmap}{Scaling IonQ's Quantum Computers: The Roadmap}, Dec. 2020.} and
+qubits~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's roadmap for scaling quantum technology}, Sept. 2020.}, and, on the other hand, IonQ quantum computers, based on trapped ion technology~\footnote{\href{https://IonQ.com/posts/december-09-2020-scaling-quantum-computer-roadmap}{Scaling IonQ's Quantum Computers: The Roadmap}, Dec. 2020.} and
 accessible to us using cloud resources from Amazon Web Services
 (AWS).
 
-We have used noise models on IBM~Q to test whether the results
+{\color{red}We have used noise models on IBM~Q to test whether the results
 presented in Section~\ref{sec:lhc} would be preserved [do we want to
-show results for the noise simulation?]. We have
+show results for the noise simulation?].} We have
 selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor.
-For our circuit we need only three qubits with at least one connected to both the other two.
-We use an translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo} and the quantum hardware to automatically select the three qubits out of the five available with the best noise property.
+For our circuit, we need only three qubits with at least one connected to both the other two.
+We use an translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo} and the quantum hardware to automatically select the three qubits out of the five available with the best noise properties.
 Note that this also allows
 us to test the impact of potential interference between qubits, as
 IonQ qubits are fully connected while those of IBM~Q are
@@ -518,16 +512,16 @@ not.
 We present in Figure~\ref{fig:ibm} examples of samples that have been
 generated using {\tt ibmq\_santiago} machine on IBM~Q. We use a 3-qubit
 model with 5 latent dimensions and 2 layers, which hyperparameters are
-the same as the one used in Section~\ref{sec:lhc} and trained on
+the same as the ones used in Section~\ref{sec:lhc} and trained on
 $10^4_{}$ samples. We display the generation of the same amount of
 samples in two-dimensional projections. The second row of plots in
 Figure~\ref{fig:ibm} shows again the ratio between the reference
 samples, generated using the MC event generator, and the samples
 generated by the style-qGAN on the {\tt ibmq\_santiago} quantum
-hardware. As expected the agreement is worse than in
+hardware. As expected, the agreement is worse than in
 Figure~\ref{fig:ttbar} because of the noise, but still quite
-good in particular in the regions with large sampling frequencies. The
-style-qGAN generator model deployed in this NISQ quantum hardware still
+reasonable. The
+style-qGAN generator model deployed in this NISQ hardware still
 manages to capture the correlations and provides reasonably good
 samples when compared to the reference distribution.
 
@@ -540,6 +534,10 @@ samples when compared to the reference distribution.
   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_RATIO_IBM_10k.pdf}%
   \includegraphics[width=0.305\textwidth]{plots/hardware/ibm_santiago/t-y_RATIO_IBM_10k.pdf}%
   \includegraphics[width=0.31\textwidth]{plots/hardware/ibm_santiago/y-s_RATIO_IBM_10k.pdf}
+  
+  \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/s-distribution_LHCdata_10k.pdf}%
+  \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/t-distribution_LHCdata_10k.pdf}%
+  \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/y-distribution_LHCdata_10k.pdf}
 
   \caption{\label{fig:ibm}Example of two-dimensional sampling projections for
   $pp \rightarrow t\bar{t}$ production using the style-qGAN generator
@@ -553,14 +551,14 @@ In order to compare quantum technologies we have also performed a run
 with $10^3$ samples only on IonQ machines, compared to a run on IBM~Q
 machines with also $10^3$ samples. We have selected this fearly small
 amount of samples mainly because of cost constraints to access IonQ on
-AWS. This shall be viewed as a comparison of two technologies on equal
+AWS. {\color{red} C: We should rephrase this. This shall be viewed as a comparison of two technologies on equal
 ground with the same amount of samples. We display in
 Figure~\ref{fig:ionq} the two-dimensional projections using IonQ. It
 is clear that the sampling is sparser than in Figure~\ref{fig:ibm},
 due to the lower number of samples, nonetheless it appears that the
 style-qGAN is already capturing the underlying distribution and
 correlations. This is particularly visible on the left plot for the
-$t-s$ correlation.
+$t-s$ correlation.}
 
 {\color{red} J.: we should add the ratio reference/generated plots,
   and also add the corresponding 1k ibm plots to compare IonQ against
@@ -568,9 +566,9 @@ $t-s$ correlation.
 
 
 \begin{figure*}
-  %\includegraphics[width=0.25\textwidth]{plots/hardware/ionQ/s-t_REAL_1000_100.pdf}%
-  %\includegraphics[width=0.25\textwidth]{plots/hardware/ionQ/t-y_REAL_1000_100.pdf}%
-  %\includegraphics[width=0.25\textwidth]{plots/hardware/ionQ/y-s_REAL_1000_100.pdf}
+  \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_1k.pdf}%
+  \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/t-y_FAKE_IBM_1k.pdf}%
+  \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/y-s_FAKE_IBM_1k.pdf}
 
   \includegraphics[width=0.32\textwidth]{plots/hardware/ionQ/s-t_FAKE_ionQ_1k.pdf}%
   \includegraphics[width=0.32\textwidth]{plots/hardware/ionQ/t-y_FAKE_ionQ_1k.pdf}%
