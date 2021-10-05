@@ -56,11 +56,11 @@
 
 
 \begin{abstract}
-  We propose an alternative quantum generator architecture in the context of generative adversarial learning, and we assess this model for the generation of
+  We propose and assess an alternative quantum generator architecture in the context of generative adversarial learning for the generation of
   Monte Carlo events. We validate
-  the methodology by implementing our architecture on artificial data generated from
+  the methodology by implementing our quantum network on artificial data generated from
   known underlying distributions. Then, we model Monte Carlo simulated
-  events for particle physics processes at the Large Hadron Collider. We benchmark its performance and demand high accuracy results. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations using shallow quantum neural networks. Finally, we successfully deploy our model into two different quantum hardware architectures, namely, superconducting qubit and trapped ion technologies.
+  events for particle physics processes at the Large Hadron Collider. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations using shallow depth networks. Moreover, the quantum generator is able to learn the underlying distribution functions even if trained with a small training sample set, which is particularly interesting for data augmentation applications. Finally, we successfully deploy our model into two different quantum hardware architectures, namely, trapped ion and superconducting technologies.
 \end{abstract}
 
 \maketitle
@@ -546,7 +546,7 @@ In order to compare quantum technologies we have also performed a run
 with $10^3$ samples only on IonQ machines, compared to a run on IBM~Q
 machines with also $10^3$ samples. We have selected this fearly small
 amount of samples mainly because of cost constraints to access IonQ on
-AWS. {\color{red} C: We should rephrase this. This shall be viewed as a comparison of two technologies on equal
+AWS. {\color{red} C: We should rephrase the sentences below and include somewhere the number of shots for each sample. --- This shall be viewed as a comparison of two technologies on equal
 ground with the same amount of samples. We display in
 Figure~\ref{fig:ionq} the two-dimensional projections using IonQ. It
 is clear that the sampling is sparser than in Figure~\ref{fig:ibm},
