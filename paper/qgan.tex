@@ -13,15 +13,6 @@
 
 \usepackage{array}
 
-
-\newcommand{\commentCBP}[1]{{\color{red} {[C: #1]}}}
-\newcommand{\commentJB}[1]{{\color{blue} {[J: #1]}}}
-\newcommand{\commentMC}[1]{{\color{magenta} {[M: #1]}}}
-\newcommand{\commentAF}[1]{{\color{cyan} {[A: #1]}}}
-\newcommand{\commentDMG}[1]{{\color{orange} {[D: #1]}}}
-\newcommand{\commentSC}[1]{{\color{purple} {[S: #1]}}}
-
-
 \begin{document}
 
 \title{
@@ -67,16 +58,6 @@
 \begin{abstract}
 We propose and assess an alternative quantum generator architecture in the context of generative adversarial learning for Monte Carlo event generation, used to simulate particle physics processes at the Large Hadron Collider (LHC). We validate the methodology by implementing the quantum network on artificial data generated from known underlying distributions. The network is then applied to Monte Carlo generated datesets of specific important LHC scattering processes. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations while maintaining shallow depth networks. Moreover, the quantum generator successfully learns the underlying distribution functions even if trained with small training sample sets; this is particularly interesting for data augmentation applications. We deploy this novel methodology on two different quantum hardware architectures, trapped ion and superconducting technologies, to tests its hardware-independent viability.  
 
-
-\commentCBP{Carlos}
-\commentJB{Julien}
-\commentMC{Marco}
-\commentAF{Anthony}
-\commentDMG{Dorota}
-\commentSC{Stefano}
-
-
-{\color{red}  We propose and assess an alternative quantum generator architecture in the context of generative adversarial learning for the generation of Monte Carlo events. We validate the methodology by implementing our quantum network on artificial data generated from known underlying distributions. Then, we model Monte Carlo simulated events for particle physics processes at the Large Hadron Collider. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations using shallow depth networks. Moreover, the quantum generator is able to learn the underlying distribution functions even if trained with a small training sample set, which is particularly interesting for data augmentation applications. Finally, we successfully deploy our model into two different quantum hardware architectures, namely, trapped ion and superconducting technologies. }
 \end{abstract}
 
 \maketitle
@@ -141,11 +122,11 @@ There are alternative approaches where both models could be represented by a
 QNN~\cite{dallaire2018quantum, hu2019quantum, benedetti2019adversarial, romero2021variational, niu2021entangling}. However, after testing some prototype architectures, we have observed faster convergence when using a classical discriminator.
 
 In Figure~\ref{fig:scheme} we schematically show the steps involved in the style-qGAN
-presented here. The procedure starts from the preparation of samples from a
+presented here. The procedure starts from the preparation of reference samples from a
 known distribution function that we would like to encode in the quantum
 generator model. At the same time, we define a QNN model where
 we inject stochastic noise in the latent space variables; these are used to
-define all the quantum gates of the network. The generator model is then used to extract fake samples
+define all the quantum gates of the network. The generator model is then used to extract fake generated samples
 that, after the training procedure, should match the quality of the known input
 distribution. Lastly, both sets of samples are used to train the discriminator
 model. The quality of the training is measured by an appropriate loss function
@@ -155,7 +136,7 @@ stochastic gradient descent for both models which, after reaching convergence,
 delivers a quantum generator model with realistic sampling.
 
 In the next paragraphs, we first introduce the optimization procedure and the quantum
-generator network, and validate the procedure by using samples from known
+generator network, and validate the procedure by using reference samples from known
 distribution functions and quantum simulation on classical hardware. We then
 train our style-qGAN model with Monte Carlo generated LHC events using quantum
 simulation. Finally, the best-trained model is deployed on real quantum hardware
@@ -237,14 +218,14 @@ hyper-optimization of the training and quantum generator model.
 \subsection{1D Gamma distribution}
 \label{sec:gamma}
 
-In order to test the framework proposed in the paragraphs above, we have
-considered the sampling of a 1D gamma distribution with probability density
+In order to test the framework proposed above, we
+consider the sampling of a 1D gamma distribution with probability density
 function reading
 \begin{equation}
   p_\gamma (x, \alpha, \beta) = x^{\alpha-1} \frac{e^{-x/\beta}}{\beta^\alpha \Gamma(\alpha)}\,,
 \end{equation}
 where $\Gamma$ is the Gamma function. In this example we take $p_\gamma (x, 1,
-1)$ as input distribution and train a style-qGAN with 1 qubit, 1 latent dimension and
+1)$ as the input distribution and train a style-qGAN with 1 qubit, 1 latent dimension and
 1 layer using $10^4$ samples from the input distribution. The total number of trainable parameters is 10. We perform a linear pre-processing of the data to fit the samples within $x \in [-1, 1]$. We undo this transformation after the training.
 %
 In Figure~\ref{fig:loss} we show the evolution of the loss function for the
@@ -259,10 +240,13 @@ The style-qGAN is trained with batch sizes of 128 samples.
   initial warm-up phase, the loss function of both models converges.}
 \end{figure}
 
+A necessary property of this framework is that the style-qGAN model can learn the underlying distribution even if given a small data set. To demonstrate this, we train a style-qGAN model with a set number of reference samples and then use it to generate two sets of samples; these generated sample sets have different size. If the style-qGAN model behaves as it should, the larger set of generated samples should more closely agree with the reference input distribution function. We present the results of this study in Figure~\ref{fig:gamma}.
+  
+
 The image on the top of Figure~\ref{fig:gamma} compares the output generated by
 the style-qGAN model (blue histogram) with the reference input distribution
 function (red histogram) for $10^4$ samples in a grid of 100 bins spaced
-linearly. We observe that the distributions are statistically similar even for
+linearly; the style-qGAN has been trained on $10^4$ reference samples. We observe that the distributions are statistically similar even for
 this high-density binning choice. In particular, the Kullback-Leibler
 divergence (KL)~\cite{kullback1951information} between both distributions is
 0.141.
@@ -270,7 +254,7 @@ divergence (KL)~\cite{kullback1951information} between both distributions is
 In order to verify the quality of the style-qGAN model, we compare both distributions
 with $10^5$ samples in the bottom image of Figure~\ref{fig:gamma}. In this case,
 the number of sampled points is one order of magnitude larger than the input
-training set. The agreement between both distributions is remarkably good,
+training set as the style-qGAN model has been trained on $10^4$ reference samples. The agreement between both distributions is remarkably good,
 obtaining a small KL distance of 0.041
 %
 This behavior confirms that the style-qGAN model is able to learn the underlying
@@ -284,16 +268,16 @@ with satisfactory outcome.
   \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1Dgamma_distribution_10k.pdf}
   \includegraphics[width=0.45\textwidth]{plots/1Dgamma/1Dgamma_distribution_100k.pdf}
   \caption{\label{fig:gamma} Examples of 1D gamma distribution sampling for the
-  reference underlying distribution (red) and the style-qGAN model (blue)
-  trained with $10^4$ samples. On the top we compare the $10^4$ samples, while
-  the figure in the bottom shows $10^5$ samples from the same style-qGAN model
-  trained with $10^4$ samples. We observe a good level of agreement between both
+  reference underlying distribution (red) and a style-qGAN model (blue) that has been
+  trained with $10^4$ reference samples. On the top we compare $10^4$ generated samples, while
+  on the bottom, $10^5$ generated samples from the same style-qGAN model
+  trained with $10^4$ reference samples. We observe a good level of agreement between both
   distributions with low values of the Kullback-Leibler distance.}
 \end{figure}
 
 \subsection{3D correlated Gaussian distribution}
 
-The previous test shows that the style-qGAN model based on a single qubit can be
+The previous test shows that a style-qGAN model implemented on a single qubit can be
 trained and produce acceptable results. However, this particular set-up does not
 include entanglement between qubits. In order to study the impact of the
 entanglement term $U_{\rm ent}$ in the considered QNN, we select as an
@@ -593,7 +577,7 @@ may benefit from quantum computing.
 C.B.-P. acknowledges Stavros Efthymiou for useful discussions about the
 realization of the manuscript's code. S.C.~thanks Marco Zaro and Luigi Favaro for
 discussions about classical GAN models applied to Monte Carlo events. This
-project is supported by CERN's QTI. SC is supported by the European Research
+project is supported by CERN's Quantum Technology Initiative. SC is supported by the European Research
 Council under the European Union's Horizon 2020 research and innovation
 Programme (grant agreement number 740006).
 M.C.\ is supported by the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement number 843134.
