@@ -530,10 +530,6 @@ style-qGAN is already capturing the underlying distribution and
 correlations. This is particularly visible on the left plot for the
 $t-s$ correlation.}
 
-{\color{red} J.: we should add the ratio reference/generated plots,
-  and also add the corresponding 1k ibm plots to compare IonQ against
-  IBM~Q. Also add the 1D plots with KL.}
-
 
 \begin{figure*}
   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_1k.pdf}%
@@ -585,6 +581,18 @@ Nevertheless, this is a first attempt to bridge the power of quantum machine
 learning algorithms into the complexity of Monte Carlo simulation in HEP. We
 wish that the approach presented here will inspire new HEP applications which
 may benefit from quantum computing.
+
+\section{Remaining to Do}
+\commentDMG{Things still to do, from Oct. 6 meeting}
+\begin{itemize}
+\item Normalization sampling discussion/line
+\item Number of trainable parameters and how comparse to classical
+\item Maybe small discussion about Fig 3 to highlight why we include it -- typical GAN training convergence that shows that archicture does what it needs to do
+\item Add Fig 5 discription of gray and white to make it clear (and so people know to look on computer if need be)
+\item Keep working on this $10^4$ vs $10^5$ training versus generated vs reference
+\item Green line for Fig 7 sanity check with different pull of $10^4$ reference samples. Anthony (+ Carlos for aid if need be)
+\item Noise plot addition -- simultion/real, simulation/noise model, real/noise model. we dont know how they look but might be useful for an appendix. Marco
+\end{itemize}
 
 \acknowledgments
 
