@@ -58,7 +58,7 @@
 \begin{abstract}
 We propose and assess an alternative quantum generator architecture in the context of generative adversarial learning for Monte Carlo event generation, used to simulate particle physics processes at the Large Hadron Collider (LHC). We validate the methodology by implementing the quantum network on artificial data generated from known underlying distributions. This methodology is then applied to Monte-Carlo generated datesets of specific important LHC scattering processes. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations while maintaining shallow depth networks. Moreover, the quantum generator successfully learns the underlying distribution functions even if trained with small training sample sets; this is particularly interesting for data augmentation applications. Additionally, the model is deployed onto two different quantum hardware architectures, trapped ion and superconducting technologies, demonstrating the methodology is hardware-independence. 
 
-\color{red}  We propose and assess an alternative quantum generator architecture in the context of generative adversarial learning for the generation of Monte Carlo events. We validate the methodology by implementing our quantum network on artificial data generated from known underlying distributions. Then, we model Monte Carlo simulated events for particle physics processes at the Large Hadron Collider. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations using shallow depth networks. Moreover, the quantum generator is able to learn the underlying distribution functions even if trained with a small training sample set, which is particularly interesting for data augmentation applications. Finally, we successfully deploy our model into two different quantum hardware architectures, namely, trapped ion and superconducting technologies. \color{black}
+{\color{red}  We propose and assess an alternative quantum generator architecture in the context of generative adversarial learning for the generation of Monte Carlo events. We validate the methodology by implementing our quantum network on artificial data generated from known underlying distributions. Then, we model Monte Carlo simulated events for particle physics processes at the Large Hadron Collider. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations using shallow depth networks. Moreover, the quantum generator is able to learn the underlying distribution functions even if trained with a small training sample set, which is particularly interesting for data augmentation applications. Finally, we successfully deploy our model into two different quantum hardware architectures, namely, trapped ion and superconducting technologies. }
 \end{abstract}
 
 \maketitle
@@ -78,9 +78,9 @@ as one of the most promising approaches to make use of NISQ computers.
 Early work in QML was mostly focused on speeding up linear algebra
 subroutines~\cite{wiebe2012quantum, lloyd:2013ml, Rebentrost:2014svm,
   kerenidis2020quantum}, widely used in classical machine learning, by leveraging
-the HHL algorithm~\cite{harrow2009quantum}. Notice, however, that this approach holds
-promise for the future, when large-scale quantum computers exist with low gate
-errors and enough qubits to perform quantum error correction. On the other hand, more
+the Harrow-Hassidim-Lloyd (HHL) algorithm~\cite{harrow2009quantum}. This approach holds
+promise for the future, though its utility depends on the existance of large-scale quantum computers with low gate
+errors and enough qubits to perform quantum error correction.{\color{red} D.: Which approach? The one using HHL or in general QML. It is not clear in this context.} On the other hand, more
 recent proposals suggest using current quantum devices to define a quantum neural network (QNN), or parameterized
 quantum circuit~\cite{benedetti2019parameterized, sim2019expressibility,
   bravo2020scaling}, which then can be trained to
@@ -88,11 +88,11 @@ implement a function class~\cite{schuld2021effect, goto2021universal,
   perez2021one}. For example, several QNNs have been proposed for pattern
 classification~\cite{havlivcek2019supervised, Schuld:2020circuit,
   perezsalinas:2020reuploading, dutta2021realization} or data compression~\cite{romero2017quantum, pepper2019experimental,
-  bravo2021quantum, cao2021noise}. Interestingly, this QML approach to quantum
+  bravo2021quantum, cao2021noise}. This QML approach to quantum
 computing is a research topic that can be adapted, improved, and tested on many
 research problems. Motivated by this idea, we propose to investigate the
-possibility to use QNNs for generative modeling~\cite{benedetti2019generative,
-  hamilton2019generative, coyle2020born}. More specifically, for the generation of
+possibility of using QNNs for generative modeling~\cite{benedetti2019generative,
+  hamilton2019generative, coyle2020born}. More specifically, we explore the uses of QNNs for the generation of
 Monte Carlo events through quantum generative adversarial networks
 (qGANs)~\cite{dallaire2018quantum, lloyd2018quantum}.
 
