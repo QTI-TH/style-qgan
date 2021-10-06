@@ -13,6 +13,13 @@
 
 \usepackage{array}
 
+\newcommand{\commentCBP}[1]{{\color{red} {[C: #1]}}}
+ \newcommand{\commentJB}[1]{{\color{blue} {[J: #1]}}}
+ \newcommand{\commentMC}[1]{{\color{magenta} {[M: #1]}}}
+ \newcommand{\commentAF}[1]{{\color{cyan} {[A: #1]}}}
+ \newcommand{\commentDMG}[1]{{\color{orange} {[D: #1]}}}
+ \newcommand{\commentSC}[1]{{\color{purple} {[S: #1]}}}
+
 \begin{document}
 
 \title{
@@ -57,6 +64,13 @@
 
 \begin{abstract}
 We propose and assess an alternative quantum generator architecture in the context of generative adversarial learning for Monte Carlo event generation, used to simulate particle physics processes at the Large Hadron Collider (LHC). We validate the methodology by implementing the quantum network on artificial data generated from known underlying distributions. The network is then applied to Monte Carlo generated datesets of specific important LHC scattering processes. The new quantum generator architecture leads to an improvement on the state-of-the-art implementations while maintaining shallow depth networks. Moreover, the quantum generator successfully learns the underlying distribution functions even if trained with small training sample sets; this is particularly interesting for data augmentation applications. We deploy this novel methodology on two different quantum hardware architectures, trapped ion and superconducting technologies, to tests its hardware-independent viability.  
+\commentCBP{Carlos}
+ \commentJB{Julien}
+ \commentMC{Marco}
+ \commentAF{Anthony}
+ \commentDMG{Dorota}
+ \commentSC{Stefano}
+
 
 \end{abstract}
 
