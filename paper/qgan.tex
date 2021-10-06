@@ -16,7 +16,7 @@
 \begin{document}
 
 \title{
-  Style-based Quantum Generative Adversarial Networks for Monte Carlo events
+  Style-based quantum generative adversarial networks for Monte Carlo events
 }
 
 \preprint{CERN-TH-2021-139, TIF-UNIMI-2021-14}
@@ -247,7 +247,7 @@ parts of the QNN the latent variables should play a relevant role.
 
 Recall that the quantum generator's task is creating fake samples to fool the classical discriminator. The fake samples are prepared by acting with the parameterized QNN on the initial $n$-qubit state $\ket{0}^{\otimes n}$, and then measuring in the computational basis. For our implementations, each qubit delivers one sample component. That is, the sample $x \in \mathbb{R}^n$ is generated as
 \begin{equation}
-    \label{eq:samples} x = \left[\left\langle\sigma_z^1\right\rangle,\left\langle\sigma_z^2\right\rangle,\hdots,\left\langle\sigma_z^n\right\rangle\right]\,,
+    \label{eq:samples} x = \left[-\left\langle\sigma_z^1\right\rangle,-\left\langle\sigma_z^2\right\rangle,\hdots,-\left\langle\sigma_z^n\right\rangle\right]\,,
 \end{equation}
 with
 \begin{equation}
