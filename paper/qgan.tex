@@ -502,7 +502,7 @@ Implementing our style-qGAN models onto real quantum hardware introduces a new p
  Prior to running on actual quantum hardware, we performed noise simulations using the
 IBM~Q simplified noise model provided with the properties of real device backends, to test whether the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise} and show that the impact of the noise is expected to be visible but should not alter too significantly our
 results. For the noise simulation as well as the actual runs on IBM~Q quantum devices,
-we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor. For our circuit, we need only three qubits with at least one connected to both the other two. We use a translation layer written in \texttt{Qiskit} to implement the circuit in Figure~\ref{fig:circuit} and automatically select the three qubits out of the five available
+we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor. For our circuit, we need only three qubits with at least one connected to both the other two. We use a translation layer written in \texttt{Qiskit}~\cite{gadi_aleksandrowicz_2019_2562111} to implement the circuit in Figure~\ref{fig:circuit} and automatically select the three qubits out of the five available
 with the best noise properties. Note that this also allows us to test the impact of potential
 interference between qubits, as IonQ qubits are fully connected while those of IBM~Q are not.
 
@@ -548,17 +548,17 @@ The  KL distances reported in the third row of plots are still relatively small,
   for each dimension. Note that we choose a grey background for the plots in the middle row to highlight when the reference and generated samples are identical. \commentAF{would like to change row order: $1,2,3 \rightarrow 1,3,2$}\commentDMG{We should use Julien's darker background}}
 \end{figure*}
 
-\commentAF{ idea:
-During the current $NISQ$-era the different quantum hardware architectures pose limits on applications that they can perform. Here, we study how the style-qGAN  performs across different quantum hardware. The aim is to understand whether and to what extent its performance is hardware dependent and its potential hardware transferability. To this extent we performed calculations generating $10^3$ samples each on IonQ machines and seperately on IBM~Q
-machines. The fairly small amount of samples available is mainly due to cost constraints.
-}
-
-
-In order to test different quantum technologies we have also performed a run
-with $10^3$ samples only on IonQ machines, compared to a run on IBM~Q
-machines with also $10^3$ samples. We have selected this fairly small
-amount of samples mainly because of cost constraints to access IonQ on
-AWS. Note that the purpose of these tests is not to compare the two different hardware technologies, but instead to test whether the novel style-qGAN architecture works well on different quantum architectures. We use again a translation layer, written in Python with the
+\commentJB{Idea of AF merged to the text.}
+During the current NISQ-era the different quantum hardware architectures are not standardized and can have limits
+on potential applications of the machines. Here, we study how the style-qGAN  performs across different quantum hardware.
+The aim is to understand whether and to what extent its performance is hardware dependent and its potential hardware transferability.
+In view of this testing different quantum technologies we have also performed a run
+with $10^3$ samples only, on IonQ machines and seperately on IBM~Q
+machines. We have selected this fairly small amount of samples
+mainly due to external constraints on IonQ machine access on AWS.
+Note that the purpose of these tests is not to compare the two different hardware technologies,
+but instead to test whether the novel style-qGAN architecture works well on different quantum architectures.
+We use again a translation layer, written in Python with the
 \texttt{Braket SDK} from Amazon, between our circuit and the quantum hardware, and we
 have also performed around 1000 shots for the measurement of the quantum circuit.
 Note that the amount of samples is quite low, but the purpose of this test is to assess
@@ -645,7 +645,7 @@ M.C.\ is supported by the European Union’s Horizon 2020 research and innovatio
 SC is supported by the European Research
 Council under the European Union's Horizon 2020 research and innovation
 Programme (grant agreement number 740006). \commentJB{The authors acknowledge the support of the CloudBank EU as a pilot brockering cloud service at CERN, allowing
- for access to Amazon Web Services in order to run our algorithm on ionQ hardware.}
+ for access to Amazon Web Services in order to run our algorithm on IonQ hardware.}
 
 
 \appendix
