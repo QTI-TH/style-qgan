@@ -198,13 +198,12 @@ The optimization of the parameters $\phi_g$ and $\phi_d$ is done alternatively b
 
 \subsection{Quantum generator architecture}
 The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. \commentDMG{I dont think adding this info is actually that important and will actually just make things harder to understand. This is simply the architecture. If you really want to add something, id keep it to one sentence}\commentAF{had removed this comment, because agreed, but new thread by Marco in skype might indicate some confusion that could be useful to clarify also in text.}\commentDMG{agreed that it will be useful to clarify what we mean by various terms. but id hesitate to put too much explanation into the nitty-gritty of the circuit creation. but marco and anthony feel free to make a pass at this to clarify}
-
+\commentMC{I think that the level of detail currently in the text is ok. Also, the definition of what is one layer is arbitrary and how it is in the paper is perfectly fine, just it does not matches the code.}
 %Additionally, the number of layers can be modified to tune the capacity of the quantum generator. %However, in the following we obtain state-of-the-art results with shallow QNNs with only one and two layers.
 %\commentAF{changed "However, as we shall see in the following sections, we manage to obtain improved state-of-the-art results with shallow QNNs, namely, with only one and two layers."} \commentCBP{I think it is important to specify that our results \textit{improve} the state-of-the-arts results for qGANs. Obviously we do not improve with respect classical techniques.}
 %\commentAF{Good point. If we want to write this we need to explain how and in what way we improve. We could add this in the following sections explicitly mentioning the improvements other qGANs. Alternatively we could add a sentence here, but then it might be better situated at the end of section I. } \commentCBP{Let me put here the points we improve. (1) Higher binning density (at least 1 order of magnitude higher) (2) Even with the higher binning density we obtained smaller KL divergences (3) We use a real setup (non-toy data)}\commentDMG{I have edited the end of the introduction to details the ways that we improve, as i dont think it belongs in this section. this is about the implementation itself, not the results. it will just muddy the water to include it here. We can highlight this list elsewhere. Therefore, i suggest this paragraph to be:
 %`The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.}
-
-Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.
+The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.
 \commentAF{thought it good to comment out the discussion (still available in the tex) and shortened Dorota's suggestion to reflect how it'd look like in situ}
 
 Let us emphasize here the novelty of the quantum generator architecture used for the style-qGAN model, where the action of each qubit rotation is parameterized by the set of trainable parameters $\phi_g$ and, most importantly, the latent vector $\xi$. Specifically, we encode them by using a linear function as
@@ -501,10 +500,9 @@ accessible to us using cloud resources from Amazon Web Services
 Implementing our style-qGAN models onto real quantum hardware introduces a new parameter into the model: the number of shots done for each calculation. Specifically,  we now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a set number of experiment (shots) have been carried out. These then build up expectation values that are used to create generated samples.
 
  Prior to running on actual quantum hardware, we performed noise simulations using the
-IBM~Q simplified noise model provided with the properties of real device backends, to test whether the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise}and show that the impact of the noise is expected to be visible but should not alter too significantly our
+IBM~Q simplified noise model provided with the properties of real device backends, to test whether the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise} and show that the impact of the noise is expected to be visible but should not alter too significantly our
 results. For the noise simulation as well as the actual runs on IBM~Q quantum devices,
-we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor. For our circuit, we need only three qubits with at least one connected to both the other two. We use a translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo}
-and the quantum hardware to automatically select the three qubits out of the five available
+we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor. For our circuit, we need only three qubits with at least one connected to both the other two. We use a translation layer written in \texttt{Qiskit} to implement the circuit in Figure~\ref{fig:circuit} and automatically select the three qubits out of the five available
 with the best noise properties. Note that this also allows us to test the impact of potential
 interference between qubits, as IonQ qubits are fully connected while those of IBM~Q are not.
 
@@ -512,8 +510,8 @@ We present in Figure~\ref{fig:ibm} examples of samples that have been
 generated using {\tt ibmq\_santiago} machine on IBM~Q. We use a 3-qubit
 model with 5 latent dimensions and 2 layers, which hyperparameters are
 the same as the ones used in Section~\ref{sec:lhc} and trained on
-$10^4_{}$ samples. To compute each fake sample, we have performed around 1000 shots on the
-quantum circuits. We display the generation of $10^5_{}$ samples, as in the previous section,
+$10^4_{}$ samples. To compute each fake sample, we have performed 1000 shots on the
+quantum circuits. We display the generation of $10^5$ samples, as in the previous section,
 %of the same amount of samples
 in two-dimensional projections. The second row of plots in
 Figure~\ref{fig:ibm} shows again the ratio between the reference
