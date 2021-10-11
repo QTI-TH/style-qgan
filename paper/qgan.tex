@@ -270,6 +270,7 @@ In both cases the $10^4$ samples have been transformed into histograms with 100 
 Going further, in the bottom of Figure~\ref{fig:gamma} we show the same results as in the top on the larger set containing $10^5$ samples; these samples are generated with the same style-qGAN trained on $10^4$ reference samples. Again, we use for comparison a re-sampling of the reference distribution at the same size as the generated set and show both distributions on a grid with 100 linearly spaced bins. 
 %
 Having generated an order of magnitude more samples than the training set we observe that the style-qGAN model performs well. Both distributions are visually very close to each other and the KL divergence of 0.041 signals a high degree of similarity. \commentAF{Would like to quantify that it also agrees better than before}\commentDMG{doesnt the KL already do this? I dont think we need to add anything here, as it will just clutter the discussion}
+\commentAF{Would like to quantify that it also agrees better than before...trying to figure this out I found this: https://stats.stackexchange.com/questions/368000/correcting-kullback-leibler-divergence-for-size-of-datasets . A naive rescaling by a factor 0.1 between the two would mean that the qGAN did not improve with higher stats, so there's some devil in the detail. But perhaps increasing the number of bins and checking that the KL is the same would be better?}
 
 %
 This behavior confirms that the style-qGAN model is able to learn the underlying
