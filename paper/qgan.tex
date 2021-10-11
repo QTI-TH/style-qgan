@@ -334,6 +334,7 @@ sampling frequency is larger. The largest deviations are seen at the edges of th
 
 To quantify how well the correlations have been learned beyond 
 this level we study the covariance matrices defined by the reference and the generated samples. The summed eigenvalues of the reference and generated covariance matrices give a means to estimate the similarity between the learned underlying correlations. We find agreement between the reference and generated eigenvalues to the better of $\lesssim 10\%$ for style-qGAN set-ups with equal and more than 3 latent dimensions. Recall that the latent variables are introduced in every gate of the circuit, including the entangling ones $U_{ent}$.  With $D_{latent}< 3$ we observe significant deviations of factors $\mathcal{O}(10)$ while for $D_{latent}\geq 3$ no further significant improvement is seen. The same holds for increasing the number of layers in the style-qGAN model. This suggests that the number of latent dimensions introduced are key hyperparameters once the number of layers allows a sufficient complexity.
+\commentAF{Carlos, thanks for accepting most of the suggested changes. The motivation of the training-success sentence was to prepare for the real data case where we use 5 dimensions and 2 layers, even though we historically later found out that 3,2 or even 3,1 would have worked too. having some fluff that it trained better could be good with this viewpoint in mind?}
 
 Since the eigenvalues are known also exactly through Eq.~\ref{eq:covmat} we furthermore can compare the performance of the style-qGAN with increased generation sample size. We find that the style-qGAN with 3 latent dimensions and 1 layer (shown here)
 generates sets that reproduce the exact eigenvalues of the input covariance matrix to better than $\lesssim 6\%$ for $10^3$, $\lesssim 1.3\%$ for $5\times10^3$ and $\lesssim 0.8\%$ for $2\times10^4$ samples.
@@ -492,15 +493,20 @@ qubits~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's 
 accessible to us using cloud resources from Amazon Web Services
 (AWS).
 
-\commentAF{(Revisit) It could be useful to expand a little more on the implementation here. This is not really featured so far. Possible start:\\
- Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Furthermore...
- }
-Implementing our style-qGAN models onto real quantum hardware introduces a parameter into the model: the number of shots done with each calculation. Specifically,  we now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a set number of experiment (shots) have been carried out. These then build up expectation values that are used to create generated samples.
 
- Prior to running on actual quantum hardware, we performed noise simulations using the
-IBM~Q simplified noise model provided with the properties of real device backends, to test whether the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise}and show that the impact of the noise is expected to be visible but should not alter too significantly our
-results. For the noise simulation as well as the actual runs on IBM~Q quantum devices,
-we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor. For our circuit, we need only three qubits with at least one connected to both the other two. We use a translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo}
+\commentJB{
+ Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Indeed, we
+ now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a number of experiment (shots) to build
+ up expectation values that are used to create generated samples.
+
+ Prior to send runs on actual quantum hardware, we performed noise simulations using the
+IBM~Q simplified noise model provided with the properties of real device backends, to test whether
+the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise}
+and show that the impact of the noise is expected to be visible but should not alter too significantly our
+results. For the noise simulation as well as the actual runs on IBM~Q quantum devices,}
+we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor.
+For our circuit, we need only three qubits with at least one connected to both the other two.
+We use a translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo} \commentAF{Marco, given the comment in the intro, is this right?}
 and the quantum hardware to automatically select the three qubits out of the five available
 with the best noise properties. Note that this also allows us to test the impact of potential
 interference between qubits, as IonQ qubits are fully connected while those of IBM~Q are not.
@@ -522,8 +528,8 @@ reasonable. The
 style-qGAN generator model deployed in this NISQ hardware still
 manages to capture the correlations and provides reasonably good
 samples when compared to the reference distribution.
-The  KL distances reported in the third row of plots are still relatively small, at most one
-  order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.
+\commentJB{The KL distances reported in the third row of plots are still relatively small, at most one
+  order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.}
 
 \begin{figure*}
 
