@@ -417,6 +417,7 @@ model has been trained on $10^4$ samples. See Table~\ref{table:summary_lhc} for 
 to fit the samples within $x \in [-1, 1]$ after a power
 transform~\cite{yeo2000new}. As previously, we undo this transformation after
 the training.
+\commentMC{What are the parameters of the transform? I think the exact transformation used should be given in the paper.}
 
 Following the same training procedure employed in the previous section, in the
 first row of Figure~\ref{fig:ttbar} we show $10^5$ samples produced by the
@@ -478,6 +479,11 @@ corresponding KL distance being small and close to each other.
 \section{Sampling from quantum hardware}
 \label{sec:deployment}
 
+\commentMC{IMPORTANT: figure~\ref{fig:ibm} on real hardware (and figure~\ref{fig:ionq} I assume) use the samples from the generator with one layer! This is different from figure~\ref{fig:ttbar} that used the two-layer 63-parameters generator given in Table~II.
+I think the sampling from real hardware should match the sampling with the model discussed in the paper so I suggest that we either:
+1. switch to using the one-layer generator thought. But is one layer actually sufficient to learn the distribution? If not, maybe the one deviations in figure~\ref{fig:ibm} are due to the poor generator used and not due to the noise of the quantum hardware.
+2. run the two-layer model on quantum hardware and include tests for that. This is doable with IBM Q but not with IonQ.
+}
 In order to benchmark our style-qGAN model on real quantum hardware we
 have performed several runs on two different types of
 architectures. This allows us to qualitatively assess the impact of
