@@ -492,9 +492,6 @@ qubits~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's 
 accessible to us using cloud resources from Amazon Web Services
 (AWS).
 
-\commentAF{(Revisit) It could be useful to expand a little more on the implementation here. This is not really featured so far. Possible start:\\
- Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Furthermore...
- }
 
 \commentJB{
  Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Indeed, we
@@ -508,7 +505,7 @@ and show that the impact of the noise is expected to be visible but should not a
 results. For the noise simulation as well as the actual runs on IBM~Q quantum devices,}
 we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor.
 For our circuit, we need only three qubits with at least one connected to both the other two.
-We use a translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo}
+We use a translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo} \commentAF{Marco, given the comment in the intro, is this right?}
 and the quantum hardware to automatically select the three qubits out of the five available
 with the best noise properties. Note that this also allows us to test the impact of potential
 interference between qubits, as IonQ qubits are fully connected while those of IBM~Q are not.
