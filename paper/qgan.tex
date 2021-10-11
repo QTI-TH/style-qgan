@@ -492,20 +492,15 @@ qubits~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's 
 accessible to us using cloud resources from Amazon Web Services
 (AWS).
 
+\commentAF{(Revisit) It could be useful to expand a little more on the implementation here. This is not really featured so far. Possible start:\\
+ Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Furthermore...
+ }
+Implementing our style-qGAN models onto real quantum hardware introduces a parameter into the model: the number of shots done with each calculation. Specifically,  we now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a set number of experiment (shots) have been carried out. These then build up expectation values that are used to create generated samples.
 
-\commentJB{
- Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Indeed, we
- now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a number of experiment (shots) to build
- up expectation values that are used to create generated samples.
-
- Prior to send runs on actual quantum hardware, we performed noise simulations using the
-IBM~Q simplified noise model provided with the properties of real device backends, to test whether
-the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise}
-and show that the impact of the noise is expected to be visible but should not alter too significantly our
-results. For the noise simulation as well as the actual runs on IBM~Q quantum devices,}
-we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor.
-For our circuit, we need only three qubits with at least one connected to both the other two.
-We use a translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo} \commentAF{Marco, given the comment in the intro, is this right?}
+ Prior to running on actual quantum hardware, we performed noise simulations using the
+IBM~Q simplified noise model provided with the properties of real device backends, to test whether the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise}and show that the impact of the noise is expected to be visible but should not alter too significantly our
+results. For the noise simulation as well as the actual runs on IBM~Q quantum devices,
+we have selected in particular the {\tt ibmq\_santiago} 5-qubit Falcon r4L quantum processor. For our circuit, we need only three qubits with at least one connected to both the other two. We use a translation layer written in \texttt{Qiskit} between our circuit coded in \texttt{Qibo}
 and the quantum hardware to automatically select the three qubits out of the five available
 with the best noise properties. Note that this also allows us to test the impact of potential
 interference between qubits, as IonQ qubits are fully connected while those of IBM~Q are not.
@@ -527,8 +522,8 @@ reasonable. The
 style-qGAN generator model deployed in this NISQ hardware still
 manages to capture the correlations and provides reasonably good
 samples when compared to the reference distribution.
-\commentJB{The KL distances reported in the third row of plots are still relatively small, at most one
-  order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.}
+The  KL distances reported in the third row of plots are still relatively small, at most one
+  order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.
 
 \begin{figure*}
 
