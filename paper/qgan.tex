@@ -200,7 +200,7 @@ where the optimum uniquely corresponds to the Nash equilibrium between the loss 
 The optimization of the parameters $\phi_g$ and $\phi_d$ is done alternatively by updating the quantum generator and classical discriminator. The optimizer used to update the steps in this work is the ADADELTA~\cite{zeiler2012adadelta}, which is a stochastic gradient descent method that monotonically decreases its learning rate. To be precise, the starting learning rates utilized are $0.1$ for the classical discriminator and $0.5$ for the quantum generator.
 
 \subsection{Quantum generator architecture}
-The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. \commentDMG{I dont think adding this info is actually that important and will actually just make things harder to understand. This is simply the architecture. If you really want to add something, id keep it to one sentence}\commentAF{had removed this comment, because agreed, but new thread by Marco in skype might indicate some confusion that could be useful to clarify also in text.}
+The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. \commentDMG{I dont think adding this info is actually that important and will actually just make things harder to understand. This is simply the architecture. If you really want to add something, id keep it to one sentence}\commentAF{had removed this comment, because agreed, but new thread by Marco in skype might indicate some confusion that could be useful to clarify also in text.}\commentDMG{agreed that it will be useful to clarify what we mean by various terms. but id hesitate to put too much explanation into the nitty-gritty of the circuit creation. but marco and anthony feel free to make a pass at this to clarify}
 
 %Additionally, the number of layers can be modified to tune the capacity of the quantum generator. %However, in the following we obtain state-of-the-art results with shallow QNNs with only one and two layers.
 %\commentAF{changed "However, as we shall see in the following sections, we manage to obtain improved state-of-the-art results with shallow QNNs, namely, with only one and two layers."} \commentCBP{I think it is important to specify that our results \textit{improve} the state-of-the-arts results for qGANs. Obviously we do not improve with respect classical techniques.}
@@ -495,8 +495,8 @@ accessible to us using cloud resources from Amazon Web Services
 
 \commentAF{(Revisit) It could be useful to expand a little more on the implementation here. This is not really featured so far. Possible start:\\
  Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Furthermore...
- }
-Implementing our style-qGAN models onto real quantum hardware introduces a parameter into the model: the number of shots done with each calculation. Specifically,  we now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a set number of experiment (shots) have been carried out. These then build up expectation values that are used to create generated samples.
+ }\commentDMG{Anthony -- see whether the paragraph that Julien added is what you were hoping for}
+Implementing our style-qGAN models onto real quantum hardware introduces a new parameter into the model: the number of shots done for each calculation. Specifically,  we now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a set number of experiment (shots) have been carried out. These then build up expectation values that are used to create generated samples.
 
  Prior to running on actual quantum hardware, we performed noise simulations using the
 IBM~Q simplified noise model provided with the properties of real device backends, to test whether the results presented in Section~\ref{sec:lhc} would be preserved. Results are provided in Appendix~\ref{sec:appendixnoise}and show that the impact of the noise is expected to be visible but should not alter too significantly our
@@ -554,25 +554,23 @@ machines. The fairly small amount of samples available is mainly due to cost con
 }
 
 
-In order to \commentJB{test different} quantum technologies we have also performed a run
+In order to test different quantum technologies we have also performed a run
 with $10^3$ samples only on IonQ machines, compared to a run on IBM~Q
 machines with also $10^3$ samples. We have selected this fairly small
 amount of samples mainly because of cost constraints to access IonQ on
-AWS.
-\commentJB{We use again a translation layer, written in Python with the
+AWS. Note that the purpose of these tests is not to compare the two different hardware technologies, but instead to test whether the novel style-qGAN architecture works well on different quantum architectures. We use again a translation layer, written in Python with the
 \texttt{Braket SDK} from Amazon, between our circuit and the quantum hardware, and we
 have also performed around 1000 shots for the measurement of the quantum circuit.
 Note that the amount of samples is quite low, but the purpose of this test is to assess
 how the algorithm performs on different quantum technologies using the same amount of
-samples, not to obtain fine-grained results, because of the constraints of our deployment
-on IonQ machines.} We show in Figure~\ref{fig:ionq} the two-dimensional projections using
-\commentJB{IBM~Q  {\tt ibmq\_santiago} machine (upper row) and IBMQ machine (lower row).
+samples, not to obtain fine-grained results. We show in Figure~\ref{fig:ionq} the two-dimensional projections using
+IBM~Q  {\tt ibmq\_santiago} machine (upper row) and IBMQ machine (lower row).
 It is clear that the sampling is sparser than in Figure~\ref{fig:ibm}, due to the lower number of
 samples, nonetheless it appears that the style-qGAN is already capturing the underlying
 distribution and correlations. This is particularly visible on the left plots for the $t-s$ correlation.
 The comparison between the upper row and the lower row also indicates that both architectures
 obtain similar results. The style-qGAN can give good results on two different quantum harware
-technologies.}
+technologies.
 
 \begin{figure*}
   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_1k.pdf}%
