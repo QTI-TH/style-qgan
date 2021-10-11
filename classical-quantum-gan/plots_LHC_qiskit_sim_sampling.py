@@ -291,11 +291,11 @@ def main(samples, bins, latent_dim, layers, training_samples, batch_samples, lr,
     plot_loss(g_loss, d_loss, nqubits, samples, bins, latent_dim, layers, training_samples, batch_samples, lr)
     
     print('generating real samples')
-    x_real = load_events('data/ppttbar_10k_events.lhe')
+    x_real = load_events('data/ppttbar_10k_events.lhe', samples=samples)
     x_real1 = []
     x_real2 = []
     x_real3 = []
-    for i in range(training_samples):
+    for i in range(min(samples, 10000)):
         x_real1.append(x_real[i][0])
         x_real2.append(x_real[i][1])
         x_real3.append(x_real[i][2])
