@@ -67,7 +67,7 @@ We propose and assess an alternative quantum generator architecture in the conte
 \commentCBP{Carlos}
  \commentJB{Julien}
  \commentMC{Marco}
- \commentAF{The label (Revisit) denotes sentences where I'm working on an alternative but think we should clarify or change sth}
+ \commentAF{Anthony}
  \commentDMG{Dorota}
  \commentSC{Stefano}
 
@@ -197,14 +197,13 @@ where the optimum uniquely corresponds to the Nash equilibrium between the loss 
 The optimization of the parameters $\phi_g$ and $\phi_d$ is done alternatively by updating the quantum generator and classical discriminator. The optimizer used to update the steps in this work is the ADADELTA~\cite{zeiler2012adadelta}, which is a stochastic gradient descent method that monotonically decreases its learning rate. To be precise, the starting learning rates utilized are $0.1$ for the classical discriminator and $0.5$ for the quantum generator.
 
 \subsection{Quantum generator architecture}
-The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. \commentDMG{I dont think adding this info is actually that important and will actually just make things harder to understand. This is simply the architecture. If you really want to add something, id keep it to one sentence}\commentAF{had removed this comment, because agreed, but new thread by Marco in skype might indicate some confusion that could be useful to clarify also in text.}\commentDMG{agreed that it will be useful to clarify what we mean by various terms. but id hesitate to put too much explanation into the nitty-gritty of the circuit creation. but marco and anthony feel free to make a pass at this to clarify}
-\commentMC{I think that the level of detail currently in the text is ok. Also, the definition of what is one layer is arbitrary and how it is in the paper is perfectly fine, just it does not matches the code.}
+The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. 
+%\commentDMG{I dont think adding this info is actually that important and will actually just make things harder to understand. This is simply the architecture. If you really want to add something, id keep it to one sentence}\commentAF{had removed this comment, because agreed, but new thread by Marco in skype might indicate some confusion that could be useful to clarify also in text.}\commentDMG{agreed that it will be useful to clarify what we mean by various terms. but id hesitate to put too much explanation into the nitty-gritty of the circuit creation. but marco and anthony feel free to make a pass at this to clarify} \commentMC{I think that the level of detail currently in the text is ok. Also, the definition of what is one layer is arbitrary and how it is in the paper is perfectly fine, just it does not matches the code.}
 %Additionally, the number of layers can be modified to tune the capacity of the quantum generator. %However, in the following we obtain state-of-the-art results with shallow QNNs with only one and two layers.
 %\commentAF{changed "However, as we shall see in the following sections, we manage to obtain improved state-of-the-art results with shallow QNNs, namely, with only one and two layers."} \commentCBP{I think it is important to specify that our results \textit{improve} the state-of-the-arts results for qGANs. Obviously we do not improve with respect classical techniques.}
 %\commentAF{Good point. If we want to write this we need to explain how and in what way we improve. We could add this in the following sections explicitly mentioning the improvements other qGANs. Alternatively we could add a sentence here, but then it might be better situated at the end of section I. } \commentCBP{Let me put here the points we improve. (1) Higher binning density (at least 1 order of magnitude higher) (2) Even with the higher binning density we obtained smaller KL divergences (3) We use a real setup (non-toy data)}\commentDMG{I have edited the end of the introduction to details the ways that we improve, as i dont think it belongs in this section. this is about the implementation itself, not the results. it will just muddy the water to include it here. We can highlight this list elsewhere. Therefore, i suggest this paragraph to be:
 %`The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.}
 The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.
-\commentAF{thought it good to comment out the discussion (still available in the tex) and shortened Dorota's suggestion to reflect how it'd look like in situ}
 
 Let us emphasize here the novelty of the quantum generator architecture used for the style-qGAN model, where the action of each qubit rotation is parameterized by the set of trainable parameters $\phi_g$ and, most importantly, the latent vector $\xi$. Specifically, we encode them by using a linear function as
 \begin{equation}
@@ -267,8 +266,8 @@ The top of Figure~\ref{fig:gamma} shows the smaller sample distribution generate
 
 Going further, in the bottom of Figure~\ref{fig:gamma} we show the same results as in the top on the larger set containing $10^5$ samples; these samples are generated with the same style-qGAN trained on $10^4$ reference samples. Again, we use for comparison a re-sampling of the reference distribution at the same size as the generated set and show both distributions on a grid with 100 linearly spaced bins. 
 %
-Having generated an order of magnitude more samples than the training set we observe that the style-qGAN model performs well. Both distributions are visually very close to each other and the KL divergence of 0.041 signals a high degree of similarity. \commentAF{Would like to quantify that it also agrees better than before}\commentDMG{doesnt the KL already do this? I dont think we need to add anything here, as it will just clutter the discussion}
-\commentAF{Would like to quantify that it also agrees better than before...trying to figure this out I found this: https://stats.stackexchange.com/questions/368000/correcting-kullback-leibler-divergence-for-size-of-datasets . A naive rescaling by a factor 0.1 between the two would mean that the qGAN did not improve with higher stats, so there's some devil in the detail. But perhaps increasing the number of bins and checking that the KL is the same would be better?}
+Having generated an order of magnitude more samples than the training set we observe that the style-qGAN model performs well. Both distributions are visually very close to each other and the KL divergence of 0.041 signals a high degree of similarity. 
+\commentAF{Based on https://stats.stackexchange.com/questions/368000/correcting-kullback-leibler-divergence-for-size-of-datasets a naive rescaling by a factor 0.1 between the two would mean that the qGAN did not improve with higher stats. But perhaps increasing the number of bins and checking that the KL is the same would be a more robust check?}
 
 %
 This behavior confirms that the style-qGAN model is able to learn the underlying
@@ -344,7 +343,7 @@ That the larger set of generated samples more closely agrees with the reference 
 %for this example, we observe that the distributions are statistically similar,
 %in fact, the corresponding KL distances are quite small and close to each other."}
 
-\commentAF{kept original as commented out tex, will implemented suggested changes in figures to see how it looks.}
+%\commentAF{kept original as commented out tex, will implemented suggested changes in figures to see how it looks.}
 
 
 
@@ -494,9 +493,6 @@ qubits~\footnote{\href{https://research.ibm.com/blog/ibm-quantum-roadmap}{IBM's 
 accessible to us using cloud resources from Amazon Web Services
 (AWS).
 
-\commentAF{(Revisit) It could be useful to expand a little more on the implementation here. This is not really featured so far. Possible start:\\
- Going towards real quantum hardware adds a new dimension to our implementation through the number of shots done with each calculation. Furthermore...
- }\commentDMG{Anthony -- see whether the paragraph that Julien added is what you were hoping for}
 Implementing our style-qGAN models onto real quantum hardware introduces a new parameter into the model: the number of shots done for each calculation. Specifically,  we now perform a quantum experiment each time we measure the three-qubit state, and we collect the results after a set number of experiment (shots) have been carried out. These then build up expectation values that are used to create generated samples.
 
  Prior to running on actual quantum hardware, we performed noise simulations using the
@@ -548,7 +544,6 @@ The  KL distances reported in the third row of plots are still relatively small,
   for each dimension. Note that we choose a grey background for the plots in the middle row to highlight when the reference and generated samples are identical. \commentAF{would like to change row order: $1,2,3 \rightarrow 1,3,2$}\commentDMG{We should use Julien's darker background}}
 \end{figure*}
 
-\commentJB{Idea of AF merged to the text.}
 During the current NISQ-era the different quantum hardware architectures are not standardized and can have limits
 on potential applications of the machines. Here, we study how the style-qGAN  performs across different quantum hardware.
 The aim is to understand whether and to what extent its performance is hardware dependent and its potential hardware transferability.
@@ -625,6 +620,7 @@ learning algorithms into the complexity of Monte Carlo simulation in HEP. We
 wish that the approach presented here will inspire new HEP applications which
 may benefit from quantum computing.
 
+\iffalse
 \section{Remaining to Do}
 \commentDMG{Things still to do, from Oct. 6 meeting}
 \begin{itemize}
@@ -634,6 +630,7 @@ may benefit from quantum computing.
 \item Keep working on this $10^4$ vs $10^5$ training versus generated vs reference
 \item Green line for Fig 7 sanity check with different pull of $10^4$ reference samples. Anthony (+ Carlos for aid if need be)
 \end{itemize}
+\fi
 
 \acknowledgments
 
