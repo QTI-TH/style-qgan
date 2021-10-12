@@ -327,8 +327,8 @@ We observe a good level of agreement, in particular in those regions where the
 sampling frequency is larger. The largest deviations are seen at the edges of the distributions, this is on the one hand an artefact from the visualisation due to data augmentation and on the other also a common limitation to the GAN method.
 
 To quantify how well the correlations have been learned beyond 
-this level we study the covariance matrices defined by the reference and the generated samples. The summed eigenvalues of the reference and generated covariance matrices give a means to estimate the similarity between the learned underlying correlations. We find agreement between the reference and generated eigenvalues to the better of $\lesssim 10\%$ for style-qGAN set-ups with equal and more than 3 latent dimensions. Recall that the latent variables are introduced in every gate of the circuit, including the entangling ones $U_{\mathrm{ent}}$.  With $D_{\mathrm{latent}}< 3$ we observe significant deviations of factors $\mathcal{O}(10)$ while for $D_{\mathrm{latent}}\geq 3$ no further significant improvement is seen. The same holds for increasing the number of layers in the style-qGAN model. This suggests that the number of latent dimensions introduced are key hyperparameters once the number of layers allows a sufficient complexity.
-\commentAF{Carlos, thanks for accepting most of the suggested changes. The motivation of the training-success sentence was to prepare for the real data case where we use 5 dimensions and 2 layers, even though we historically later found out that 3,2 or even 3,1 would have worked too. having some fluff that it trained better could be good with this viewpoint in mind?}
+this level we study the covariance matrices defined by the reference and the generated samples. The summed eigenvalues of the reference and generated covariance matrices give a means to estimate the similarity between the learned underlying correlations. We find agreement between the reference and generated eigenvalues to the better of $\lesssim 10\%$ for style-qGAN set-ups with equal and more than 3 latent dimensions. Recall that the latent variables are introduced in every gate of the circuit, including the entangling ones $U_{\mathrm{ent}}$.  With $D_{\mathrm{latent}}< 3$ we observe significant deviations of factors $\mathcal{O}(10)$ while for $D_{\mathrm{latent}}\geq 3$ no further significant improvement is seen. The same holds for increasing the number of layers in the style-qGAN model. This suggests that the number of latent dimensions introduced are key hyperparameters once the number of layers allows a sufficient complexity. However, training success also depends on the convergence of the GAN through optimization. This might make a larger than minimal set of layers and parameters a better choice in practice.
+\commentAF{Carlos, thanks for accepting most of the suggested changes. The motivation of the training-success sentence was to prepare for the real data case where we use 5 dimensions and 2 layers, even though we historically later found out that 3,2 or even 3,1 would have worked too. having some fluff that it trained better could be good with this viewpoint in mind?} \commentCBP{You are right, I added two last sentences from your previous comment. Check if you like it, if so, remove these comments.}
 
 Since the eigenvalues are known also exactly through Eq.~\ref{eq:covmat} we furthermore can compare the performance of the style-qGAN with increased generation sample size. We find that the style-qGAN with 3 latent dimensions and 1 layer (shown here)
 generates sets that reproduce the exact eigenvalues of the input covariance matrix to better than $\lesssim 6\%$ for $10^3$, $\lesssim 1.3\%$ for $5\times10^3$ and $\lesssim 0.8\%$ for $2\times10^4$ samples.
@@ -481,7 +481,7 @@ corresponding KL distance being small and close to each other.
 I think the sampling from real hardware should match the sampling with the model discussed in the paper so I suggest that we either:
 1. switch to using the one-layer generator thought. But is one layer actually sufficient to learn the distribution? If not, maybe the one deviations in figure~\ref{fig:ibm} are due to the poor generator used and not due to the noise of the quantum hardware.
 2. run the two-layer model on quantum hardware and include tests for that. This is doable with IBM Q but not with IonQ.
-}
+} \commentCBP{I modified the main text so now for the hardware implementations it displays that we used 1 layer. I think we have two possible solutions: (1) We add the exact simulation results for 1 layer in a new Appendix and we refer to it in the main text. (2) We do not add anything else. Somehow, Fig. 10 already gives some information about the exact simulation results with 1 layer by showing the ratio noiseless / noise simulation.}
 In order to benchmark our style-qGAN model on real quantum hardware we
 have performed several runs on two different types of
 architectures. This allows us to qualitatively assess the impact of
@@ -504,9 +504,9 @@ interference between qubits, as IonQ qubits are fully connected while those of I
 
 We present in Figure~\ref{fig:ibm} examples of samples that have been
 generated using {\tt ibmq\_santiago} machine on IBM~Q. We use a 3-qubit
-model with 5 latent dimensions and 2 layers, which hyperparameters are
+model with 5 latent dimensions and 1 layer, which hyperparameters are
 the same as the ones used in Section~\ref{sec:lhc} and trained on
-$10^4_{}$ samples. To compute each fake sample, we have performed 1000 shots on the
+$10^4_{}$ samples. \commentCBP{In contrast to the previous Sec. \ref{sec:lhc}, for this implementation in the quantum hardware we reduced the number of layers to 1. This means that we have trained a different style-qGAN with only 1 layer and then deployed the model to the quantum architecture. This change is motivated by the fact that we want to diminish the effect of noise as much as possible by reducing the depth of the circuit. (Refer here to the exact simulation with 1 layer Appendix if we decide to put one)} To compute each fake sample, we have performed 1000 shots on the
 quantum circuits. We display the generation of $10^5$ samples, as in the previous section,
 %of the same amount of samples
 in two-dimensional projections. The second row of plots in
@@ -514,7 +514,7 @@ Figure~\ref{fig:ibm} shows again the ratio between the reference
 samples, generated using the MC event generator, and the samples
 generated by the style-qGAN on the {\tt ibmq\_santiago} quantum
 hardware. As expected, the agreement is worse than in
-Figure~\ref{fig:ttbar} because of the noise, but still quite
+Figure~\ref{fig:ttbar} because of the noise \commentCBP{and reduced capacity of the quantum generator}, but still quite
 reasonable. The
 style-qGAN generator model deployed in this NISQ hardware still
 manages to capture the correlations and provides reasonably good
@@ -552,10 +552,10 @@ with $10^3$ samples only, on IonQ machines and seperately on IBM~Q
 machines. We have selected this fairly small amount of samples
 mainly due to external constraints on IonQ machine access on AWS.
 Note that the purpose of these tests is not to compare the two different hardware technologies,
-but instead to test whether the novel style-qGAN architecture works well on different quantum architectures.
+but instead to test whether the style-qGAN model works well on different quantum architectures.
 We use again a translation layer, written in Python with the
 \texttt{Braket SDK} from Amazon, between our circuit and the quantum hardware, and we
-have also performed around 1000 shots for the measurement of the quantum circuit.
+have also performed around 1000 shots for the measurement of the generated samples.
 Note that the amount of samples is quite low, but the purpose of this test is to assess
 how the algorithm performs on different quantum technologies using the same amount of
 samples, not to obtain fine-grained results. We show in Figure~\ref{fig:ionq} the two-dimensional projections using
@@ -641,8 +641,8 @@ project is supported by CERN's Quantum Technology Initiative.
 M.C.\ is supported by the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement number 843134.
 SC is supported by the European Research
 Council under the European Union's Horizon 2020 research and innovation
-Programme (grant agreement number 740006). \commentJB{The authors acknowledge the support of the CloudBank EU as a pilot brockering cloud service at CERN, allowing
- for access to Amazon Web Services in order to run our algorithm on IonQ hardware.}
+Programme (grant agreement number 740006). The authors acknowledge the support of the CloudBank EU as a pilot brockering cloud service at CERN, allowing
+ for access to Amazon Web Services in order to run our algorithm on IonQ hardware.
 
 
 \appendix
@@ -654,7 +654,7 @@ We have performed a noise simulation of our style-qGAN on IBM~Q device, taking a
 5-qubit Falcon r4L quantum processor that we have used for our runs on actual IBM~Q hardware.
 
 The noise model takes into account the readout error probability of each qubit (mean value of the probability
-of reading $|1\rangle$ while being in state $|0\rangle$ and the probability of reading $|0\rangle$ while being in
+of reading $|1\rangle$ while being in state $|0\rangle$, and the probability of reading $|0\rangle$ while being in
 state $|1\rangle$), the relaxation time constants of each qubit (relaxation time and dephasing time), the gate error probability
 of each basis gate, and the gate length (timing of the gate) of each basis gate. The values are taken from the calibration information
 of the selected device for the noise simulation. Note that this calibration is performed at regular intervals. The generation of our
@@ -686,13 +686,13 @@ the lower row are also comparable to the KL distances reported in Figure~\ref{fi
   model in a noise simulation of {\tt ibmq\_santiago} device (top row) trained
   with $10^4$ samples and the corresponding ratio to the generated samples on actual quantum hardware (middle row).
   Marginal samples distribution (bottom row) for each dimension compared to the the reference underlying prior MC
-   distribution.}
+   distribution. \commentCBP{In the middle row, do we want to plot noise simulation/generated or reference/noise simulation ? Anyhow, please Julien could you change the title to show the full word "simulation" instead of "simu"?}}
 \end{figure*}
 
-We also compare our noise simulation to the noiseless simulation presented in Section~\ref{sec:lhc}.
-The results shown in Figure~\ref{fig:ibmnoise2} indicate that while the noise has an impact, as expected, There are
+We also compare our noise simulation to the noiseless simulation \commentCBP{ presented in Appendix ? (in case we put an appendix for this)}.
+The results shown in Figure~\ref{fig:ibmnoise2} indicate that while the noise has an impact, as expected, there are
 still many points close the ratio 1, so that the style-qGAN still performs fairly well in a noisy environment. This has led us
-to believe that running on an actual harware gives fairly good results.
+to believe that running on an actual hardware gives fairly good results.
 
 \begin{figure*}
 
