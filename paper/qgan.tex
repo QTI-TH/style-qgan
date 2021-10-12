@@ -363,12 +363,13 @@ That the larger set of generated samples more closely agrees with the reference 
   \includegraphics[width=0.3\textwidth]{plots/3Dgaussian_posdef/3-1_RATIO_100k.pdf}
 
 
-  \caption{\label{fig:3dgauss}Two-dimensional sampling projections of a 3D
-  correlated Gaussian distribution for the style-qGAN model (first row) trained
-  with $10^4$ samples and the marginal samples distribution (middle row)
-  for each dimension. Corresponding ratio to the reference underlying
-  prior distribution (bottom row).  The style-qGAN generator model learns the correlations and
-  provides acceptable samples when compared to the reference distribution. Note that we choose a grey background for the plots in the bottom row to highlight when the reference and generated samples are identical.}
+  \caption{\label{fig:3dgauss}Marginal samples distributions for each dimension $x,y,z$
+    of the 3D correlated Gaussian distribution for the style-qGAN model trained
+    with $10^4$ samples (top row), together with the corresponding
+    two-dimensional sampling projections (middle row) and the ratio to the reference underlying
+    prior distribution (bottom row). The style-qGAN generator model learns the correlations and
+    provides acceptable samples when compared to the reference distribution. Note that we choose
+    a grey background for the plots in the bottom row to highlight when the reference and generated samples are identical.}
 \end{figure*}
 
 \begin{table}
@@ -443,25 +444,28 @@ It should be stressed that this test is slightly different from the one in the p
  
 
 \begin{figure*}
-  \includegraphics[width=0.32\textwidth]{plots/LHCttbar/s-t_FAKE_100k.pdf}%
-  \includegraphics[width=0.3\textwidth]{plots/LHCttbar/t-y_FAKE_100k.pdf}%
-  \includegraphics[width=0.31\textwidth]{plots/LHCttbar/y-s_FAKE_100k.pdf}
 
   \includegraphics[width=0.29\textwidth]{plots/LHCttbar/s-distribution_LHCdata_100k.pdf}%
   \includegraphics[width=0.29\textwidth]{plots/LHCttbar/t-distribution_LHCdata_100k.pdf}%
   \includegraphics[width=0.29\textwidth]{plots/LHCttbar/y-distribution_LHCdata_100k.pdf}
+  
+  \includegraphics[width=0.32\textwidth]{plots/LHCttbar/s-t_FAKE_100k.pdf}%
+  \includegraphics[width=0.3\textwidth]{plots/LHCttbar/t-y_FAKE_100k.pdf}%
+  \includegraphics[width=0.31\textwidth]{plots/LHCttbar/y-s_FAKE_100k.pdf}
 
   \includegraphics[width=0.32\textwidth]{plots/LHCttbar/s-t_RATIO_100k.pdf}%
   \includegraphics[width=0.3\textwidth]{plots/LHCttbar/t-y_RATIO_100k.pdf}%
   \includegraphics[width=0.31\textwidth]{plots/LHCttbar/y-s_RATIO_100k.pdf}
 
 
-  \caption{\label{fig:ttbar}Two-dimensional sampling projections for $pp
-  \rightarrow t\bar{t}$ production for the style-qGAN model (top row) trained
-  with $10^4$ samples and the marginal sample distribution (middle row)
-  for each dimension. The bottom row shows the corresponding ratio to the reference underlying
-  prior MC distribution.  The style-qGAN generator model learns the correlations and
-  provides acceptable samples when compared to the reference distribution. Note that we choose a grey background for the plots in the bottom row to highlight when the reference and generated samples are identical.
+  \caption{\label{fig:ttbar}
+    Marginal samples distributions for the physical observables $s,t,y$
+    in $pp\rightarrow t\bar{t}$ production at the LHC for the style-qGAN model trained
+    with $10^4$ samples (top row), together with the corresponding
+    two-dimensional sampling projections (middle row) and the ratio to the reference underlying
+    prior MC distribution (bottom row). The style-qGAN generator model learns the correlations and
+    provides acceptable samples when compared to the reference distribution. Note that we choose a grey
+    background for the plots in the bottom row to highlight when the reference and generated samples are identical.
 }
 \end{figure*}
 
@@ -531,28 +535,27 @@ samples when compared to the reference distribution.
 The  KL distances reported in the third row of plots are still relatively small, at most one
   order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.
 
-\begin{figure*}
+  \begin{figure*}
 
-  \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_100k.pdf}%
-  \includegraphics[width=0.305\textwidth]{plots/hardware/ibm_santiago/t-y_FAKE_IBM_100k.pdf}%
-  \includegraphics[width=0.31\textwidth]{plots/hardware/ibm_santiago/y-s_FAKE_IBM_100k.pdf}
+    \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/s-distribution_IBM_LHCdata_100k.pdf}%
+    \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/t-distribution_IBM_LHCdata_100k.pdf}%
+    \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/y-distribution_IBM_LHCdata_100k.pdf}
 
+    \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_100k.pdf}%
+    \includegraphics[width=0.305\textwidth]{plots/hardware/ibm_santiago/t-y_FAKE_IBM_100k.pdf}%
+    \includegraphics[width=0.31\textwidth]{plots/hardware/ibm_santiago/y-s_FAKE_IBM_100k.pdf}
 
-  \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/s-distribution_IBM_LHCdata_100k.pdf}%
-  \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/t-distribution_IBM_LHCdata_100k.pdf}%
-  \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/y-distribution_IBM_LHCdata_100k.pdf}
+    \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_RATIO_IBM_100k.pdf}%
+    \includegraphics[width=0.305\textwidth]{plots/hardware/ibm_santiago/t-y_RATIO_IBM_100k.pdf}%
+    \includegraphics[width=0.31\textwidth]{plots/hardware/ibm_santiago/y-s_RATIO_IBM_100k.pdf}
 
-  \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_RATIO_IBM_100k.pdf}%
-  \includegraphics[width=0.305\textwidth]{plots/hardware/ibm_santiago/t-y_RATIO_IBM_100k.pdf}%
-  \includegraphics[width=0.31\textwidth]{plots/hardware/ibm_santiago/y-s_RATIO_IBM_100k.pdf}
-
-
-  \caption{\label{fig:ibm}Example of two-dimensional sampling projections for
-  $pp \rightarrow t\bar{t}$ production using the style-qGAN generator
-  model on {\tt ibmq\_santiago} (top row) trained with $10^4$ samples and
-  the marginal sample distribution (middle row)
-  for each dimension. Corresponding ratio to the reference underlying prior MC
-  distribution (bottom row). Note that we choose a grey background for the plots in the bottom row to highlight when the reference and generated samples are identical. }
+  \caption{\label{fig:ibm}
+    Marginal samples distributions for the physical observables $s,t,y$
+    in $pp\rightarrow t\bar{t}$ production at the LHC using the style-qGAN generator model trained
+    with $10^4$ samples on {\tt ibmq\_santiago} (top row), together with the corresponding
+    two-dimensional sampling projections (middle row) and the ratio to the reference underlying
+    prior MC distribution (bottom row). Note that we choose a grey background for the plots in the bottom
+    row to highlight when the reference and generated samples are identical.}
 \end{figure*}
 
 During the current NISQ-era the different quantum hardware architectures are not standardized and can have limits
@@ -680,26 +683,28 @@ the lower row are also comparable to the KL distances reported in Figure~\ref{fi
 
 \begin{figure*}
 
-  \includegraphics[width=0.32\textwidth]{plots/hardware_noise_simulation/s-t_FAKE_100k_noise-simu.pdf}%
-  \includegraphics[width=0.305\textwidth]{plots/hardware_noise_simulation/t-y_FAKE_100k_noise-simu.pdf}%
-  \includegraphics[width=0.31\textwidth]{plots/hardware_noise_simulation/y-s_FAKE_100k_noise-simu.pdf}
-
-
   \includegraphics[width=0.29\textwidth]{plots/hardware_noise_simulation/s-distribution_LHCdata_100k_noise-simu.pdf}%
   \includegraphics[width=0.29\textwidth]{plots/hardware_noise_simulation/t-distribution_LHCdata_100k_noise-simu.pdf}%
   \includegraphics[width=0.29\textwidth]{plots/hardware_noise_simulation/y-distribution_LHCdata_100k_noise-simu.pdf}
+  
+  \includegraphics[width=0.32\textwidth]{plots/hardware_noise_simulation/s-t_FAKE_100k_noise-simu.pdf}%
+  \includegraphics[width=0.305\textwidth]{plots/hardware_noise_simulation/t-y_FAKE_100k_noise-simu.pdf}%
+  \includegraphics[width=0.31\textwidth]{plots/hardware_noise_simulation/y-s_FAKE_100k_noise-simu.pdf}
 
   \includegraphics[width=0.32\textwidth]{plots/hardware_noise_simulation/s-t_RATIO_100k_noise-generated.pdf}%
   \includegraphics[width=0.305\textwidth]{plots/hardware_noise_simulation/t-y_RATIO_100k_noise-generated.pdf}%
   \includegraphics[width=0.31\textwidth]{plots/hardware_noise_simulation/y-s_RATIO_100k_noise-generated.pdf}
 
 
-  \caption{\label{fig:ibmnoise}Example of two-dimensional sampling projections for
-  $pp \rightarrow t\bar{t}$ production using the style-qGAN generator
-  model in a noise simulation of {\tt ibmq\_santiago} device (top row) trained
-  with $10^4$ samples and the marginal samples distribution (middle row) for each dimension compared to the the reference underlying prior MC
-   distribution. Corresponding ratio to the generated samples on actual quantum hardware (bottom row).
-   \commentCBP{In the bottom row, do we want to plot noise simulation/generated or reference/noise simulation ? Anyhow, please Julien could you change the title to show the full word "simulation" instead of "simu"?}}
+  \caption{\label{fig:ibmnoise}
+    Marginal samples distributions for the physical observables $s,t,y$
+    in $pp\rightarrow t\bar{t}$ production at the LHC using the style-qGAN generator model in
+    a noise simulation of {\tt ibmq\_santiago} device (top row), trained with $10^4$ samples (top row),
+    together with the corresponding two-dimensional sampling projections (middle row) and the ratio to the reference underlying
+    prior MC distribution (bottom row). Note that we choose a grey background for the plots in the bottom
+    row to highlight when the reference and generated samples are identical.
+    \commentCBP{In the bottom row, do we want to plot noise simulation/generated or reference/noise simulation ?}
+  \commentJB{Well I have these plots and I'm not sure they display more useful information compared to the current plots.}}
 \end{figure*}
 
 We also compare our noise simulation to the noiseless simulation \commentCBP{ presented in Appendix ? (in case we put an appendix for this)}.
