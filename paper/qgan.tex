@@ -162,7 +162,7 @@ classical hardware. For this particular project, we have used the {\tt
 tensorflow}~\cite{tensorflow2015-whitepaper} backend which provides the
 possibility to use gradient descent optimizers during the training step. The
 style-qGAN model is publicly available through the {\tt Qibo}
-documentation~\cite{add_cite_tutorial}.
+documentation~\cite{qGAN_github_model}.
 
 \begin{figure}
   \includegraphics[width=0.4\textwidth]{plots/scheme2.pdf}
@@ -225,7 +225,7 @@ with
 \begin{equation}
     \label{eq:expectation}\left\langle\sigma_z^i\right\rangle = \left\langle\Psi(\phi_g,\xi)\left|\,\sigma_z^i\,\right|\Psi(\phi_g,\xi)\right\rangle \,,
 \end{equation}
-where $\Psi(\phi_g,\xi)$ is the output state from the quantum generator. Notice, however, that for other models, more sophisticated ways of generating fake samples could be more convenient to implement. For instance, one could generate a sample component by computing expectation values involving several qubits. Finally, let us briefly comment that we used a deep convolutional neural network for the discriminator. More details about the classical discriminator implementation can be found in the code~\cite{cite_code}.
+where $\Psi(\phi_g,\xi)$ is the output state from the quantum generator. Notice, however, that for other models, more sophisticated ways of generating fake samples could be more convenient to implement. For instance, one could generate a sample component by computing expectation values involving several qubits. Finally, let us briefly comment that we used a deep convolutional neural network for the discriminator. More details about the classical discriminator implementation can be found in the code~\cite{qGAN_github_code}.
 
 \section{Validation examples}
 \label{sec:validation}
