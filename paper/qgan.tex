@@ -608,6 +608,25 @@ architectures.
 \section{Conclusion}
 \label{sec:conclusion}
 \commentDMG{In the conclusion, we dont mention style-qGAN at all, but just qGANs. Might be worth including and/or differentiating the two.}\commentCBP{I believe the conclusion has to be rewritten, this is just a placeholder.}
+\commentDMG{ok so let me do a new pass through the conclusion. Ill keep the original in black and then my proposed change in my comment
+
+What do i think should be in the conclusion?
+\begin{itemize}
+\item This work focused on applying QNNs for the generation of MC events through quantum generative adverserial networks
+\item We proposed a novel quantum generator architecture - style-qGAN
+\item We trained on both toy and real data
+\item we ran on both simulated and real quantum hardware and on two different quantum hardware architectures
+\item proof of concept
+\item we were successful in improving on the state-of-the-art QNNs despite a relatively shallow circuit depth
+\item able to demonstrate that our style-qGAN was able to learn a distribution despite being trained on small sample sizes
+\end{itemize}
+
+In this work, we explore the use of quantum neutral networks (QNNs) for Monto-Carlo event generation, specifically for scattering processes at the Large Hadron Collider (LHC). We focus specifically on quantum generative adversarial networks (qGANs), which employ two competing networks, the generator and the discriminator, that are trained alternatively. In this work, we propose a novel quantum generator model. Traditionally, the prior noise distribution is provided to the quantum generator through its first quantum gate. We instead choose to embed it on every layer of the network. This allows for improvement on state-of-the-art results with a shallow QNN.  As a similar concept has been utilised in the classical context, coined as style-GANs, we choose to call our novel architecture a style-qGAN.
+
+As this is a new quantum generative architecture, the body of this work focuses on validating and assessing our methodology on various data sets and hardware architecture. In particular, we not only trained our model on toy data, namely 1D and 3D Gaussian distributions, but also on data for real quantum processes at the LHC, generated via MadGraph. For both toy data and real data, we saw evidence that the style-qGAN model could be used for data augmentation, as it was able to reproduce known reference distributions from small sample sets. Additionally, we deployed the models on two different quantum hardware architectures -- superconducting qubits (IBM~Q) and trapped ions (IonQ). Despite working with a small sample set, we saw clear evidence that the style-qGAN works well on different hardware archictures. This points to its hardware-independent viability. 
+
+The results presented here should be considered as proof-of-concept, providing a robust and reproducible starting point for future investigations. Nevertheless, this is a first attempt to bridge the power of quantum machine learning algorithms into the complexity of Monte Carlo simulation in HEP. We wish that the approach presented here will inspire new HEP applications which may benefit from quantum computing.}
+
 In this work we proposed a novel quantum neural network model for the generation
 of Monte Carlo events in the context of high energy physics (HEP). We have
 investigated and identified the most suitable ansatz for the parametrization of
@@ -642,17 +661,6 @@ learning algorithms into the complexity of Monte Carlo simulation in HEP. We
 wish that the approach presented here will inspire new HEP applications which
 may benefit from quantum computing.
 
-\iffalse
-\section{Remaining to Do}
-\commentDMG{Things still to do, from Oct. 6 meeting}
-\begin{itemize}
-\item Normalization sampling discussion/line
-\item Maybe small discussion about Fig 3 to highlight why we include it -- typical GAN training convergence that shows that archicture does what it needs to do \commentJB{done on lines 274-277, should be enough?}
-\item Add Fig 5 discription of gray and white to make it clear (and so people know to look on computer if need be) \commentJB{done}
-\item Keep working on this $10^4$ vs $10^5$ training versus generated vs reference \commentJB{this should be clear now I think}
-\item Green line for Fig 7 sanity check with different pull of $10^4$ reference samples. Anthony (+ Carlos for aid if need be) \commentJB{I think this we forget about it, so consider this point done}
-\end{itemize}
-\fi
 
 \acknowledgments
 
