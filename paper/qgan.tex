@@ -111,7 +111,7 @@ In this work, we consider the possibility to use a qGAN model in a data
 augmentation context, where the model is trained with a small amount of input
 samples and it learns how to sample the underlying distribution.
 
-% To be modified
+
 The paper is structured as follows. In Sec.~\ref{sec:implementation} we define our style-qGAN model. In Sec.~\ref{sec:validation} we
 validate the style-qGAN model using toy data. Then, in Sec.~\ref{sec:lhc} we train the style-qGAN
 generator on simulated LHC events. Finally, in Sec.~\ref{sec:deployment} we test
@@ -178,13 +178,11 @@ As previously discussed, our style-qGAN comprises of a QNN for the generator $G(
 
 In this work, we consider the binary cross-entropy for the optimization objective. The generator's loss function can be defined as
 \begin{equation}
-%  \mathcal{L}_G(\phi_g,\phi_d) = -\mathbb{E}_{z \sim p_{prior}(z)}[\log D(\phi_d,G(\phi_g,z))]  \,,
    \mathcal{L}_G(\phi_g,\phi_d) = -\mathbb{E}_{z \sim p_{\mathrm{prior}}(z)}[\log D(\phi_d,G(\phi_g,z))]  \,,
 \end{equation}
 while the discriminator's loss function can be defined as
 \begin{equation}
 \begin{split}
-%  \mathcal{L}_D(\phi_g,\phi_d) = \mathbb{E}_{x \sim p_{real}(x)}[\log D(\phi_d,x)] \\+\, \mathbb{E}_{z \sim p_{prior}(z)}[\log (1-D(\phi_d,G(\phi_g,z)))]\,.
    \mathcal{L}_D(\phi_g,\phi_d) = \mathbb{E}_{x \sim p_{\mathrm{real}}(x)}[\log D(\phi_d,x)] \\+\, \mathbb{E}_{z \sim p_{\mathrm{prior}}(z)}[\log (1-D(\phi_d,G(\phi_g,z)))]\,.
 \end{split}
 \end{equation}
@@ -200,13 +198,7 @@ where the optimum uniquely corresponds to the Nash equilibrium between the loss 
 The optimization of the parameters $\phi_g$ and $\phi_d$ is done alternatively by updating the quantum generator and classical discriminator. The optimizer used to update the steps in this work is the ADADELTA~\cite{zeiler2012adadelta}, which is a stochastic gradient descent method that monotonically decreases its learning rate. To be precise, the starting learning rates utilized are $0.1$ for the classical discriminator and $0.5$ for the quantum generator.
 
 \subsection{Quantum generator architecture}
-The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. 
-%\commentDMG{I dont think adding this info is actually that important and will actually just make things harder to understand. This is simply the architecture. If you really want to add something, id keep it to one sentence}\commentAF{had removed this comment, because agreed, but new thread by Marco in skype might indicate some confusion that could be useful to clarify also in text.}\commentDMG{agreed that it will be useful to clarify what we mean by various terms. but id hesitate to put too much explanation into the nitty-gritty of the circuit creation. but marco and anthony feel free to make a pass at this to clarify} \commentMC{I think that the level of detail currently in the text is ok. Also, the definition of what is one layer is arbitrary and how it is in the paper is perfectly fine, just it does not matches the code.}
-%Additionally, the number of layers can be modified to tune the capacity of the quantum generator. %However, in the following we obtain state-of-the-art results with shallow QNNs with only one and two layers.
-%\commentAF{changed "However, as we shall see in the following sections, we manage to obtain improved state-of-the-art results with shallow QNNs, namely, with only one and two layers."} \commentCBP{I think it is important to specify that our results \textit{improve} the state-of-the-arts results for qGANs. Obviously we do not improve with respect classical techniques.}
-%\commentAF{Good point. If we want to write this we need to explain how and in what way we improve. We could add this in the following sections explicitly mentioning the improvements other qGANs. Alternatively we could add a sentence here, but then it might be better situated at the end of section I. } \commentCBP{Let me put here the points we improve. (1) Higher binning density (at least 1 order of magnitude higher) (2) Even with the higher binning density we obtained smaller KL divergences (3) We use a real setup (non-toy data)}\commentDMG{I have edited the end of the introduction to details the ways that we improve, as i dont think it belongs in this section. this is about the implementation itself, not the results. it will just muddy the water to include it here. We can highlight this list elsewhere. Therefore, i suggest this paragraph to be:
-%`The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.}
-The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.
+The quantum generator is implemented by a QNN with trainable parameters. In particular, we employ the architecture shown in Figure~\ref{fig:circuit}. We consider a layered QNN, where each layer is composed of a set of entangling gates $U_{\rm ent}$ preceded by two alternating $R_y$ and $R_z$ single-qubit rotations. After implementing the layered network, a final layer of $R_y$ gates is applied. Note that $U_{\rm ent}$ is specific to each example and $R_j(\theta_k) = e^{-i\theta_k \sigma_j /2}$. The number of layers can be modified to tune the capacity of the quantum generator. However, in the following we improve upon state-of-the-art results with shallow QNNs that contain one and two layers.
 
 Let us emphasize here the novelty of the quantum generator architecture used for the style-qGAN model, where the action of each qubit rotation is parameterized by the set of trainable parameters $\phi_g$ and, most importantly, the latent vector $\xi$. Specifically, we encode them by using a linear function as
 \begin{equation}
@@ -313,13 +305,8 @@ this section.
 
 Following the same training procedure employed in Section~\ref{sec:gamma} and again using $10^4$ reference samples to train the style-qGAN model, we test how well our model samples a specific 3D correlated Gaussian distribution. These results are shown in Figure~\ref{fig:3dgauss}. In the top row of Figure~\ref{fig:3dgauss} we compare the one-dimensional cumulative projections of samples generated by the style-qGAN model with the reference input distribution function for $10^5$ samples. We again use a grid of 100 linearly spaced bins per dimension in order to highlight small differences between the prior reference distribution and the artificial samples.  For this example, we also observe that the distributions are statistically similar; in fact, the corresponding KL distances are quite small and close to each other. In the second row, we show $10^5$ samples produced by the style-qGAN model in two-dimensional projections. 
 
-%Following the same training procedure employed in Section~\ref{sec:gamma} and again using $10^4$ reference samples to train the style-qGAN model, we test how well our model samples a specific 3D Gaussian distribution. These results are show in Figure~\ref{fig:3dgauss}. In the first row we show $10^5$ samples produced by the style-qGAN model in two-dimensional projections. We again use a grid of 100 linearly spaced bins per dimension in order to highlight small differences between the prior reference distribution and the artificial samples. In the second row of Figure~\ref{fig:3dgauss} we compare the one dimensional cumulative projections of samples generated by the style-qGAN model with the reference input distribution function (red histogram) for $10^5$ samples. Also for this example, we observe that the distributions are statistically similar, in fact, the corresponding KL distances are quite small and close to each other.
-
 To further study the features of the style-qGAN model in the third row of plots in Figure~\ref{fig:3dgauss} we show the two-dimensional projections of the ratio between samples generated from the prior reference distribution and the style-qGAN model.
-In this way, we can visualize how well the model learns not only the distributions but also the correlations between the dimensions of the problem. A ratio of 1, given by a white coloring of the corresponding bin in the figure, would imply the reference and generated samples are identical. Note that we aim to generate unseen samples, not an identical copy of the reference set. However, at the same time, the model should not diverge significantly, depicted by deep blue and red in the figure, nor occupy space in the grey area of the figure. 
-
-We observe a good level of agreement, in particular in those regions where the
-sampling frequency is larger. The largest deviations are seen at the edges of the distributions; this can either be an artifact of visualization due to data augmentation or evidence of the limitations in our model, common to the GAN method.\commentDMG{The original sentence read `this is on the one hand an artifact from the visualisation due to data augmentation and on the other also a common limitation to the GAN method.'. Im not quite sure what was implied, as `on one hand' is not quite the right terminology to use here if i am understanding correct. Please check}
+In this way, we can visualize how well the model learns not only the distributions but also the correlations between the dimensions of the problem. A ratio of one, given by a white coloring of the corresponding bin in the figure, would imply the reference and generated samples are identical. Note that we aim to generate unseen samples, not an identical copy of the reference set. However, at the same time, the model should not diverge significantly, depicted by deep blue and red in the figure, nor occupy space in the grey area of the figure.  We observe a good level of agreement, in particular in those regions where the sampling frequency is larger. The largest deviations are seen at the edges of the distributions, where the sampling frequency is smaller. These deviations are evidence of the limitations in our model, common to the GAN method; however, their severe appearance is an artifact of visualization due to data augmentation. 
 
 To quantify how well the correlations have been learned in more depth we study the covariance matrices defined by the reference and the generated samples. The summed eigenvalues of the reference and generated covariance matrices give a means to estimate the similarity between the learned underlying correlations. We find agreement between the reference and generated eigenvalues to the better of $\lesssim 10\%$ for style-qGAN set-ups with equal and more than 3 latent dimensions. Recall that the latent variables are introduced in every gate of the circuit, including the entangling ones $U_{\mathrm{ent}}$.  With $D_{\mathrm{latent}}< 3$ we observe significant deviations of factors $\mathcal{O}(10)$ while for $D_{\mathrm{latent}}\geq 3$ no further significant improvement is seen. The same holds for increasing the number of layers in the style-qGAN model. This suggests that the number of latent dimensions introduced is a key hyperparameter once the number of layers allows a sufficient complexity. However, training success also depends on the convergence of the GAN parameters through optimization. This might make a larger than a minimal set of layers and parameters a better choice in practice.
 
@@ -327,15 +314,6 @@ Since the eigenvalues are known also exactly through Eq.~\ref{eq:covmat} we furt
 
 This analysis demonstrates a key property of a functioning GAN model -- that the larger set of generated samples more closely agrees with the reference input distribution function. The observation that our style-qGAN fulfills this property confirms its viability as functioning quantum implementation of the generative adversarial network idea for multi-dimensional, correlated data.
 
-%\commentAF{changed, would like to change order of rows in figure and also text " The second row of plots in Figure~\ref{fig:3dgauss} shows the ratio between samples generated from the prior reference distribution and the style-qGAN model. We observe a good level of agreement, in particular in those regions where the sampling frequency is larger. We observe that the style-qGAN learns the correlations between the three dimensions.
-
-%In the last row of Figure~\ref{fig:3dgauss} we compare the one dimensional
-%cumulative projections of samples generated by the style-qGAN model with the
-%reference input distribution function (red histogram) for $10^5$ samples. Also
-%for this example, we observe that the distributions are statistically similar,
-%in fact, the corresponding KL distances are quite small and close to each other."}
-
-%\commentAF{kept original as commented out tex, will implemented suggested changes in figures to see how it looks.}
 
 
 
@@ -414,9 +392,7 @@ the training.
 
 Following the same training procedure employed in the previous section, in the top row of Figure~\ref{fig:ttbar} we compare the one-dimensional cumulative projections of samples generated by the style-qGAN model with the reference input distribution function for $10^5$ samples. We use a grid of 100 linearly spaced bins for $y$ and 100 log-spaced bins for $s$ and $t$.  For this example, the distributions are again statistically similar, with the corresponding KL distance being small and close to each other. In the second row of Figure~\ref{fig:ttbar} we show $10^5$ samples produced by the style-qGAN model in two-dimensional projections.
 
-% Following the same training procedure employed in the previous section and using a $10^4$ training sample set, in the first row of Figure~\ref{fig:ttbar} we show $10^5$ samples produced by the style-qGAN model in two-dimensional projections. We use a grid of 100 linearly spaced bins for $y$ and 100 log-spaced bins for $s$ and $t$. In the second row of Figure~\ref{fig:ttbar} we compare the one dimensional cumulative projections of samples generated by the style-qGAN model with the reference input distribution function (red histogram) for $10^5$ samples. Also for this example, the distributions are statistically similar, with the corresponding KL distance being small and close to each other.
 
-%
 The bottom row of plots in Figure~\ref{fig:ttbar} shows the ratio between
 samples generated from the prior original MC distribution and the style-qGAN
 model. Again, even for this physically-realistic model, we observe a remarkable level of agreement, especially in those regions where the sampling frequency is larger. Most importantly, we observe that the style-qGAN learns
@@ -425,7 +401,7 @@ the correlations between the three dimensions.
 Applying the same reasoning as in the previous section we compute the eigenvalues of the covariance matrices derived from the reference and generated data sets. To this extent a larger sized reference data set is calculated using MadGraph ({\tt
 MG5\_aMC}). We find that the summed eigenvalues of the covariance matrices derived from samples generated by the shown style-qGAN with 5 latent dimensions and 2 layers agree with the corresponding reference to $\sim 9-13\%$ for $10^3$, $\sim 8-15\%$ for $5\times10^3$ and $\sim 7-14\%$ for $2\times10^4$ samples. Here the quoted range originates from comparing different samples of the reference data. Furthermore, we suppress effects from the inverse transformation that converts the generated sample and instead focussed on the learning capability of the style-qGAN model by estimating the covariances on the transformed reference data sets.
 %
-It should be stressed that this test is slightly different from the one in the previous section since the exact eigenvalues are not known. As a result, the sampling error of the reference enters and an agreement at the previous level should not be expected. Indeed a too close agreement would indicate the model is overfitted.  
+It should be stressed that this test is slightly different from the one in the previous section since the exact eigenvalues are not known. As a result, the sampling error of the reference enters and an agreement at the previous level should not be expected, as too close of an agreement would indicate the model is overfitted.  However, our model exhibits the expected and necessary behaviour, even when applied to real data. 
  
 
 \begin{figure*}
@@ -475,11 +451,6 @@ It should be stressed that this test is slightly different from the one in the p
 \section{Sampling from quantum hardware}
 \label{sec:deployment}
 
-\commentMC{IMPORTANT: figure~\ref{fig:ibm} on real hardware (and figure~\ref{fig:ionq} I assume) use the samples from the generator with one layer! This is different from figure~\ref{fig:ttbar} that used the two-layer 63-parameters generator given in Table~II.
-I think the sampling from real hardware should match the sampling with the model discussed in the paper so I suggest that we either:
-1. switch to using the one-layer generator thought. But is one layer actually sufficient to learn the distribution? If not, maybe the one deviations in figure~\ref{fig:ibm} are due to the poor generator used and not due to the noise of the quantum hardware.
-2. run the two-layer model on quantum hardware and include tests for that. This is doable with IBM Q but not with IonQ.
-} \commentCBP{I modified the main text so now for the hardware implementations it displays that we used 1 layer. I think we have two possible solutions: (1) We add the exact simulation results for 1 layer in a new Appendix and we refer to it in the main text. (2) We do not add anything else. Somehow, Fig. 10 already gives some information about the exact simulation results with 1 layer by showing the ratio noiseless / noise simulation.}\commentDMG{I dont feel strongly either way, but i do worry that we might be approaching the point of too many plots, thus mudding the waters. So i might suggest not including an additional appendix, as i dont think it would provide that much additional information}
 In order to benchmark our style-qGAN model on real quantum hardware, we
 have performed several runs on two different types of
 architectures. This allows us to qualitatively assess the impact of
@@ -522,33 +493,9 @@ interference between qubits, as IonQ qubits are fully connected while those of I
     a grey background for the plots at the bottom row to more clearly highlight a ratio of one between reference and generated samples, indicated by white.}
 \end{figure*}
 
-We present in Figure~\ref{fig:ibm} examples of samples that have been generated using {\tt ibmq\_santiago} machine on IBM~Q. We use a 3-qubit model with 5 latent dimensions and 1 layer, which hyperparameters are the same as the ones used in Section~\ref{sec:lhc} and trained on $10^4_{}$ samples. \commentCBP{In contrast to the previous Sec. \ref{sec:lhc}, for this implementation in the quantum hardware we reduced the number of layers to 1. This means that we have trained a different style-qGAN with only 1 layer and then deployed the model to the quantum architecture. This change is motivated by the desire to diminish the effect of noise by reducing the depth of the circuit. (Refer here to the exact simulation with 1 layer Appendix if we decide to put one)} To compute each fake sample, we have performed 1000 shots on the quantum circuits. In the top row of Figure~\ref{fig:ibm}, we compare the one-dimensional cumulative projections of samples generated by the style-qGAN model with the reference input distribution functions for $10^5$ samples. The binning choice is equivalent to that used in Fig. \ref{fig:ttbar}. In the middle row, we display the generation of $10^5$ samples in two-dimensional projections. In the bottom row of plots in Figure~\ref{fig:ibm}, we show again the ratio between the reference samples, generated using the MC event generator, and the samples generated by the style-qGAN on the {\tt ibmq\_santiago} quantum hardware. As expected, the agreement is worse than in Figure~\ref{fig:ttbar} because of the noise and reduced capacity of the quantum generator, but still quite reasonable. The style-qGAN generator model deployed in this NISQ hardware still manages to capture the correlations and provides reasonably good samples when compared to the reference distribution. The  KL distances reported in the top row of plots are still relatively small, at most one order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.
+We present in Figure~\ref{fig:ibm} examples of samples that have been generated using {\tt ibmq\_santiago} machine on IBM~Q. We use a 3-qubit model with 5 latent dimensions and 1 layer, which hyperparameters are the same as the ones used in Section~\ref{sec:lhc} and trained on $10^4_{}$ samples. In contrast to the previous Sec. \ref{sec:lhc}, for this implementation in the quantum hardware we reduced the number of layers to one. This means that we have trained a different style-qGAN with only one layer and then deployed the model to the quantum architecture. This change is motivated by the desire to diminish the effect of noise by reducing the depth of the circuit. To compute each fake sample, we have performed 1000 shots on the quantum circuits. In the top row of Figure~\ref{fig:ibm}, we compare the one-dimensional cumulative projections of samples generated by the style-qGAN model with the reference input distribution functions for $10^5$ samples. The binning choice is equivalent to that used in Fig. \ref{fig:ttbar}. In the middle row, we display the generation of $10^5$ samples in two-dimensional projections. In the bottom row of plots in Figure~\ref{fig:ibm}, we show again the ratio between the reference samples, generated using the MC event generator, and the samples generated by the style-qGAN on the {\tt ibmq\_santiago} quantum hardware. As expected, the agreement is worse than in Figure~\ref{fig:ttbar} because of the noise and reduced capacity of the quantum generator, but still quite reasonable. The style-qGAN generator model deployed in this NISQ hardware still manages to capture the correlations and provides reasonably good samples when compared to the reference distribution. The  KL distances reported in the top row of plots are still relatively small, at most one order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.
 
 
-%We present in Figure~\ref{fig:ibm} examples of samples that have been generated using {\tt ibmq\_santiago} machine on IBM~Q. We use a 3-qubit model with 5 latent dimensions and 1 layer, which hyperparameters are the same as the ones used in Section~\ref{sec:lhc} and trained on $10^4_{}$ samples. \commentCBP{In contrast to the previous Sec. \ref{sec:lhc}, for this implementation in the quantum hardware we reduced the number of layers to 1. This means that we have trained a different style-qGAN with only 1 layer and then deployed the model to the quantum architecture. This change is motivated by the desire to diminish the effect of noise by reducing the depth of the circuit. (Refer here to the exact simulation with 1 layer Appendix if we decide to put one)} To compute each fake sample, we have performed 1000 shots on the quantum circuits. We display the generation of $10^5$ samples, as in the previous section, of the same amount of samples in two-dimensional projections. The second row of plots in Figure~\ref{fig:ibm} shows again the ratio between the reference samples, generated using the MC event generator, and the samples generated by the style-qGAN on the {\tt ibmq\_santiago} quantum hardware. As expected, the agreement is worse than in Figure~\ref{fig:ttbar} because of the noise \commentCBP{and reduced capacity of the quantum generator}, but still quite reasonable. The style-qGAN generator model deployed in this NISQ hardware still manages to capture the correlations and provides reasonably good samples when compared to the reference distribution. The  KL distances reported in the third row of plots are still relatively small, at most one order of magnitude bigger than the KL distances reported in Fig.~\ref{fig:ttbar}.
-
-% \begin{figure*}
-
-%   \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/s-distribution_IBM_LHCdata_100k.pdf}%
-%   \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/t-distribution_IBM_LHCdata_100k.pdf}%
-%   \includegraphics[width=0.29\textwidth]{plots/hardware/ibm_santiago/y-distribution_IBM_LHCdata_100k.pdf}
-
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_100k.pdf}%
-%   \includegraphics[width=0.305\textwidth]{plots/hardware/ibm_santiago/t-y_FAKE_IBM_100k.pdf}%
-%   \includegraphics[width=0.31\textwidth]{plots/hardware/ibm_santiago/y-s_FAKE_IBM_100k.pdf}
-
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_RATIO_IBM_100k.pdf}%
-%   \includegraphics[width=0.305\textwidth]{plots/hardware/ibm_santiago/t-y_RATIO_IBM_100k.pdf}%
-%   \includegraphics[width=0.31\textwidth]{plots/hardware/ibm_santiago/y-s_RATIO_IBM_100k.pdf}
-
-%   \caption{\label{fig:ibm}
-%     Marginal samples distributions for the physical observables $s,t,y$
-%     in $pp\rightarrow t\bar{t}$ production at the LHC using the style-qGAN generator model trained
-%     with $10^4$ samples on {\tt ibmq\_santiago} (top row), together with the corresponding
-%     two-dimensional sampling projections (middle row) and the ratio to the reference underlying
-%     prior MC distribution (bottom row). Note that we choose
-%     a grey background for the plots at the bottom row to more clearly highlight a ratio of one between reference and generated samples, indicated by white.}
-% \end{figure*}
 
 \begin{figure*}
   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_1k.pdf}%
@@ -590,89 +537,25 @@ The comparison between the upper row and the lower row also indicates that both 
 obtain similar results. The style-qGAN can give good results on two different quantum hardware
 architectures.
 
-% \begin{figure*}
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/s-t_FAKE_IBM_1k.pdf}%
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/t-y_FAKE_IBM_1k.pdf}%
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ibm_santiago/y-s_FAKE_IBM_1k.pdf}
-
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ionQ/s-t_FAKE_ionQ_1k.pdf}%
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ionQ/t-y_FAKE_ionQ_1k.pdf}%
-%   \includegraphics[width=0.32\textwidth]{plots/hardware/ionQ/y-s_FAKE_ionQ_1k.pdf}
-
-%   \caption{\label{fig:ionq}Example of two-dimensional sampling projections for
-%   $pp \rightarrow t\bar{t}$ production using the style-qGAN generator
-%   model on {\tt ibmq\_santiago} (top row) and IonQ (bottom row) trained with $10^4$ samples.}
-% \end{figure*}
 
 
 \section{Conclusion}
 \label{sec:conclusion}
-\commentDMG{In the conclusion, we dont mention style-qGAN at all, but just qGANs. Might be worth including and/or differentiating the two.}\commentCBP{I believe the conclusion has to be rewritten, this is just a placeholder.}
-\commentDMG{ok so let me do a new pass through the conclusion. Ill keep the original in black and then my proposed change in my comment
-
-What do i think should be in the conclusion?
-\begin{itemize}
-\item This work focused on applying QNNs for the generation of MC events through quantum generative adverserial networks
-\item We proposed a novel quantum generator architecture - style-qGAN
-\item We trained on both toy and real data
-\item we ran on both simulated and real quantum hardware and on two different quantum hardware architectures
-\item proof of concept
-\item we were successful in improving on the state-of-the-art QNNs despite a relatively shallow circuit depth
-\item able to demonstrate that our style-qGAN was able to learn a distribution despite being trained on small sample sizes
-\end{itemize}
-
 In this work, we explore the use of quantum neutral networks (QNNs) for Monto-Carlo event generation, specifically for scattering processes at the Large Hadron Collider (LHC). We focus specifically on quantum generative adversarial networks (qGANs), which employ two competing networks, the generator and the discriminator, that are trained alternatively. In this work, we propose a novel quantum generator model. Traditionally, the prior noise distribution is provided to the quantum generator through its first quantum gate. We instead choose to embed it on every layer of the network. This allows for improvement on state-of-the-art results with a shallow QNN.  As a similar concept has been utilised in the classical context, coined as style-GANs, we choose to call our novel architecture a style-qGAN.
 
 As this is a new quantum generative architecture, the body of this work focuses on validating and assessing our methodology on various data sets and hardware architecture. In particular, we not only trained our model on toy data, namely 1D and 3D Gaussian distributions, but also on data for real quantum processes at the LHC, generated via MadGraph. For both toy data and real data, we saw evidence that the style-qGAN model could be used for data augmentation, as it was able to reproduce known reference distributions from small sample sets. Additionally, we deployed the models on two different quantum hardware architectures -- superconducting qubits (IBM~Q) and trapped ions (IonQ). Despite working with a small sample set, we saw clear evidence that the style-qGAN works well on different hardware archictures. This points to its hardware-independent viability. 
 
-The results presented here should be considered as proof-of-concept, providing a robust and reproducible starting point for future investigations. Nevertheless, this is a first attempt to bridge the power of quantum machine learning algorithms into the complexity of Monte Carlo simulation in HEP. We wish that the approach presented here will inspire new HEP applications which may benefit from quantum computing.}
-
-In this work we proposed a novel quantum neural network model for the generation
-of Monte Carlo events in the context of high energy physics (HEP). We have
-investigated and identified the most suitable ansatz for the parametrization of
-a quantum generative network. Using quantum circuit simulation on classical
-hardware, we show that qGAN generators are suitable for Monte Carlo event
-simulation.
-
-We highlight some advantages of the qGAN model when compared to the standard
-machine learning methodology. From a hardware implementation point of view, the
-possibility to write the specific qGAN circuit in a quantum processor, using its
-primitives (gates), will accelerate the evaluations and training performance of
-Monte Carlo sampling. We expect that real quantum devices will be more efficient
-in terms of energy power than classical hardware based on hardware accelerators
-such as graphical process units (GPUs).
-
-Furthermore, we propose a reconstruction method for evaluating the qGAN model in
-a real quantum device using measurements. This procedure brings all the
-difficulties that are typical of experimental quantum hardware, including noise,
-error corrections and decoherence. The implementation of accurate and stable
-qGAN in a real quantum device still requires the development of hardware
-architecture with lower gate error tolerances in comparison to the current
-available machines.
-
-On the other hand, our results should be considered as a proof-of-concept
-exercise, given that the quantum simulation performance are still not
-competitive with an equivalent machine learning implementation. The qGAN
-approach may show advantages when more precise quantum devices will be
-available.
-
-Nevertheless, this is a first attempt to bridge the power of quantum machine
-learning algorithms into the complexity of Monte Carlo simulation in HEP. We
-wish that the approach presented here will inspire new HEP applications which
-may benefit from quantum computing.
-
-
-\acknowledgments
+The results presented here should be considered as proof-of-concept, providing a robust and reproducible starting point for future investigations. Nevertheless, this is a first attempt to bridge the power of quantum machine learning algorithms into the complexity of Monte Carlo simulation in HEP. We wish that the approach presented here will inspire new HEP applications which may benefit from quantum computing.\acknowledgments
 
 C.B.-P. acknowledges Stavros Efthymiou for useful discussions about the
 realization of the manuscript's code. S.C.~thanks Marco Zaro and Luigi Favaro for
 discussions about classical GAN models applied to Monte Carlo events. This
 project is supported by CERN's Quantum Technology Initiative. 
 M.C.\ is supported by the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement number 843134.
-SC is supported by the European Research
+S.C. is supported by the European Research
 Council under the European Union's Horizon 2020 research and innovation
 Programme (grant agreement number 740006). The authors acknowledge the support of the CloudBank EU as a pilot brokering cloud service at CERN, allowing
- for access to Amazon Web Services in order to run our algorithm on IonQ hardware.
+ for access to Amazon Web Services in order to run our algorithm on IonQ hardware. The authors also acknowledge the use of IBM Quantum services for this work.
 
 \bibliography{qgan.bib}
  
@@ -684,21 +567,11 @@ Programme (grant agreement number 740006). The authors acknowledge the support o
 We have performed a noise simulation of our style-qGAN on IBM~Q device, taking as a device baseline the {\tt ibmq\_santiago}
 5-qubit Falcon r4L quantum processor that we have used for our runs on actual IBM~Q hardware.
 
-The noise model takes into account the readout error probability of each qubit (mean value of the probability
-of reading $|1\rangle$ while being in the state $|0\rangle$, and the probability of reading $|0\rangle$ while being in
-the state $|1\rangle$), the relaxation time constants of each qubit (relaxation time and dephasing time), the gate error probability
-of each basis gate, and the gate length (timing of the gate) of each basis gate. The values are taken from the calibration information
-of the selected device for the noise simulation. Note that this calibration is performed at regular intervals. The generation of
-$10^5$ samples on the actual machine took a week, meaning that the calibration parameters may have varied significantly
+The noise model takes into account the readout error probability of each qubit (mean value of the probability of reading $|1\rangle$ while being in the state $|0\rangle$, and the probability of reading $|0\rangle$ while being in the state $|1\rangle$), the relaxation time constants of each qubit (relaxation time and dephasing time), the gate error probability of each basis gate, and the gate length (timing of the gate) of each basis gate. The values are taken from the calibration information of the selected device for the noise simulation. Note that this calibration is performed at regular intervals. The generation of $10^5$ samples on the actual machine took a week, meaning that the calibration parameters may have varied significantly
 during the full run.
 
-\commentDMG{consistent with row ordering?}
-We show in Figure~\ref{fig:ibmnoise} the result of our noise simulation. In the bottom row plots, we compare our noise simulation
-to the run on actual IBM~Q hardware, the latter being reported in Section~\ref{sec:deployment}. The plots show a significant amount
-of white points, signaling that the noise simulation seems to capture most of the errors induced by running on actual quantum
-hardware and that errors beyond the parameters reported in the previous paragraph are subdominant. The KL distances displayed in
-the top row are also comparable to the KL distances reported in Figure~\ref{fig:ibm}. 
 
+We show in Figure~\ref{fig:ibmnoise} the result of our noise simulation. The KL distances displayed in the top row are comparable to the KL distances reported in Figure~\ref{fig:ibm}. We also compare our noise simulation to the run on actual IBM~Q hardware, the latter being reported in Section~\ref{sec:deployment}; this is shown in the bottom row. The plots show a significant amount of white points, signalling that the noise simulation seems to capture most of the errors induced by running on actual quantum hardware and that errors beyond the parameters reported in the previous paragraph are subdominant. 
 \begin{figure*}
 
   \includegraphics[width=0.29\textwidth]{plots/hardware_noise_simulation/s-distribution_LHCdata_100k_noise-simu.pdf}%
@@ -723,10 +596,10 @@ the top row are also comparable to the KL distances reported in Figure~\ref{fig:
     row to highlight when the reference and generated samples are identical.}
 \end{figure*}
 
-We also compare our noise simulation to the noiseless simulation \commentCBP{ presented in Appendix ? (in case we put an appendix for this)}.
+We also compare our noise simulation to the noiseless simulation.
 The results shown in Figure~\ref{fig:ibmnoise2} indicate that while the noise has an impact, as expected, there are
-still many points close to the ratio 1, therefore the style-qGAN still performs fairly well in a noisy environment. This has led us
-to believe that running on actual quantum hardware gives fairly good results.
+still many points close to the ratio of one; therefore the style-qGAN still performs fairly well in a noisy environment. This has led us
+to believe that running on actual quantum hardware gives good results.
 
 \begin{figure*}
 
@@ -738,6 +611,6 @@ to believe that running on actual quantum hardware gives fairly good results.
     corresponding noiseless simulation.}
 \end{figure*}
 
-%\clearpage
+
 
 \end{document}
