@@ -34,6 +34,8 @@
 \newcommand{\CERNaff}{Theoretical Physics Department, CERN, CH-1211
   Geneva 23, Switzerland.}
 
+\newcommand{\NYCU}{Institute of Physics, National Yang Ming Chiao Tung University, Hsinchu 30010, Taiwan.}
+
 \newcommand{\tii}{Quantum Research Centre, Technology Innovation Institute, Abu Dhabi, UAE}
 
 \newcommand{\bern}{Albert Einstein Center, CH-3012 Bern, Switzerland}
@@ -54,7 +56,8 @@
 \affiliation{\CERNaff}
 
 \author{Anthony Francis}
-\affiliation{\bern}
+\affiliation{\NYCU}
+\affiliation{\CERNaff}
 
 \author{\\Dorota M. Grabowska}
 \affiliation{\CERNaff}
@@ -96,7 +99,7 @@ generator, or both with quantum systems, we translate the scheme to quantum
 computing.
 
 In recent months, the spreading interest in QML has led to different qGAN
-implementations~\cite{zoufal2019quantum, zeng2019learning, situ2020quantum, hu2019quantum, benedetti2019adversarial, romero2021variational, niu2021entangling}. Our contribution here can be summarized in three distinct aspects. (1) Previous proposals employed toy data for their qGAN training. In contrast, we test our model using data for a quantum scattering process. In particular, we first train and validate our qGAN model with artificial data from known underlying probability density functions. Then, in order to test our model in a realistic set-up, we use as training sets simulated Monte Carlo events for particle physics processes at the Large Hadron Collider (LHC) at CERN. (2) We propose an alternative quantum generator architecture. Traditionally, the prior noise distribution, or latent dimension in the language of generative models, is provided to the quantum generator through its first quantum gates. We instead embed it on every layer of the network. This allows us to achieve improved state-of-the-art results with shallow QNNs. In particular, with a binning density that is at least an order of magnitude higher, we achieve significantly smaller Kullback-Leibler (KL) divergences, even when working with a realistic data-set. Note that a similar concept was introduced in the classical context~\cite{karras2019style}, coined as style-based generative adversarial network (GAN); it was proven to be extremely useful. Given this analogy with the classical literature, from now on we refer to our qGAN model as style-qGAN. (3) We validate and assess our style-qGAN in quantum hardware. Specifically, we successfully implement our model in two different quantum architectures, namely, ion traps and superconducting qubits.
+implementations~\cite{zoufal2019quantum, zeng2019learning, situ2020quantum, hu2019quantum, benedetti2019adversarial, romero2021variational, niu2021entangling}. Our contribution here can be summarized in three distinct aspects. (1) Previous proposals employed toy data for their qGAN training. In contrast, we test our model using data for a quantum scattering process. In particular, we first train and validate our qGAN model with artificial data from known underlying probability density functions. Then, in order to test our model in a realistic set-up, we use as training sets simulated Monte Carlo events for particle physics processes at the Large Hadron Collider (LHC) at CERN. (2) We propose an alternative quantum generator architecture. Traditionally, the prior noise distribution, or latent dimension in the language of generative models, is provided to the quantum generator through its first quantum gates. We instead embed it on every layer of the network. This allows us to achieve improved state-of-the-art results with shallow QNNs. In particular, with a binning density that is at least an order of magnitude higher, we achieve significantly smaller Kullback-Leibler (KL) divergences, even when working with a realistic dataset. Note that a similar concept was introduced in the classical context~\cite{karras2019style}, coined as style-based generative adversarial network (GAN); it was proven to be extremely useful. Given this analogy with the classical literature, from now on we refer to our qGAN model as style-qGAN. (3) We validate and assess our style-qGAN in quantum hardware. Specifically, we successfully implement our model in two different quantum architectures, namely, ion traps and superconducting qubits.
 
 It is important to highlight that several research groups from the high-energy
 physics (HEP) community are investigating potential applications of quantum
@@ -386,9 +389,8 @@ $U_{\rm ent}$ consists of two controlled-$R_{y}$ gates acting sequentially on
 the 3 qubits. The total number of trainable parameters is 62. The style-qGAN
 model has been trained on $10^4$ samples. See Table~\ref{table:summary_lhc} for more details. In this case, we perform a linear pre-processing of the data
 to fit the samples within $x \in [-1, 1]$ after a power
-transform~\cite{yeo2000new}. As previously, we undo this transformation after
+transform~\cite{yeo2000new} from the Python package {\tt Scikit Learn}~\cite{scikit-learn}. As previously, we undo this transformation after
 the training.
-\commentMC{What are the parameters of the transform? I think the exact transformation used should be given in the paper.}
 
 Following the same training procedure employed in the previous section, in the top row of Figure~\ref{fig:ttbar} we compare the one-dimensional cumulative projections of samples generated by the style-qGAN model with the reference input distribution function for $10^5$ samples. We use a grid of 100 linearly spaced bins for $y$ and 100 log-spaced bins for $s$ and $t$.  For this example, the distributions are again statistically similar, with the corresponding KL distance being small and close to each other. In the second row of Figure~\ref{fig:ttbar} we show $10^5$ samples produced by the style-qGAN model in two-dimensional projections.
 
@@ -534,18 +536,17 @@ It is clear that the sampling is sparser than in Figure~\ref{fig:ibm}, due to th
 samples; nonetheless, it appears that the style-qGAN is already capturing the underlying
 distribution and correlations. This is particularly visible on the left plots for the $t-s$ correlation.
 The comparison between the upper row and the lower row also indicates that both architectures
-obtain similar results. The style-qGAN can give good results on two different quantum hardware
-architectures.
-
-
+obtain similar results. The style-qGAN can give good results on two different quantum hardware architectures.
 
 \section{Conclusion}
 \label{sec:conclusion}
-In this work, we explore the use of quantum neutral networks (QNNs) for Monto-Carlo event generation, specifically for scattering processes at the Large Hadron Collider (LHC). We focus specifically on quantum generative adversarial networks (qGANs), which employ two competing networks, the generator and the discriminator, that are trained alternatively. In this work, we propose a novel quantum generator model. Traditionally, the prior noise distribution is provided to the quantum generator through its first quantum gate. We instead choose to embed it on every layer of the network. This allows for improvement on state-of-the-art results with a shallow QNN.  As a similar concept has been utilised in the classical context, coined as style-GANs, we choose to call our novel architecture a style-qGAN.
+In this work, we explore the use of quantum neutral networks (QNNs) for Monto-Carlo event generation, specifically for scattering processes at the Large Hadron Collider (LHC). We focus specifically on quantum generative adversarial networks (qGANs), which employ two competing networks, the generator and the discriminator, that are trained alternatively. In this work, we propose a novel quantum generator model. Traditionally, the prior noise distribution is provided to the quantum generator through its first quantum gates. We instead choose to embed it on every layer of the network. This allows for improvement on state-of-the-art results with a shallow QNN.  As a similar concept has been utilised in the classical context, coined as style-GANs, we choose to call our novel architecture a style-qGAN.
 
-As this is a new quantum generative architecture, the body of this work focuses on validating and assessing our methodology on various data sets and hardware architecture. In particular, we not only trained our model on toy data, namely 1D and 3D Gaussian distributions, but also on data for real quantum processes at the LHC, generated via MadGraph. For both toy data and real data, we saw evidence that the style-qGAN model could be used for data augmentation, as it was able to reproduce known reference distributions from small sample sets. Additionally, we deployed the models on two different quantum hardware architectures -- superconducting qubits (IBM~Q) and trapped ions (IonQ). Despite working with a small sample set, we saw clear evidence that the style-qGAN works well on different hardware archictures. This points to its hardware-independent viability. 
+As this is a new quantum generative architecture, the body of this work focuses on validating and assessing our methodology on various data sets and hardware architecture. In particular, we not only trained our model on toy data, namely 1D gamma and 3D correlated Gaussian distributions, but also on data for real quantum processes at the LHC, generated via MadGraph. For both toy data and real data, we noticed evidence that the style-qGAN model could be used for data augmentation, as it was able to reproduce known reference distributions from small sample sets. Additionally, we deployed the models on two different quantum hardware architectures -- superconducting qubits (IBM~Q) and trapped ions (IonQ). Despite working with a small sample set, we observed that the style-qGAN works well on different hardware archictures. This points to its hardware-independent viability. 
 
-The results presented here should be considered as proof-of-concept, providing a robust and reproducible starting point for future investigations. Nevertheless, this is a first attempt to bridge the power of quantum machine learning algorithms into the complexity of Monte Carlo simulation in HEP. We wish that the approach presented here will inspire new HEP applications which may benefit from quantum computing.\acknowledgments
+The results presented here should be considered as proof-of-concept, providing a robust and reproducible starting point for future investigations. Nevertheless, this is a first attempt to bridge the power of quantum machine learning algorithms into the complexity of Monte Carlo simulation in HEP. We wish that the approach presented here will inspire new HEP applications which may benefit from quantum computing.
+
+\acknowledgments
 
 C.B.-P. acknowledges Stavros Efthymiou for useful discussions about the
 realization of the manuscript's code. S.C.~thanks Marco Zaro and Luigi Favaro for
