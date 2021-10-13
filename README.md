@@ -1,6 +1,6 @@
 # Style-qGAN
 
-A style based Quantum Generative model for MC event generation.
+A style based Quantum Generative Adversarial Network (style-qGAN) model for Monte Carlo event generation.
 
 ## Tutorial
 
