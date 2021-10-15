@@ -16,5 +16,5 @@ This repository contains prototypes of qGAN models using [Qibo](https://github.c
 ## Citation policy
 
 If you use the package please cite the following references:
-- https://arxiv.org/abs/xxxx.xxxxx
+- https://arxiv.org/abs/2110.06933
 - https://doi.org/10.5281/zenodo.5567077
