@@ -185,21 +185,21 @@ def main(latent_dim, layers, training_samples, n_epochs, batch_samples, lr):
     # define hamiltonian to generate fake samples
     def hamiltonian1():
         id = [[1, 0], [0, 1]]
-        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = hamiltonians.Z(1).matrix
         m0 = np.kron(id, np.kron(id, m0))
         ham = hamiltonians.Hamiltonian(3, m0)
         return ham
     
     def hamiltonian2():
         id = [[1, 0], [0, 1]]
-        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = hamiltonians.Z(1).matrix
         m0 = np.kron(id, np.kron(m0, id))
         ham = hamiltonians.Hamiltonian(3, m0)
         return ham
     
     def hamiltonian3():
         id = [[1, 0], [0, 1]]
-        m0 = hamiltonians.Z(1, numpy=True).matrix
+        m0 = hamiltonians.Z(1).matrix
         m0 = np.kron(m0, np.kron(id, id))
         ham = hamiltonians.Hamiltonian(3, m0)
         return ham
